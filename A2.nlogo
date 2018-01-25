@@ -20,6 +20,8 @@ to setup
     setup-food distribution
     set-color
   ]
+
+  reset-ticks
 end
 
 ; set up nest - patch procedure
@@ -87,6 +89,8 @@ end
 
 to go
   ask ants [
+    ; initial delay for ants leaving the nest
+    if (who >= ticks) [stop]
     ifelse (color = brown) [look-for-food][
       ifelse (color = lime) [return-to-nest True] [
         ifelse (color = red) [return-to-nest False][]
@@ -102,9 +106,8 @@ to go
     set-color
   ]
 
-  show counter
   ; reset the ticks to allow another 10 ants to leave the nest
-  set counter 0
+  if (ticks < ant-population) [tick-advance 10]
 
 end
 
@@ -185,26 +188,7 @@ to wiggle-to [destination-patch]
   face destination-patch
   rt random 40
   lt random 40
-
-  ; delay for departure from nest so that only 10 ants can leave the nest at each time step
-  let nest-to-outside? False
-  ; check initially if in nest
-  ask patch-here [if nest? [set nest-to-outside? True]]
-  ; now check if destination outside nest
-  ask destination-patch [
-      ifelse (not nest?)
-      [set nest-to-outside? (nest-to-outside? and True)]
-      [set nest-to-outside? (nest-to-outside? and False)]
-  ]
-  ; move only if initially in nest and one of the first 10 ants to leave the nest
-  ; or if already outside of nest
-  if (nest-to-outside? and counter < 10)
-  [
-    set counter (counter + 1)
-    fd 1
-  ]
-  if (not nest-to-outside?) [fd 1]
-
+  fd 1
 end
 
 ; if ant is at edge of the NetLogo world, it turns around
@@ -313,7 +297,7 @@ ant-population
 ant-population
 1
 1000
-65.0
+370.0
 1
 1
 NIL
@@ -392,7 +376,10 @@ If an ant reaches the boundary of the grid in the NetLogo world, then it changes
 To simulate the different foraging behaviors of army ant species, we will use at least two different initial food distributions:
 a) E. burchelli: site contains 1 unit of food with probability of 1/2
 b) E. rapax: site contains 400 units of food with probability of 1/100
-c) rare: site contains 2 units of food with probability of 1/10
+
+Both a) and b) are modeled after real life foraging behaviours. We include a new  distribution:
+
+c) sparse: site contains 2 units of food with probability of 1/10
 
 Distributions c) is inspired by a) and b); it creates a sparser distribution of food than a) but denser than b).
 
