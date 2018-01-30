@@ -2,16 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SlytherinScript : MonoBehaviour {
+public class Slytherin : MonoBehaviour {
     private GameObject game;
 
     // player's targets
     private GameObject snitch;
-    private Vector3 snitchPosition;
-
     private GameObject startPoint;
-    private Vector3 startPosition;
-
 
     // player's qualities
     public float velocity;
@@ -20,8 +16,9 @@ public class SlytherinScript : MonoBehaviour {
 
     float playerDistance;
     private System.Random random;
+    private bool wasHit;
 
-    public Rigidbody body;
+    public Rigidbody body { get; private set; }
 
     // Called before Start()
     private void Awake()
@@ -39,37 +36,46 @@ public class SlytherinScript : MonoBehaviour {
         snitch = GameObject.Find("Snitch");
         startPoint = GameObject.Find("S_Start_Point");
 
+        random = new System.Random();
+        wasHit = false;
+
         velocity = 13.0f;
         acceleration = 17.0f;
         probTackle = 0.7f;
+        playerDistance = 10;
 
         body.velocity = transform.forward * velocity;
         body.position = getStartPosition();
-        random = new System.Random();
-        playerDistance = 10;
     }
 
     // Update is called once per frame
     void Update()
     {
-        // The player will move towards the snitch
-        transform.LookAt(snitch.transform);
-        body.AddRelativeForce(Vector3.forward * acceleration, ForceMode.Acceleration);
-
-        RaycastHit hit;
-        Vector3 fwd = transform.TransformDirection(Vector3.forward);
-
-        Debug.DrawRay(transform.position, fwd * playerDistance);
-
-        if (Physics.Raycast(transform.position,  fwd, out hit, playerDistance))
+        if (wasHit)
         {
-            if (hit.collider.gameObject.name.Contains("Player"))
-            {
-                transform.Rotate(new Vector3(0, 0.7f, 0) * Time.deltaTime * acceleration, Space.World);
-                print("Slytherin: There is a player in front of me!");
-            }
+            body.AddForce(Vector3.down * acceleration, ForceMode.Acceleration);
+        } else
+        {
+            // The player will move towards the snitch
+            transform.LookAt(snitch.transform);
+            body.AddRelativeForce(Vector3.forward * acceleration, ForceMode.Acceleration);
 
+            RaycastHit hit;
+            Vector3 fwd = transform.TransformDirection(Vector3.forward);
+
+            Debug.DrawRay(transform.position, fwd * playerDistance);
+
+            if (Physics.Raycast(transform.position, fwd, out hit, playerDistance))
+            {
+                if (hit.collider.gameObject.name.Contains("Player"))
+                {
+                    transform.Rotate(new Vector3(0, 0.7f, 0) * Time.deltaTime * acceleration, Space.World);
+                    print("Slytherin: There is a player in front of me!");
+                }
+
+            }
         }
+        
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -81,14 +87,20 @@ public class SlytherinScript : MonoBehaviour {
         }
         else if (collision.gameObject.name == "S_player")
         {
-
+            double aProb = random.NextDouble();
+            if (aProb < probTackle)
+            {
+                collision.gameObject.SendMessage("wasHitByOpponent");
+            }
         }
         else if (collision.gameObject.name == "Field")
         {
             transform.position = getStartPosition();
-            print("Slytherin collided with field");
             transform.LookAt(snitch.transform);
             body.AddRelativeForce(Vector3.forward * acceleration, ForceMode.Acceleration);
+            wasHit = false;
+
+            print("Slytherin collided with field");
 
         }
     }
@@ -105,12 +117,12 @@ public class SlytherinScript : MonoBehaviour {
     */
     private Vector3 getStartPosition()
     {
-
         return new Vector3(startPoint.transform.position.x, startPoint.transform.position.y, startPoint.transform.position.z);
     }
 
-    private void hitTheGround()
+    private void wasHitByOpponent()
     {
-
+        wasHit = true;
     }
+    
 }

@@ -2,20 +2,28 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameScript : MonoBehaviour {
+public class Game : MonoBehaviour {
     private int s_score;
     private int g_score;
+
+    GameObject[] s_team;
+    GameObject[] g_team;
+
+    Transform s_prefab;
+    Transform g_prefab;
 
 	// Use this for initialization
 	void Start () {
         s_score = 0;
         g_score = 0;
-	}
+
+        for (int i = 0; i < 3; i++)
+        {
+            GameObject slytherin = Instantiate(Resources.Load("Prefabs/S_Player")) as GameObject;
+            GameObject griffindor = Instantiate(Resources.Load("Prefabs/G_Player")) as GameObject;
+        }
+    }
 	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 
     void pointForSlytherin()
     {

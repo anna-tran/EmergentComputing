@@ -3,7 +3,7 @@
 /**
  * Directed movement for the Snitch in the Quidditch game
  */
-public class SnitchScript : MonoBehaviour {
+public class GoldenSnitch: MonoBehaviour {
     private float velocity;
     private Vector3 currentDirection;
     private float acceleration;
