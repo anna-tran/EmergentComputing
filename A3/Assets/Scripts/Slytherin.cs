@@ -32,7 +32,7 @@ public class Slytherin : MonoBehaviour {
         body.detectCollisions = true;
         body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 
-        game = GameObject.Find("Game");
+        game = GameObject.Find("Quidditch_Game");
         snitch = GameObject.Find("Snitch");
         startPoint = GameObject.Find("S_Start_Point");
 
@@ -49,7 +49,7 @@ public class Slytherin : MonoBehaviour {
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         if (wasHit)
         {
@@ -63,14 +63,13 @@ public class Slytherin : MonoBehaviour {
             RaycastHit hit;
             Vector3 fwd = transform.TransformDirection(Vector3.forward);
 
-            Debug.DrawRay(transform.position, fwd * playerDistance);
+            //Debug.DrawRay(transform.position, fwd * playerDistance);
 
             if (Physics.Raycast(transform.position, fwd, out hit, playerDistance))
             {
                 if (hit.collider.gameObject.name.Contains("Player"))
                 {
-                    transform.Rotate(new Vector3(0, 0.7f, 0) * Time.deltaTime * acceleration, Space.World);
-                    print("Slytherin: There is a player in front of me!");
+                    transform.Rotate(new Vector3(0, 1, 0) * Time.deltaTime * acceleration, Space.World);
                 }
 
             }
@@ -84,8 +83,9 @@ public class Slytherin : MonoBehaviour {
         if (collision.gameObject.name == "Snitch")
         {
             game.SendMessage("pointForSlytherin");
+
         }
-        else if (collision.gameObject.name == "S_player")
+        else if (collision.gameObject.name == "G_Player")
         {
             double aProb = random.NextDouble();
             if (aProb < probTackle)
@@ -100,21 +100,10 @@ public class Slytherin : MonoBehaviour {
             body.AddRelativeForce(Vector3.forward * acceleration, ForceMode.Acceleration);
             wasHit = false;
 
-            print("Slytherin collided with field");
 
         }
     }
-    /*
-    private void OnCollisionExit(Collision collision)
-    {
-        //print("collided with " + collision.gameObject.name);
-        if (collision.gameObject.name == "Field")
-        {
-            transform.position = getStartPosition();
-            print(transform.position.ToString());
-        }
-    }
-    */
+
     private Vector3 getStartPosition()
     {
         return new Vector3(startPoint.transform.position.x, startPoint.transform.position.y, startPoint.transform.position.z);

@@ -107,4 +107,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13c183233d354724b8d7de4b0e5c4756, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  griffindor: {fileID: 0}
+  g_player: {fileID: 54262816711264178, guid: ef5b80d7b90f85640ae8ee0f398b23b9, type: 2}
+  spawner: {fileID: 4740805538731464}

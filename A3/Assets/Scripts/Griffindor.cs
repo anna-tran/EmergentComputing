@@ -14,9 +14,11 @@ public class Griffindor : MonoBehaviour {
     public float acceleration;
     public float probTackle;
 
-    float playerDistance;
-    private System.Random random;
     private bool wasHit;
+    private float playerDistance;
+    private float personalRadius;
+    private System.Random random;
+    
 
     public Rigidbody body { get; private set; }
 
@@ -31,12 +33,13 @@ public class Griffindor : MonoBehaviour {
         body.detectCollisions = true;
         body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 
-        game = GameObject.Find("Game");
+        game = GameObject.Find("Quidditch_Game");
         snitch = GameObject.Find("Snitch");
         startPoint = GameObject.Find("G_Start_Point");
 
         random = new System.Random();
         playerDistance = 10;
+        personalRadius = 3;
         wasHit = false;
 
         velocity = 16.0f;
@@ -49,7 +52,7 @@ public class Griffindor : MonoBehaviour {
     }
 	
 	// Update is called once per frame
-	void Update () {
+	void FixedUpdate () {
         if (wasHit)
         {
             body.AddForce(Vector3.down * acceleration, ForceMode.Acceleration);
@@ -63,14 +66,13 @@ public class Griffindor : MonoBehaviour {
             RaycastHit hit;
             Vector3 fwd = transform.TransformDirection(Vector3.forward);
 
-            Debug.DrawRay(transform.position, fwd * playerDistance);
+            //Debug.DrawRay(transform.position, fwd * playerDistance);
 
             if (Physics.Raycast(transform.position, fwd, out hit, playerDistance))
             {
                 if (hit.collider.gameObject.name.Contains("Player"))
                 {
-                    transform.Rotate(new Vector3(0, -0.7f, 0) * Time.deltaTime * acceleration, Space.World);
-                    print("Griffindor: There is a player in front of me!");
+                    transform.Rotate(new Vector3(0, -1, 0) * Time.deltaTime * acceleration, Space.World);
                 }
 
             }
@@ -79,13 +81,17 @@ public class Griffindor : MonoBehaviour {
             
     }
 
+
+
     private void OnCollisionEnter(Collision collision)
     {
         //print("collided with " + collision.gameObject.name);
         if (collision.gameObject.name == "Snitch")
         {
             game.SendMessage("pointForGriffindor");
-        } else if (collision.gameObject.name == "S_player")
+
+        }
+        else if (collision.gameObject.name == "S_player")
         {
             double aProb = random.NextDouble();
             if (aProb < probTackle)
@@ -99,20 +105,9 @@ public class Griffindor : MonoBehaviour {
             body.AddRelativeForce(Vector3.forward * acceleration, ForceMode.Acceleration);
             wasHit = false;
 
-            print("Griffindor collided with field");
         }
     }
-    /*
-    private void OnCollisionExit(Collision collision)
-    {
-        //print("collided with " + collision.gameObject.name);
-        if (collision.gameObject.name == "Field")
-        {
-            transform.position = getStartPosition();
-            print(transform.position.ToString());
-        }
-    }
-    */
+
     private Vector3 getStartPosition()
     {
         

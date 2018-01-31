@@ -8,8 +8,6 @@ public class GoldenSnitch: MonoBehaviour {
     private Vector3 currentDirection;
     private float acceleration;
     System.Random random;
-    int frames = 0;          // counter for how often snitch will change directions
-    int maxFrames = 15;      // number of frames before snitch will change directions
 
     public Rigidbody body;
 
@@ -35,26 +33,19 @@ public class GoldenSnitch: MonoBehaviour {
         changeToRandomDirection();
         body.velocity = transform.forward * velocity;
         body.AddForce(currentDirection * acceleration, ForceMode.VelocityChange);
-
-
     }
     
     // Update is called once per frame to check if snitch should change directions
-    void Update () {
-        if (frames == maxFrames)
-        {
+    void FixedUpdate () {
             changeToRandomDirection();
-            body.AddForce(currentDirection * acceleration, ForceMode.VelocityChange);
-            frames = 0;
-        }
-        frames++;
+            body.AddForce(currentDirection * acceleration, ForceMode.Acceleration);
     }
 
     // Set new direction for snitch
     void changeToRandomDirection()
     {
         currentDirection[0] = (float) random.NextDouble();
-        currentDirection[1] = (float) random.NextDouble();
+        currentDirection[1] = ((random.NextDouble() > 0.5f) ? -1 : 1 );
         currentDirection[2] = (float) random.NextDouble();
         currentDirection = currentDirection.normalized;
         //print("direction : " + currentDirection.ToString());

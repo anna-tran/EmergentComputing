@@ -3,14 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class GriffindorSpawner : MonoBehaviour {
-    public Griffindor griffindor;
+    public Rigidbody g_player;
+    public Transform spawner;
+
 	// Use this for initialization
 	void Start () {
-        griffindor = new Griffindor();
-        for (int i = 0; i < 20; i++)
+        // Currently there is one Griffindor player on the field
+        // To create a team of 20, instantiate 19 more players
+        for (int i = 0; i < 19; i++)
         {
-            Griffindor g = Instantiate<Griffindor>(griffindor);
+            delaySpawn();
+            Rigidbody g_copy;
+            g_copy = Instantiate(g_player, spawner.position, spawner.rotation) as Rigidbody;
         }
     }
-	
+
+    IEnumerator delaySpawn()
+    {
+        yield return new WaitForSecondsRealtime(2);
+    }
 }

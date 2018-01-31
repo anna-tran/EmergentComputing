@@ -16,12 +16,6 @@ public class Game : MonoBehaviour {
 	void Start () {
         s_score = 0;
         g_score = 0;
-
-        for (int i = 0; i < 3; i++)
-        {
-            GameObject slytherin = Instantiate(Resources.Load("Prefabs/S_Player")) as GameObject;
-            GameObject griffindor = Instantiate(Resources.Load("Prefabs/G_Player")) as GameObject;
-        }
     }
 	
 
