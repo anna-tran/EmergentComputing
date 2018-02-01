@@ -10,8 +10,11 @@ public class Griffindor : MonoBehaviour {
     private GameObject startPoint;
 
     // player's qualities
+    [Range(1.0f,16.0f)]
     public float velocity;
+    [Range(1.0f, 20.0f)]
     public float acceleration;
+    [Range(0.1f, 1.0f)]
     public float probTackle;
 
     private bool wasHit;

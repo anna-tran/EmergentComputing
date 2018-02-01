@@ -5,13 +5,7 @@ using UnityEngine;
 public class Game : MonoBehaviour {
     private int s_score;
     private int g_score;
-
-    GameObject[] s_team;
-    GameObject[] g_team;
-
-    Transform s_prefab;
-    Transform g_prefab;
-
+    
 	// Use this for initialization
 	void Start () {
         s_score = 0;

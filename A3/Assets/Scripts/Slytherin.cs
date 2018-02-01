@@ -10,8 +10,12 @@ public class Slytherin : MonoBehaviour {
     private GameObject startPoint;
 
     // player's qualities
+    // player's qualities
+    [Range(1.0f, 13.0f)]
     public float velocity;
+    [Range(1.0f, 17.0f)]
     public float acceleration;
+    [Range(0.0f, 1.0f)]
     public float probTackle;
 
     float playerDistance;
@@ -79,7 +83,6 @@ public class Slytherin : MonoBehaviour {
 
     private void OnCollisionEnter(Collision collision)
     {
-        //print("collided with " + collision.gameObject.name);
         if (collision.gameObject.name == "Snitch")
         {
             game.SendMessage("pointForSlytherin");
