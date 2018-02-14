@@ -197,7 +197,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05105526c94907a4d9d3593ba39c79b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  velocity: 0
+  velocity: 16
   acceleration: 0
   probTackle: 0
 --- !u!114 &114948745550102716
