@@ -30,7 +30,10 @@ public class TriangleMesh : MonoBehaviour {
         };
         // create an array of integers
         // order for Unity to read indices of 'vertices' array
-        triangles = new int[] { 0, 1, 2 };
+        triangles = new int[] {
+            0, 1, 2,    // top face
+            0, 2, 1     // bottom face
+        };
     }
 
     void CreateMesh()
