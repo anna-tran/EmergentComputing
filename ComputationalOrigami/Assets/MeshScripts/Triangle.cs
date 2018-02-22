@@ -4,92 +4,78 @@ using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter))]
 public class Triangle : MonoBehaviour {
-    Mesh mesh;
+
+    public static int UP = 0;
+    public static int DOWN = 1;
+
+    // up, down
+    Vector3[] directions;
     Transform[] pivots;
-    Vector3 direction;
-    public List<Edge> edges { get; set; }
+    
     bool rotatable;
     
-
-    private void Awake()
-    {
-
-        edges = new List<Edge>();
-        mesh = GetComponent<MeshFilter>().mesh;
-        int[] tris = mesh.triangles;
-        HashSet<HashSet<int>> uniqueEdges = new HashSet<HashSet<int>>();
-        for (int i = 0; i < tris.Length; i += 3)
-        {
-            HashSet<int> verticeSet = new HashSet<int> { tris[i], tris[i + 1], tris[i + 2] };
-            if (!uniqueEdges.Contains(verticeSet))
-            {
-                uniqueEdges.Add(verticeSet);
-            }
-            
-        }
-
-        foreach (HashSet<int> verticeSet in uniqueEdges)
-        {
-            int[] vertices = new int[3];
-            verticeSet.CopyTo(vertices);
-            int v1 = vertices[0];
-            int v2 = vertices[1];
-            int v3 = vertices[2];
-
-            edges.Add(new Edge(v1, v2));
-            edges.Add(new Edge(v1, v3));
-            edges.Add(new Edge(v2, v3));
-        }
-    }
-
 
 
     void Start()
     {
         rotatable = true;
-        int num_children = gameObject.transform.childCount;
-        pivots = new Transform[num_children];
-        for (int i = 0; i < num_children; i++)
-        {
-            Transform pivot = gameObject.transform.GetChild(i).transform;
-            pivots[i] = pivot;
-        }
+        directions = new Vector3[2];
+        directions[0] = transform.TransformDirection(new Vector3(0, 1, 0));
+        directions[1] = transform.TransformDirection(new Vector3(-0.5f, 0, -0.5f));
 
-
-        direction = transform.TransformDirection(new Vector3(-0.5f, 0, -0.5f));
+        pivots = new Transform[2];
+        pivots[0] = gameObject.transform.Find("Pivot_Hyp_Up");
+        pivots[1] = gameObject.transform.Find("Pivot_Hyp_Down");
+        
     }
 
-    public void Rotate()
+    public void Update()
     {
         if (rotatable)
         {
             float degreesPerSecond = 50.0f;
-            transform.RotateAround(pivots[0].position, direction,degreesPerSecond * Time.deltaTime);
+            Debug.DrawRay(transform.position, directions[0], Color.blue);
+            transform.RotateAround(pivots[0].position, directions[0], degreesPerSecond * Time.deltaTime);
+        }
+
+    }
+
+
+    public void Rotate(int direction_index)
+    {
+        if (rotatable)
+        {
+
+            float degreesPerSecond = 50.0f;
+            Debug.DrawRay(pivots[direction_index].position, directions[direction_index], Color.red);
+            transform.RotateAround(pivots[direction_index].position, directions[direction_index],degreesPerSecond * Time.deltaTime);
         } 
        
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        
+        
+
+        if (collision.gameObject.name.Equals("Corner_In") && !collision.transform.IsChildOf(transform))
+        {
+            print(collision.gameObject.name);
+            rotatable = false;
+        }
     }
 
 
     void OnCollisionStay(Collision collision)
     {
-        foreach (ContactPoint contact in collision.contacts)
-        {
-            Debug.DrawRay(contact.point, contact.normal, Color.red);
-        }
+        
 
-        string colls = gameObject.name + "\n";
-        for (int i = 0; i < collision.contacts.Length; i++)
+        if (collision.gameObject.name.Equals("Corner_In") && !collision.transform.IsChildOf(transform))
         {
-            ContactPoint contact = collision.contacts[i];
-            Debug.DrawRay(contact.point, contact.normal, Color.red);
-            if (Math.Abs(contact.point.x) < 0.01f &&
-                Math.Abs(contact.point.y) < 0.01f &&
-                Math.Abs(contact.point.z) < 0.01f)
-                
-            {              
-                rotatable = false;
-            }
+            print(collision.gameObject.name);
+            rotatable = false;
         }
 
     }
+    
 }
