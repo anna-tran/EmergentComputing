@@ -69,7 +69,7 @@ public class Four_Tri : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        FoldHorizontal(UP);
+        //FoldHorizontal(UP);
 	}
 
 

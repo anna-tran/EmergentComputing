@@ -28,9 +28,6 @@ public class Triangle : MonoBehaviour {
         pivots[0] = transform.Find("Pivot_Hyp_Up").transform;
         pivots[1] = transform.Find("Pivot_Hyp_Down").transform;
 
-        other = GameObject.Find("Sphere").transform;
-
-
     }
 
 
@@ -50,26 +47,17 @@ public class Triangle : MonoBehaviour {
 
     void OnCollisionEnter(Collision collision)
     {
-        
-        
+        print(collision.gameObject.name);
 
-        if (collision.gameObject.name.Equals("Corner_In") && !collision.transform.IsChildOf(transform))
+
+        if (collision.gameObject.name.Contains("Corner_In") && !collision.transform.IsChildOf(transform))
         {
+            gameObject.AddComponent<HingeJoint>();
+            gameObject.GetComponent<HingeJoint>().connectedBody = collision.rigidbody;
             print(collision.gameObject.name);
             rotatable = false;
         }
     }
 
-
-    void OnCollisionStay(Collision collision)
-    {
-        
-
-        if (collision.gameObject.name.Equals("Corner_In") && !collision.transform.IsChildOf(transform))
-        {
-            rotatable = false;
-        }
-
-    }
     
 }

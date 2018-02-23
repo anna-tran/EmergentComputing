@@ -21,20 +21,19 @@ public class TriSquare : MonoBehaviour
         col.size = GetComponent<MeshFilter>().mesh.bounds.size;
 
     }
-    /*
+    
     void Update()
     {
 
         tri2.Rotate(Triangle.UP);
     }
-    */
+    
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.name.Equals("Corner_Out") && !collision.transform.IsChildOf(transform))
+        if (collision.gameObject.name.Contains("Corner_Out") && !collision.transform.IsChildOf(transform))
         {
-            print(transform.name +  " collided with " + collision.collider.GetComponentInParent<TriSquare>().name);
-            print(collision.contacts);
+            //print(transform.name +  " collided with " + collision.collider.GetComponentInParent<TriSquare>().name);
             gameObject.SendMessageUpwards("SetHorizontalRotation", false);
         }
     }
