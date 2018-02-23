@@ -66,9 +66,21 @@ public class Four_Tri : MonoBehaviour {
 
     }
 
+    void FoldDiagonal(TriSquare a_trisquare)
+    {
+        a_trisquare.FoldDiagonal();
+    }
+
 	
 	// Update is called once per frame
 	void Update () {
+        if (trisquares[0].IsDiagFoldable())
+        {
+            FoldDiagonal(trisquares[0]);
+        } else
+        {
+            FoldHorizontal(UP);
+        }
         //FoldHorizontal(UP);
 	}
 

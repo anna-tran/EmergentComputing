@@ -12,14 +12,14 @@ public class Triangle : MonoBehaviour {
     Vector3[] directions;
     Transform[] pivots;
     
-    bool rotatable;
+    bool diag_foldable;
 
     Transform other;
 
 
     void Start()
     {
-        rotatable = true;
+        diag_foldable = true;
         directions = new Vector3[2];
         directions[0] = transform.TransformDirection(new Vector3(1, 0, 1));
         directions[1] = transform.TransformDirection(new Vector3(-1, 0, -1));
@@ -33,9 +33,9 @@ public class Triangle : MonoBehaviour {
 
 
 
-    public void Rotate(int direction_index)
+    public void FoldDiagonal(int direction_index)
     {
-        if (rotatable)
+        if (diag_foldable)
         {
             Vector3 dir = directions[direction_index];
             float degreesPerSecond = 50.0f;
@@ -47,7 +47,6 @@ public class Triangle : MonoBehaviour {
 
     void OnCollisionEnter(Collision collision)
     {
-        print(collision.gameObject.name);
 
 
         if (collision.gameObject.name.Contains("Corner_In") && !collision.transform.IsChildOf(transform))
@@ -55,8 +54,13 @@ public class Triangle : MonoBehaviour {
             gameObject.AddComponent<HingeJoint>();
             gameObject.GetComponent<HingeJoint>().connectedBody = collision.rigidbody;
             print(collision.gameObject.name);
-            rotatable = false;
+            diag_foldable = false;
         }
+    }
+
+    public bool IsDiagFoldable()
+    {
+        return diag_foldable;
     }
 
     

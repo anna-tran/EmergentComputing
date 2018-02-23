@@ -22,25 +22,32 @@ public class TriSquare : MonoBehaviour
 
     }
     
-    void Update()
-    {
 
-        tri2.Rotate(Triangle.UP);
+    public void FoldDiagonal()
+    {
+        tri2.FoldDiagonal(Triangle.DOWN);
+    }
+
+    public bool IsDiagFoldable()
+    {
+        return tri2.IsDiagFoldable();
     }
     
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.name.Contains("Corner_Out") && !collision.transform.IsChildOf(transform))
+        if (collision.gameObject.name.Contains("Corner_Out") 
+            && !collision.transform.IsChildOf(transform)
+            && GetComponent<Collider>().bounds.Intersects(collision.collider.bounds))
         {
-            //print(transform.name +  " collided with " + collision.collider.GetComponentInParent<TriSquare>().name);
+            gameObject.AddComponent<HingeJoint>();
+            gameObject.GetComponent<HingeJoint>().connectedBody = collision.rigidbody;
+            print(transform.name +  " collided with " + collision.collider.GetComponentInParent<TriSquare>().name
+                + " -- " + collision.collider.name);
             gameObject.SendMessageUpwards("SetHorizontalRotation", false);
         }
     }
 
-    private void OnCollisionStay(Collision collision)
-    {
-        
-    }
+
 
 }
