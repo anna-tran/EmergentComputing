@@ -13,42 +13,37 @@ public class Triangle : MonoBehaviour {
     Transform[] pivots;
     
     bool rotatable;
-    
+
+    Transform other;
 
 
     void Start()
     {
         rotatable = true;
         directions = new Vector3[2];
-        directions[0] = transform.TransformDirection(new Vector3(0, 1, 0));
-        directions[1] = transform.TransformDirection(new Vector3(-0.5f, 0, -0.5f));
+        directions[0] = transform.TransformDirection(new Vector3(1, 0, 1));
+        directions[1] = transform.TransformDirection(new Vector3(-1, 0, -1));
 
         pivots = new Transform[2];
-        pivots[0] = gameObject.transform.Find("Pivot_Hyp_Up");
-        pivots[1] = gameObject.transform.Find("Pivot_Hyp_Down");
-        
-    }
+        pivots[0] = transform.Find("Pivot_Hyp_Up").transform;
+        pivots[1] = transform.Find("Pivot_Hyp_Down").transform;
 
-    public void Update()
-    {
-        if (rotatable)
-        {
-            float degreesPerSecond = 50.0f;
-            Debug.DrawRay(transform.position, directions[0], Color.blue);
-            transform.RotateAround(pivots[0].position, directions[0], degreesPerSecond * Time.deltaTime);
-        }
+        other = GameObject.Find("Sphere").transform;
+
 
     }
+
+
 
 
     public void Rotate(int direction_index)
     {
         if (rotatable)
         {
-
+            Vector3 dir = directions[direction_index];
             float degreesPerSecond = 50.0f;
-            Debug.DrawRay(pivots[direction_index].position, directions[direction_index], Color.red);
-            transform.RotateAround(pivots[direction_index].position, directions[direction_index],degreesPerSecond * Time.deltaTime);
+            Debug.DrawRay(pivots[direction_index].position, dir, Color.red);
+            transform.RotateAround(pivots[direction_index].position, dir,degreesPerSecond * Time.deltaTime);
         } 
        
     }
@@ -72,7 +67,6 @@ public class Triangle : MonoBehaviour {
 
         if (collision.gameObject.name.Equals("Corner_In") && !collision.transform.IsChildOf(transform))
         {
-            print(collision.gameObject.name);
             rotatable = false;
         }
 

@@ -21,7 +21,7 @@ public class Four_Tri : MonoBehaviour {
     void Start () {
         trisquares = new TriSquare[4];
         for (int i = 1; i <= 4; i++) {
-            trisquares[i - 1] = gameObject.transform.Find("TriSquare (" + i + ")").GetComponent<TriSquare>();
+            trisquares[i - 1] = gameObject.transform.Find("TriSquare " + i).GetComponent<TriSquare>();
             if (trisquares[i-1] == null)
             {
                 print("null at trisquares index " + i);

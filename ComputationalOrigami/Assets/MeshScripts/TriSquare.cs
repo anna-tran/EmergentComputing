@@ -5,8 +5,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class TriSquare : MonoBehaviour {
-
+public class TriSquare : MonoBehaviour
+{
+    BoxCollider col;
     Triangle tri1;
     Triangle tri2;
 
@@ -15,31 +16,32 @@ public class TriSquare : MonoBehaviour {
     {
         tri1 = gameObject.transform.Find("Triangle 1").GetComponent<Triangle>();
         tri2 = gameObject.transform.Find("Triangle 2").GetComponent<Triangle>();
+
+        col = transform.GetComponent<Collider>() as BoxCollider;
+        col.size = GetComponent<MeshFilter>().mesh.bounds.size;
+
     }
-/*
+    /*
     void Update()
     {
-        
-        if (gameObject.name.Contains("1"))
-            tri2.Rotate(Triangle.UP);
+
+        tri2.Rotate(Triangle.UP);
     }
     */
-    void OnCollisionEnter(Collision collision)
+
+    private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.name.Equals("Corner_Out") && !collision.transform.IsChildOf(transform))
         {
+            print(transform.name +  " collided with " + collision.collider.GetComponentInParent<TriSquare>().name);
+            print(collision.contacts);
             gameObject.SendMessageUpwards("SetHorizontalRotation", false);
         }
-
     }
 
-    void OnCollisionStay(Collision collision)
+    private void OnCollisionStay(Collision collision)
     {
-        if (collision.gameObject.name.Equals("Corner_Out") && !collision.transform.IsChildOf(transform))
-        {
-            gameObject.SendMessageUpwards("SetHorizontalRotation", false);
-        }
-
+        
     }
 
 }
