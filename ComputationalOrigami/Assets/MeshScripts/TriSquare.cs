@@ -25,7 +25,7 @@ public class TriSquare : MonoBehaviour
 
     public void FoldDiagonal()
     {
-        tri2.FoldDiagonal(Triangle.DOWN);
+        tri2.FoldDiagonal(Triangle.UP);
     }
 
     public bool IsDiagFoldable()
@@ -36,7 +36,9 @@ public class TriSquare : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.name.Contains("Corner_Out") 
+        print(transform.name + " touching " + collision.collider.GetComponentInParent<TriSquare>().name
+                + " -- " + collision.collider.name);
+        if (collision.gameObject.name.Contains("Corner") 
             && !collision.transform.IsChildOf(transform)
             && GetComponent<Collider>().bounds.Intersects(collision.collider.bounds))
         {

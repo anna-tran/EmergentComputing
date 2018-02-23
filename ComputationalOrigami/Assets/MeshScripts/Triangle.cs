@@ -51,8 +51,7 @@ public class Triangle : MonoBehaviour {
 
         if (collision.gameObject.name.Contains("Corner_In") && !collision.transform.IsChildOf(transform))
         {
-            gameObject.AddComponent<HingeJoint>();
-            gameObject.GetComponent<HingeJoint>().connectedBody = collision.rigidbody;
+
             print(collision.gameObject.name);
             diag_foldable = false;
         }
