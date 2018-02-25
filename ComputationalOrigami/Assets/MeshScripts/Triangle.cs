@@ -8,17 +8,19 @@ public class Triangle : MonoBehaviour {
     public static int UP = 0;
     public static int DOWN = 1;
 
+
+    Rigidbody rb;
     // up, down
-    Vector3[] directions;
+    public Vector3[] directions { get; set; }
     Transform[] pivots;
     
     bool diag_foldable;
 
-    Transform other;
-
 
     void Start()
     {
+        rb = GetComponent<Rigidbody>();
+
         diag_foldable = true;
         directions = new Vector3[2];
         directions[0] = transform.TransformDirection(new Vector3(1, 0, 1));
@@ -30,29 +32,39 @@ public class Triangle : MonoBehaviour {
 
     }
 
-
-
+    private void addForce()
+    {
+        if (gameObject.name.Contains("2"))
+        {
+            rb.AddForce(Vector3.up * 3, ForceMode.Acceleration);
+        }
+            
+    }
 
     public void FoldDiagonal(int direction_index)
     {
         if (diag_foldable)
         {
+           
             Vector3 dir = directions[direction_index];
             float degreesPerSecond = 50.0f;
             Debug.DrawRay(pivots[direction_index].position, dir, Color.red);
             transform.RotateAround(pivots[direction_index].position, dir,degreesPerSecond * Time.deltaTime);
+            
         } 
        
     }
 
-    void OnCollisionEnter(Collision collision)
+    void OnTriggerEnter(Collider other)
     {
 
 
-        if (collision.gameObject.name.Contains("Corner_In") && !collision.transform.IsChildOf(transform))
+        if (other.name.Contains("Corner_In") && !other.transform.IsChildOf(transform))
         {
-
-            print(collision.gameObject.name);
+            rb.isKinematic = true;
+            rb.velocity = Vector3.zero;
+            Debug.Log(transform.name + " collided with " + other.GetComponentInParent<TriSquare>().name
+                    + " -- " + other.name);
             diag_foldable = false;
         }
     }

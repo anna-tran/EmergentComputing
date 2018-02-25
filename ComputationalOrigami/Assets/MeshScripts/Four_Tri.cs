@@ -51,19 +51,34 @@ public class Four_Tri : MonoBehaviour {
 
     void FoldHorizontal(int direction)
     {
+        Vector3 z_dir;
+        if (direction == UP)
+        {
+            z_dir = Vector3.back;
+        }
+        else //if (direction == DOWN)
+        {
+            z_dir = Vector3.forward;
+        }
         if (horz_rotatable)
         {
-            int degreesPerSecond = 20;
+            int degreesPerSecond = 60;
             Debug.DrawRay(pivots[1 + (4 * direction)].position, Vector3.back.normalized, Color.red);
-            trisquares[0].transform.RotateAround(pivots[1 + (4 * direction)].position, Vector3.back, degreesPerSecond * Time.deltaTime);
-            trisquares[3].transform.RotateAround(pivots[3 + (4 * direction)].position, Vector3.back, degreesPerSecond * Time.deltaTime);
+            trisquares[0].transform.RotateAround(pivots[1 + (4 * direction)].position, z_dir, degreesPerSecond * Time.deltaTime);
+            trisquares[3].transform.RotateAround(pivots[3 + (4 * direction)].position, z_dir, degreesPerSecond * Time.deltaTime);
         }
         
     }
 
-    void FoldVertical()
+    void FoldVertical(int direction)
     {
-
+        if (vert_rotatable)
+        {
+            int degreesPerSecond = 60;
+            Debug.DrawRay(pivots[1 + (4 * direction)].position, Vector3.back.normalized, Color.red);
+            trisquares[1].transform.RotateAround(pivots[0 + (4 * direction)].position, Vector3.back, degreesPerSecond * Time.deltaTime);
+            trisquares[2].transform.RotateAround(pivots[2 + (4 * direction)].position, Vector3.back, degreesPerSecond * Time.deltaTime);
+        }
     }
 
     void FoldDiagonal(TriSquare a_trisquare)
@@ -74,21 +89,31 @@ public class Four_Tri : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (trisquares[0].IsDiagFoldable())
+        if (trisquares[1].IsDiagFoldable())
         {
-            FoldDiagonal(trisquares[0]);
-        } else
+            FoldDiagonal(trisquares[1]);
+        }
+        else if (horz_rotatable)
         {
             FoldHorizontal(UP);
+            
+        } else if (vert_rotatable)
+        {
+
         }
         //FoldHorizontal(UP);
 	}
-
+    
 
 
     public void SetHorizontalRotation(bool rotatable)
     {
         horz_rotatable = rotatable;
+    }
+
+    public void SetVerticalRotation(bool rotatable)
+    {
+        vert_rotatable = rotatable;
     }
 
 

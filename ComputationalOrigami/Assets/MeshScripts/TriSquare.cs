@@ -7,45 +7,55 @@ using UnityEngine;
 
 public class TriSquare : MonoBehaviour
 {
-    BoxCollider col;
-    Triangle tri1;
-    Triangle tri2;
+    Collider col;
+    Transform tri1;
+    Transform tri2;
 
     // Use this for initialization
     void Start()
     {
-        tri1 = gameObject.transform.Find("Triangle 1").GetComponent<Triangle>();
-        tri2 = gameObject.transform.Find("Triangle 2").GetComponent<Triangle>();
+        tri1 = gameObject.transform.Find("Triangle 1");
+        tri2 = gameObject.transform.Find("Triangle 2");
 
-        col = transform.GetComponent<Collider>() as BoxCollider;
-        col.size = GetComponent<MeshFilter>().mesh.bounds.size;
-
+        col = transform.GetComponent<Collider>();
+        
     }
     
+    void Update()
+    {
+        
+        col.bounds.Encapsulate(tri1.GetComponent<Collider>().bounds);
+        col.bounds.Encapsulate(tri2.GetComponent<Collider>().bounds);
+    }
 
+    
     public void FoldDiagonal()
     {
-        tri2.FoldDiagonal(Triangle.UP);
+        Triangle t2 = tri2.GetComponent<Triangle>();
+        Vector3 dir = tri2.position - tri1.position;
+        Vector3 perp = Vector3.Cross(dir, Vector3.up).normalized;
+        Debug.DrawRay(tri2.position, dir, Color.yellow);
+        t2.directions[0] = perp;
+        t2.directions[1] = -perp;
+        t2.FoldDiagonal(Triangle.UP);
     }
 
     public bool IsDiagFoldable()
     {
-        return tri2.IsDiagFoldable();
+        return tri2.GetComponent<Triangle>().IsDiagFoldable();
     }
-    
 
-    private void OnCollisionEnter(Collision collision)
+
+    void OnTriggerEnter(Collider other)
     {
-        print(transform.name + " touching " + collision.collider.GetComponentInParent<TriSquare>().name
-                + " -- " + collision.collider.name);
-        if (collision.gameObject.name.Contains("Corner") 
-            && !collision.transform.IsChildOf(transform)
-            && GetComponent<Collider>().bounds.Intersects(collision.collider.bounds))
+
+        if (other.name.Contains("Corner") 
+            && !other.transform.IsChildOf(transform)
+            && col.bounds.Intersects(other.bounds)
+            )
         {
-            gameObject.AddComponent<HingeJoint>();
-            gameObject.GetComponent<HingeJoint>().connectedBody = collision.rigidbody;
-            print(transform.name +  " collided with " + collision.collider.GetComponentInParent<TriSquare>().name
-                + " -- " + collision.collider.name);
+            Debug.Log(transform.name + " collided with " + other.GetComponentInParent<TriSquare>().name
+                    + " -- " + other.name);
             gameObject.SendMessageUpwards("SetHorizontalRotation", false);
         }
     }
