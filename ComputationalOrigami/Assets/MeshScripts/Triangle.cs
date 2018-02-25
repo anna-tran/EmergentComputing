@@ -8,7 +8,7 @@ public class Triangle : MonoBehaviour {
     public static int UP = 0;
     public static int DOWN = 1;
 
-
+    Collider col;
     Rigidbody rb;
     // up, down
     public Vector3[] directions { get; set; }
@@ -20,6 +20,7 @@ public class Triangle : MonoBehaviour {
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        col = transform.GetComponent<Collider>();
 
         diag_foldable = true;
         directions = new Vector3[2];
@@ -47,7 +48,7 @@ public class Triangle : MonoBehaviour {
         {
            
             Vector3 dir = directions[direction_index];
-            float degreesPerSecond = 50.0f;
+            float degreesPerSecond = 70.0f;
             Debug.DrawRay(pivots[direction_index].position, dir, Color.red);
             transform.RotateAround(pivots[direction_index].position, dir,degreesPerSecond * Time.deltaTime);
             
@@ -55,16 +56,31 @@ public class Triangle : MonoBehaviour {
        
     }
 
+    void OnCollisionEnter(Collision collision)
+    {
+
+
+        if (collision.collider.name.Contains("Corner_In")
+            && !collision.collider.transform.IsChildOf(transform))
+        {
+            gameObject.AddComponent<FixedJoint>();
+            GetComponent<FixedJoint>().connectedBody = collision.collider.GetComponent<Rigidbody>();
+            //Debug.Log(transform.name + " collided with " + other.GetComponentInParent<TriSquare>().name
+            //        + " -- " + other.name);
+            diag_foldable = false;
+        }
+    }
+
     void OnTriggerEnter(Collider other)
     {
 
 
-        if (other.name.Contains("Corner_In") && !other.transform.IsChildOf(transform))
+        if (other.name.Contains("Corner_In") )
         {
-            rb.isKinematic = true;
-            rb.velocity = Vector3.zero;
-            Debug.Log(transform.name + " collided with " + other.GetComponentInParent<TriSquare>().name
-                    + " -- " + other.name);
+            gameObject.AddComponent<FixedJoint>();
+            GetComponent<FixedJoint>().connectedBody = other.GetComponent<Rigidbody>();
+            //Debug.Log(transform.name + " collided with " + other.GetComponentInParent<TriSquare>().name
+            //        + " -- " + other.name);
             diag_foldable = false;
         }
     }

@@ -47,10 +47,17 @@ public class Four_Tri : MonoBehaviour {
         horz_rotatable = true;
         vert_rotatable = true;
 
+        AddSpringJoint(trisquares[0].gameObject, trisquares[1].gameObject);
+        AddSpringJoint(trisquares[1].gameObject, trisquares[2].gameObject);
+        AddSpringJoint(trisquares[2].gameObject, trisquares[3].gameObject);
+        AddSpringJoint(trisquares[3].gameObject, trisquares[0].gameObject);
+        gameObject.AddComponent<Collider>();
     }
 
     void FoldHorizontal(int direction)
     {
+        for (int i = 0; i < 4; i++)
+            trisquares[i].cease_fold_parent = "SetHorizontalRotation";
         Vector3 z_dir;
         if (direction == UP)
         {
@@ -72,35 +79,43 @@ public class Four_Tri : MonoBehaviour {
 
     void FoldVertical(int direction)
     {
+        for (int i = 0; i < 4; i++)
+            trisquares[i].cease_fold_parent = "SetVerticalRotation";
+        Vector3 z_dir;
+        if (direction == UP)
+        {
+            z_dir = Vector3.left;
+        }
+        else //if (direction == DOWN)
+        {
+            z_dir = Vector3.right;
+        }
         if (vert_rotatable)
         {
             int degreesPerSecond = 60;
             Debug.DrawRay(pivots[1 + (4 * direction)].position, Vector3.back.normalized, Color.red);
-            trisquares[1].transform.RotateAround(pivots[0 + (4 * direction)].position, Vector3.back, degreesPerSecond * Time.deltaTime);
-            trisquares[2].transform.RotateAround(pivots[2 + (4 * direction)].position, Vector3.back, degreesPerSecond * Time.deltaTime);
+            trisquares[0].transform.RotateAround(pivots[0 + (4 * direction)].position, z_dir, degreesPerSecond * Time.deltaTime);
+            trisquares[1].transform.RotateAround(pivots[2 + (4 * direction)].position, z_dir, degreesPerSecond * Time.deltaTime);
         }
+
     }
 
-    void FoldDiagonal(TriSquare a_trisquare)
+    void FoldDiagonal(TriSquare a_trisquare, int direction)
     {
-        a_trisquare.FoldDiagonal();
+        a_trisquare.FoldDiagonal(direction);
     }
 
 	
 	// Update is called once per frame
 	void Update () {
-        if (trisquares[1].IsDiagFoldable())
+        if (vert_rotatable)
         {
-            FoldDiagonal(trisquares[1]);
+            FoldVertical(UP);
+        } else
+        {
+            print(GetComponent<Collider>().bounds.size);
         }
-        else if (horz_rotatable)
-        {
-            FoldHorizontal(UP);
-            
-        } else if (vert_rotatable)
-        {
-
-        }
+         
         //FoldHorizontal(UP);
 	}
     
@@ -116,6 +131,11 @@ public class Four_Tri : MonoBehaviour {
         vert_rotatable = rotatable;
     }
 
+    void AddSpringJoint(GameObject go1, GameObject go2) 
+    {
+        go1.AddComponent<SpringJoint>();
+        GetComponent<SpringJoint>().connectedBody = go2.GetComponent<Rigidbody>();
+    }
 
 }
 

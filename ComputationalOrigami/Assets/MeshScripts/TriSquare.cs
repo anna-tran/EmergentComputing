@@ -7,6 +7,8 @@ using UnityEngine;
 
 public class TriSquare : MonoBehaviour
 {
+
+    public String cease_fold_parent { get; set; }
     Collider col;
     Transform tri1;
     Transform tri2;
@@ -29,7 +31,7 @@ public class TriSquare : MonoBehaviour
     }
 
     
-    public void FoldDiagonal()
+    public void FoldDiagonal(int direction)
     {
         Triangle t2 = tri2.GetComponent<Triangle>();
         Vector3 dir = tri2.position - tri1.position;
@@ -37,7 +39,7 @@ public class TriSquare : MonoBehaviour
         Debug.DrawRay(tri2.position, dir, Color.yellow);
         t2.directions[0] = perp;
         t2.directions[1] = -perp;
-        t2.FoldDiagonal(Triangle.UP);
+        t2.FoldDiagonal(direction);
     }
 
     public bool IsDiagFoldable()
@@ -49,14 +51,16 @@ public class TriSquare : MonoBehaviour
     void OnTriggerEnter(Collider other)
     {
 
-        if (other.name.Contains("Corner") 
-            && !other.transform.IsChildOf(transform)
-            && col.bounds.Intersects(other.bounds)
+        if (other.name.Contains("Tri_Center") 
+                && !other.transform.IsChildOf(transform)
+                && col.bounds.Intersects(other.bounds)
             )
         {
+            gameObject.AddComponent<SpringJoint>();
+            GetComponent<SpringJoint>().connectedBody = other.GetComponent<Rigidbody>();
             Debug.Log(transform.name + " collided with " + other.GetComponentInParent<TriSquare>().name
                     + " -- " + other.name);
-            gameObject.SendMessageUpwards("SetHorizontalRotation", false);
+            gameObject.SendMessageUpwards(cease_fold_parent, false);
         }
     }
 
