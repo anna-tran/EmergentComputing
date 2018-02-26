@@ -30,8 +30,9 @@ public class Triangle : MonoBehaviour {
         pivots = new Transform[2];
         pivots[0] = transform.Find("Pivot_Hyp_Up").transform;
         pivots[1] = transform.Find("Pivot_Hyp_Down").transform;
-
     }
+
+
 
     private void addForce()
     {
@@ -79,8 +80,22 @@ public class Triangle : MonoBehaviour {
         {
             gameObject.AddComponent<FixedJoint>();
             GetComponent<FixedJoint>().connectedBody = other.GetComponent<Rigidbody>();
-            //Debug.Log(transform.name + " collided with " + other.GetComponentInParent<TriSquare>().name
-            //        + " -- " + other.name);
+            
+            GameObject[] vertices = GameObject.FindGameObjectsWithTag("Vertice");
+            GameObject[] touching_vertices = new GameObject[2];
+            int i = 0;
+            foreach(GameObject v in vertices)
+            {
+                if (v.GetComponent<Renderer>().bounds.Intersects(GetComponent<Renderer>().bounds) && !v.name.Contains("Vertice5"))
+                {
+                    touching_vertices[i] = v;
+                    i++;
+                }
+
+            }
+            Edge e = new Edge(touching_vertices[0], touching_vertices[1]);
+            gameObject.SendMessageUpwards("AddEdgeToParent", e);
+
             diag_foldable = false;
         }
     }

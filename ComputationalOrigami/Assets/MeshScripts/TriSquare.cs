@@ -39,7 +39,14 @@ public class TriSquare : MonoBehaviour
         Debug.DrawRay(tri2.position, dir, Color.yellow);
         t2.directions[0] = perp;
         t2.directions[1] = -perp;
-        t2.FoldDiagonal(direction);
+        if (IsDiagFoldable())
+        {
+            t2.FoldDiagonal(direction);
+        } else
+        {
+
+        }
+           
     }
 
     public bool IsDiagFoldable()
@@ -47,6 +54,11 @@ public class TriSquare : MonoBehaviour
         return tri2.GetComponent<Triangle>().IsDiagFoldable();
     }
 
+
+    public void AddEdgeToParent(Edge e)
+    {
+        gameObject.SendMessageUpwards("AddEdge", e);
+    }
 
     void OnTriggerEnter(Collider other)
     {
@@ -58,8 +70,8 @@ public class TriSquare : MonoBehaviour
         {
             gameObject.AddComponent<SpringJoint>();
             GetComponent<SpringJoint>().connectedBody = other.GetComponent<Rigidbody>();
-            Debug.Log(transform.name + " collided with " + other.GetComponentInParent<TriSquare>().name
-                    + " -- " + other.name);
+            //Debug.Log(transform.name + " collided with " + other.GetComponentInParent<TriSquare>().name
+                    //+ " -- " + other.name);
             gameObject.SendMessageUpwards(cease_fold_parent, false);
         }
     }

@@ -10,6 +10,8 @@ public class Four_Tri : MonoBehaviour {
     // P1       P3
     // 4    P4  3
     TriSquare[] trisquares;
+    HashSet<Edge> edges;
+    List<GameObject> vertices;
 
     // 0 to 3 UP
     // 4 to 7 DOWN
@@ -22,42 +24,52 @@ public class Four_Tri : MonoBehaviour {
         trisquares = new TriSquare[4];
         for (int i = 1; i <= 4; i++) {
             trisquares[i - 1] = gameObject.transform.Find("TriSquare " + i).GetComponent<TriSquare>();
-            if (trisquares[i-1] == null)
-            {
-                print("null at trisquares index " + i);
-            }
         }
-
         pivots = new Transform[8];
         for (int i = 1; i <= 4; i++) {
             pivots[i - 1] = gameObject.transform.Find("Pivot" + i + "_Up");
-            if (pivots[i - 1] == null)
-            {
-                print("null at pivots index " + i);
-            }
         }
         for (int i = 5; i <= 8; i++) {
             pivots[i - 1] = gameObject.transform.Find("Pivot" + (i-4) + "_Down");
-            if (pivots[i - 1] == null)
-            {
-                print("null at pivots index " + i);
-            }
+        }
+        vertices = new List<GameObject>();
+        for (int i = 0; i < 5; i++) {
+            vertices.Add(GameObject.Find("Vertice" + (i+1)));
         }
 
         horz_rotatable = true;
         vert_rotatable = true;
 
-        AddSpringJoint(trisquares[0].gameObject, trisquares[1].gameObject);
-        AddSpringJoint(trisquares[1].gameObject, trisquares[2].gameObject);
-        AddSpringJoint(trisquares[2].gameObject, trisquares[3].gameObject);
-        AddSpringJoint(trisquares[3].gameObject, trisquares[0].gameObject);
-        gameObject.AddComponent<Collider>();
+        edges = new HashSet<Edge>();
+    }
+
+
+
+    void InitializeEdges(HashSet<Edge> edges)
+    {
+        // 1 connects to 2, 4, 5
+        edges.Add(new Edge(vertices[0], vertices[1]));
+        edges.Add(new Edge(vertices[0], vertices[3]));
+        edges.Add(new Edge(vertices[0], vertices[4]));
+
+        // 2 connects to 3, 5
+        edges.Add(new Edge(vertices[1], vertices[2]));
+        edges.Add(new Edge(vertices[1], vertices[4]));
+
+        // 3 connects to 4, 5
+        edges.Add(new Edge(vertices[2], vertices[3]));
+        edges.Add(new Edge(vertices[2], vertices[4]));
+
+        // 4 connects to 5
+        edges.Add(new Edge(vertices[3], vertices[4]));
     }
 
     void FoldHorizontal(int direction)
     {
+        
+        
         for (int i = 0; i < 4; i++)
-            trisquares[i].cease_fold_parent = "SetHorizontalRotation";
+            trisquares[i].cease_fold_parent = "StopHorzRotation";
         Vector3 z_dir;
         if (direction == UP)
         {
@@ -80,7 +92,7 @@ public class Four_Tri : MonoBehaviour {
     void FoldVertical(int direction)
     {
         for (int i = 0; i < 4; i++)
-            trisquares[i].cease_fold_parent = "SetVerticalRotation";
+            trisquares[i].cease_fold_parent = "StopVertRotation";
         Vector3 z_dir;
         if (direction == UP)
         {
@@ -108,27 +120,46 @@ public class Four_Tri : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (vert_rotatable)
+        // assume that non-rotatable means that we've already folded on them
+        if (trisquares[0].IsDiagFoldable())
         {
-            FoldVertical(UP);
-        } else
+            FoldDiagonal(trisquares[0], UP);
+        } else if (horz_rotatable)
         {
-            print(GetComponent<Collider>().bounds.size);
+            FoldHorizontal(UP);
+        } 
+        string edges_str = "";
+        if (edges.Count > 0)
+        {
+            foreach (Edge e in edges)
+            {
+                edges_str += e.ToString() + "\n";
+            }
+            print(edges_str);
         }
-         
+        
         //FoldHorizontal(UP);
 	}
     
 
 
-    public void SetHorizontalRotation(bool rotatable)
+    public void StopHorzRotation()
     {
-        horz_rotatable = rotatable;
+        horz_rotatable = false;
+        edges.Add(new Edge(vertices[1], vertices[4]));
+        edges.Add(new Edge(vertices[3], vertices[4]));
     }
 
-    public void SetVerticalRotation(bool rotatable)
+    public void StopVertRotation()
     {
-        vert_rotatable = rotatable;
+        vert_rotatable = false;
+        edges.Add(new Edge(vertices[0], vertices[4]));
+        edges.Add(new Edge(vertices[2], vertices[4]));
+    }
+
+    public void AddEdge(Edge e)
+    {
+        edges.Add(e);
     }
 
     void AddSpringJoint(GameObject go1, GameObject go2) 
