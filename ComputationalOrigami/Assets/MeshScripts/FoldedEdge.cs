@@ -3,23 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class FoldedEdge {
-	float vertice1;
-	float vertice2;
+	Vector3 vertice1;
+    Vector3 vertice2;
 
 	public FoldedEdge() {}
 
-	public FoldedEdge(float v1, float v2)
+	public FoldedEdge(Vector3 v1, Vector3 v2)
 	{
 		vertice1 = v1;
 		vertice2 = v2;
 	}
 
-	public float GetVertice1()
+	public Vector3 GetVertice1()
 	{
 		return vertice1;
 	}
 
-	public float GetVertice2()
+	public Vector3 GetVertice2()
 	{
 		return vertice2;
 	}
@@ -32,9 +32,9 @@ public class FoldedEdge {
 		}
 
 		FoldedEdge e = (FoldedEdge)obj;
-		if ((Mathf.Approximately(vertice1,e.GetVertice1()) && Mathf.Approximately(vertice2,e.GetVertice2()))
-			|| (Mathf.Approximately(vertice2,e.GetVertice1()) && Mathf.Approximately(vertice1,e.GetVertice2()))
-			)
+		if ((vertice1.Equals(e.GetVertice1()) && vertice2.Equals(e.GetVertice2()))
+            || (vertice1.Equals(e.GetVertice2()) && vertice2.Equals(e.GetVertice1()))
+            )
 		{
 			return true;
 		} else
@@ -49,8 +49,8 @@ public class FoldedEdge {
 		{
 			int hash = 17;
 			// Suitable nullity checks etc, of course :)
-			hash = hash * 23 + (int) vertice1.GetHashCode();
-			hash = hash * 23 + (int) vertice2.GetHashCode();
+			hash = hash * 23 + vertice1.GetHashCode();
+			hash = hash * 23 + vertice2.GetHashCode();
 			return hash;
 		}
 	}
