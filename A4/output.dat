@@ -1,0 +1,455 @@
+Monte Carlo steps: 0
+Number of cells: 226
+Id of smallest cell: 68
+Id of largest cell: 221
+Volume of smallest cell: 1
+Volume of largest cell: 78
+Neighboring cell ids for smallest cell: 56 67 69 
+Neighboring cell ids for largest cell: 56 67 69 6 222 209 210 220 4 5 
+
+Monte Carlo steps: 100
+Number of cells: 135
+Id of smallest cell: 159
+Id of largest cell: 44
+Volume of smallest cell: 1
+Volume of largest cell: 262
+Neighboring cell ids for smallest cell: 147 172 
+Neighboring cell ids for largest cell: 147 172 32 22 43 58 54 45 23 35 67 69 
+
+Monte Carlo steps: 200
+Number of cells: 87
+Id of smallest cell: 7
+Id of largest cell: 44
+Volume of smallest cell: 2
+Volume of largest cell: 502
+Neighboring cell ids for smallest cell: 19 6 8 
+Neighboring cell ids for largest cell: 19 6 8 58 42 35 88 80 0 66 31 
+
+Monte Carlo steps: 300
+Number of cells: 63
+Id of smallest cell: 123
+Id of largest cell: 44
+Volume of smallest cell: 3
+Volume of largest cell: 627
+Neighboring cell ids for smallest cell: 135 101 155 110 
+Neighboring cell ids for largest cell: 135 101 155 110 58 35 88 81 80 0 66 31 87 
+
+Monte Carlo steps: 400
+Number of cells: 52
+Id of smallest cell: 125
+Id of largest cell: 44
+Volume of smallest cell: 5
+Volume of largest cell: 702
+Neighboring cell ids for smallest cell: 135 101 147 103 
+Neighboring cell ids for largest cell: 135 101 147 103 25 58 81 80 0 66 31 87 
+
+Monte Carlo steps: 500
+Number of cells: 37
+Id of smallest cell: 151
+Id of largest cell: 73
+Volume of smallest cell: 51
+Volume of largest cell: 857
+Neighboring cell ids for smallest cell: 173 138 140 128 175 
+Neighboring cell ids for largest cell: 173 138 140 128 175 25 101 63 81 44 39 128 103 86 
+
+Monte Carlo steps: 600
+Number of cells: 32
+Id of smallest cell: 175
+Id of largest cell: 73
+Volume of smallest cell: 1
+Volume of largest cell: 983
+Neighboring cell ids for smallest cell: 173 166 
+Neighboring cell ids for largest cell: 173 166 25 101 81 44 39 128 65 103 86 
+
+Monte Carlo steps: 700
+Number of cells: 27
+Id of smallest cell: 87
+Id of largest cell: 73
+Volume of smallest cell: 15
+Volume of largest cell: 1144
+Neighboring cell ids for smallest cell: 119 44 66 86 
+Neighboring cell ids for largest cell: 119 44 66 86 25 101 44 39 128 65 103 86 
+
+Monte Carlo steps: 800
+Number of cells: 24
+Id of smallest cell: 66
+Id of largest cell: 73
+Volume of smallest cell: 3
+Volume of largest cell: 1257
+Neighboring cell ids for smallest cell: 6 44 65 86 
+Neighboring cell ids for largest cell: 6 44 65 86 25 119 101 44 39 128 65 103 86 
+
+Monte Carlo steps: 900
+Number of cells: 21
+Id of smallest cell: 210
+Id of largest cell: 73
+Volume of smallest cell: 124
+Volume of largest cell: 1344
+Neighboring cell ids for smallest cell: 173 190 6 4 39 
+Neighboring cell ids for largest cell: 173 190 6 4 39 25 6 119 101 44 39 128 103 86 
+
+Monte Carlo steps: 1000
+Number of cells: 20
+Id of smallest cell: 210
+Id of largest cell: 73
+Volume of smallest cell: 85
+Volume of largest cell: 1464
+Neighboring cell ids for smallest cell: 173 190 6 4 39 
+Neighboring cell ids for largest cell: 173 190 6 4 39 25 6 119 101 44 39 128 103 86 
+
+Monte Carlo steps: 1100
+Number of cells: 19
+Id of smallest cell: 4
+Id of largest cell: 73
+Volume of smallest cell: 8
+Volume of largest cell: 1562
+Neighboring cell ids for smallest cell: 25 173 39 2 
+Neighboring cell ids for largest cell: 25 173 39 2 25 6 119 101 44 39 128 103 86 
+
+Monte Carlo steps: 1200
+Number of cells: 16
+Id of smallest cell: 195
+Id of largest cell: 73
+Volume of smallest cell: 58
+Volume of largest cell: 1740
+Neighboring cell ids for smallest cell: 173 193 147 2 
+Neighboring cell ids for largest cell: 173 193 147 2 25 173 6 119 101 44 39 86 
+
+Monte Carlo steps: 1300
+Number of cells: 15
+Id of smallest cell: 147
+Id of largest cell: 73
+Volume of smallest cell: 8
+Volume of largest cell: 1854
+Neighboring cell ids for smallest cell: 173 135 101 193 
+Neighboring cell ids for largest cell: 173 135 101 193 25 173 6 119 101 44 39 86 
+
+Monte Carlo steps: 1400
+Number of cells: 11
+Id of smallest cell: 193
+Id of largest cell: 73
+Volume of smallest cell: 112
+Volume of largest cell: 2005
+Neighboring cell ids for smallest cell: 173 190 101 0 
+Neighboring cell ids for largest cell: 173 190 101 0 25 173 6 119 101 44 39 
+
+Monte Carlo steps: 1500
+Number of cells: 11
+Id of smallest cell: 193
+Id of largest cell: 73
+Volume of smallest cell: 18
+Volume of largest cell: 2180
+Neighboring cell ids for smallest cell: 173 190 0 
+Neighboring cell ids for largest cell: 173 190 0 25 173 6 119 101 44 0 39 
+
+Monte Carlo steps: 1600
+Number of cells: 10
+Id of smallest cell: 25
+Id of largest cell: 73
+Volume of smallest cell: 103
+Volume of largest cell: 2239
+Neighboring cell ids for smallest cell: 173 0 73 39 
+Neighboring cell ids for largest cell: 173 0 73 39 25 173 6 119 101 44 0 39 
+
+Monte Carlo steps: 1700
+Number of cells: 10
+Id of smallest cell: 25
+Id of largest cell: 73
+Volume of smallest cell: 73
+Volume of largest cell: 2358
+Neighboring cell ids for smallest cell: 173 0 73 
+Neighboring cell ids for largest cell: 173 0 73 25 173 6 119 101 44 0 39 
+
+Monte Carlo steps: 1800
+Number of cells: 8
+Id of smallest cell: 6
+Id of largest cell: 73
+Volume of smallest cell: 201
+Volume of largest cell: 2513
+Neighboring cell ids for smallest cell: 173 190 44 0 73 
+Neighboring cell ids for largest cell: 173 190 44 0 73 173 6 119 101 44 0 
+
+Monte Carlo steps: 1900
+Number of cells: 8
+Id of smallest cell: 6
+Id of largest cell: 73
+Volume of smallest cell: 136
+Volume of largest cell: 2673
+Neighboring cell ids for smallest cell: 173 190 44 0 73 
+Neighboring cell ids for largest cell: 173 190 44 0 73 173 6 119 101 44 0 
+
+Monte Carlo steps: 2000
+Number of cells: 8
+Id of smallest cell: 6
+Id of largest cell: 73
+Volume of smallest cell: 119
+Volume of largest cell: 2777
+Neighboring cell ids for smallest cell: 173 190 44 0 73 
+Neighboring cell ids for largest cell: 173 190 44 0 73 173 6 119 101 44 0 
+
+Monte Carlo steps: 2100
+Number of cells: 8
+Id of smallest cell: 6
+Id of largest cell: 73
+Volume of smallest cell: 94
+Volume of largest cell: 2921
+Neighboring cell ids for smallest cell: 173 190 44 0 73 
+Neighboring cell ids for largest cell: 173 190 44 0 73 173 6 119 101 44 0 
+
+Monte Carlo steps: 2200
+Number of cells: 7
+Id of smallest cell: 101
+Id of largest cell: 73
+Volume of smallest cell: 158
+Volume of largest cell: 3089
+Neighboring cell ids for smallest cell: 173 190 119 44 73 
+Neighboring cell ids for largest cell: 173 190 119 44 73 173 190 119 101 44 0 
+
+Monte Carlo steps: 2300
+Number of cells: 7
+Id of smallest cell: 101
+Id of largest cell: 73
+Volume of smallest cell: 122
+Volume of largest cell: 3161
+Neighboring cell ids for smallest cell: 173 190 119 44 73 
+Neighboring cell ids for largest cell: 173 190 119 44 73 173 190 119 101 44 0 
+
+Monte Carlo steps: 2400
+Number of cells: 6
+Id of smallest cell: 101
+Id of largest cell: 73
+Volume of smallest cell: 69
+Volume of largest cell: 3241
+Neighboring cell ids for smallest cell: 173 190 119 44 73 
+Neighboring cell ids for largest cell: 173 190 119 44 73 173 190 119 101 44 
+
+Monte Carlo steps: 2500
+Number of cells: 6
+Id of smallest cell: 101
+Id of largest cell: 73
+Volume of smallest cell: 33
+Volume of largest cell: 3234
+Neighboring cell ids for smallest cell: 173 190 119 44 73 
+Neighboring cell ids for largest cell: 173 190 119 44 73 173 190 119 101 44 
+
+Monte Carlo steps: 2600
+Number of cells: 5
+Id of smallest cell: 119
+Id of largest cell: 73
+Volume of smallest cell: 280
+Volume of largest cell: 3267
+Neighboring cell ids for smallest cell: 173 190 44 73 
+Neighboring cell ids for largest cell: 173 190 44 73 173 190 119 44 
+
+Monte Carlo steps: 2700
+Number of cells: 5
+Id of smallest cell: 119
+Id of largest cell: 73
+Volume of smallest cell: 82
+Volume of largest cell: 3309
+Neighboring cell ids for smallest cell: 173 190 44 73 
+Neighboring cell ids for largest cell: 173 190 44 73 173 190 119 44 
+
+Monte Carlo steps: 2800
+Number of cells: 4
+Id of smallest cell: 44
+Id of largest cell: 73
+Volume of smallest cell: 1802
+Volume of largest cell: 3310
+Neighboring cell ids for smallest cell: 173 190 73 
+Neighboring cell ids for largest cell: 173 190 73 173 190 44 
+
+Monte Carlo steps: 2900
+Number of cells: 4
+Id of smallest cell: 44
+Id of largest cell: 73
+Volume of smallest cell: 1790
+Volume of largest cell: 3376
+Neighboring cell ids for smallest cell: 173 190 73 
+Neighboring cell ids for largest cell: 173 190 73 173 190 44 
+
+Monte Carlo steps: 3000
+Number of cells: 4
+Id of smallest cell: 44
+Id of largest cell: 73
+Volume of smallest cell: 1752
+Volume of largest cell: 3420
+Neighboring cell ids for smallest cell: 173 190 73 
+Neighboring cell ids for largest cell: 173 190 73 173 190 44 
+
+Monte Carlo steps: 3100
+Number of cells: 4
+Id of smallest cell: 44
+Id of largest cell: 73
+Volume of smallest cell: 1720
+Volume of largest cell: 3435
+Neighboring cell ids for smallest cell: 173 190 73 
+Neighboring cell ids for largest cell: 173 190 73 173 190 44 
+
+Monte Carlo steps: 3200
+Number of cells: 4
+Id of smallest cell: 44
+Id of largest cell: 73
+Volume of smallest cell: 1726
+Volume of largest cell: 3434
+Neighboring cell ids for smallest cell: 173 190 73 
+Neighboring cell ids for largest cell: 173 190 73 173 190 44 
+
+Monte Carlo steps: 3300
+Number of cells: 4
+Id of smallest cell: 44
+Id of largest cell: 73
+Volume of smallest cell: 1726
+Volume of largest cell: 3448
+Neighboring cell ids for smallest cell: 173 190 73 
+Neighboring cell ids for largest cell: 173 190 73 173 190 44 
+
+Monte Carlo steps: 3400
+Number of cells: 4
+Id of smallest cell: 44
+Id of largest cell: 73
+Volume of smallest cell: 1713
+Volume of largest cell: 3429
+Neighboring cell ids for smallest cell: 173 190 73 
+Neighboring cell ids for largest cell: 173 190 73 173 190 44 
+
+Monte Carlo steps: 3500
+Number of cells: 4
+Id of smallest cell: 44
+Id of largest cell: 73
+Volume of smallest cell: 1712
+Volume of largest cell: 3497
+Neighboring cell ids for smallest cell: 173 190 73 
+Neighboring cell ids for largest cell: 173 190 73 173 190 44 
+
+Monte Carlo steps: 3600
+Number of cells: 4
+Id of smallest cell: 44
+Id of largest cell: 73
+Volume of smallest cell: 1768
+Volume of largest cell: 3425
+Neighboring cell ids for smallest cell: 173 190 73 
+Neighboring cell ids for largest cell: 173 190 73 173 190 44 
+
+Monte Carlo steps: 3700
+Number of cells: 4
+Id of smallest cell: 44
+Id of largest cell: 73
+Volume of smallest cell: 1770
+Volume of largest cell: 3382
+Neighboring cell ids for smallest cell: 173 190 73 
+Neighboring cell ids for largest cell: 173 190 73 173 190 44 
+
+Monte Carlo steps: 3800
+Number of cells: 4
+Id of smallest cell: 44
+Id of largest cell: 73
+Volume of smallest cell: 1783
+Volume of largest cell: 3352
+Neighboring cell ids for smallest cell: 173 190 73 
+Neighboring cell ids for largest cell: 173 190 73 173 190 44 
+
+Monte Carlo steps: 3900
+Number of cells: 4
+Id of smallest cell: 44
+Id of largest cell: 73
+Volume of smallest cell: 1793
+Volume of largest cell: 3369
+Neighboring cell ids for smallest cell: 173 190 73 
+Neighboring cell ids for largest cell: 173 190 73 173 190 44 
+
+Monte Carlo steps: 4000
+Number of cells: 4
+Id of smallest cell: 44
+Id of largest cell: 73
+Volume of smallest cell: 1805
+Volume of largest cell: 3347
+Neighboring cell ids for smallest cell: 173 190 73 
+Neighboring cell ids for largest cell: 173 190 73 173 190 44 
+
+Monte Carlo steps: 4100
+Number of cells: 4
+Id of smallest cell: 44
+Id of largest cell: 73
+Volume of smallest cell: 1788
+Volume of largest cell: 3408
+Neighboring cell ids for smallest cell: 173 190 73 
+Neighboring cell ids for largest cell: 173 190 73 173 190 44 
+
+Monte Carlo steps: 4200
+Number of cells: 4
+Id of smallest cell: 44
+Id of largest cell: 73
+Volume of smallest cell: 1767
+Volume of largest cell: 3433
+Neighboring cell ids for smallest cell: 173 190 73 
+Neighboring cell ids for largest cell: 173 190 73 173 190 44 
+
+Monte Carlo steps: 4300
+Number of cells: 4
+Id of smallest cell: 44
+Id of largest cell: 73
+Volume of smallest cell: 1759
+Volume of largest cell: 3434
+Neighboring cell ids for smallest cell: 173 190 73 
+Neighboring cell ids for largest cell: 173 190 73 173 190 44 
+
+Monte Carlo steps: 4400
+Number of cells: 4
+Id of smallest cell: 44
+Id of largest cell: 73
+Volume of smallest cell: 1757
+Volume of largest cell: 3472
+Neighboring cell ids for smallest cell: 173 190 73 
+Neighboring cell ids for largest cell: 173 190 73 173 190 44 
+
+Monte Carlo steps: 4500
+Number of cells: 4
+Id of smallest cell: 44
+Id of largest cell: 73
+Volume of smallest cell: 1748
+Volume of largest cell: 3393
+Neighboring cell ids for smallest cell: 173 190 73 
+Neighboring cell ids for largest cell: 173 190 73 173 190 44 
+
+Monte Carlo steps: 4600
+Number of cells: 4
+Id of smallest cell: 44
+Id of largest cell: 73
+Volume of smallest cell: 1743
+Volume of largest cell: 3350
+Neighboring cell ids for smallest cell: 173 190 73 
+Neighboring cell ids for largest cell: 173 190 73 173 190 44 
+
+Monte Carlo steps: 4700
+Number of cells: 4
+Id of smallest cell: 44
+Id of largest cell: 73
+Volume of smallest cell: 1752
+Volume of largest cell: 3363
+Neighboring cell ids for smallest cell: 173 190 73 
+Neighboring cell ids for largest cell: 173 190 73 173 190 44 
+
+Monte Carlo steps: 4800
+Number of cells: 4
+Id of smallest cell: 44
+Id of largest cell: 73
+Volume of smallest cell: 1747
+Volume of largest cell: 3320
+Neighboring cell ids for smallest cell: 173 190 73 
+Neighboring cell ids for largest cell: 173 190 73 173 190 44 
+
+Monte Carlo steps: 4900
+Number of cells: 4
+Id of smallest cell: 44
+Id of largest cell: 73
+Volume of smallest cell: 1715
+Volume of largest cell: 3379
+Neighboring cell ids for smallest cell: 173 190 73 
+Neighboring cell ids for largest cell: 173 190 73 173 190 44 
+
+est cell: 1883
+Volume of largest cell: 3808
+Neighboring cell ids for smallest cell: 44 136 175 
+Neighboring cell ids for largest cell: 44 136 175 4 44 136 
+

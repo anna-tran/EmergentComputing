@@ -1,0 +1,14 @@
+\documentclass{article}
+\author{Anna Tran}
+\title{CPSC 565 Assignment 4}
+
+\begin{document}
+\maketitle
+Questions:
+\begin{enumerate}
+	\item As the \emph{NeighborOrder} tag value increases, the boundaries of the cells become smoother and cells evolve more quickly. At a low value of 1, cell boundaries are rigid and cells consume their neighboring cells as a slow rate. However, as the tag value increases, cell boundaries become much smoother and cells move more quickly to grow by merging with neighboring cells.
+	\item Looking at one cell, and assuming that the NeighborOrder tag is set to a value that is greater than the size of its largest neighbor cell, this may generate unrealistic effects in the simulation. The cell we are looking at will make contact with a non-adjacent cell since its \emph{NeighborOrder} tag value goes beyond the largest neighbor cell. As a result, non-adjacent cells to react as if they were touching the given cell. This creates an unrealistic effect since cells should only influence the other cells that they are physically touching.
+	\item As the \emph{Temperature} tag value increases, the texture of the cell boundaries become rougher and the boundaries fail to form a realistic cell shape. At a value of 3, the cells barely merge together and there are few flips (attempts to change their pixel id are only in the 40s).  However, the boundaries and shapes of the cells are very well defined. As the tag value increases, boundaries become very spread out, not holding the cell's shape very well. Moreover, the cells merge and disappear very quickly. There are many flips (attempts to change their pixel id are in the 2000s).
+\end{enumerate}
+
+\end{document}

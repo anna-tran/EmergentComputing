@@ -120,14 +120,15 @@ public class Four_Tri : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		
         // assume that non-rotatable means that we've already folded on them
-        if (trisquares[0].IsDiagFoldable())
-        {
-            FoldDiagonal(trisquares[0], UP);
-        } else if (horz_rotatable)
-        {
-            FoldHorizontal(UP);
-        } 
+		if (trisquares [0].IsDiagFoldable ()) {
+			FoldDiagonal (trisquares [0], UP);
+		} else if (horz_rotatable) {
+			FoldHorizontal (UP);
+		} else {
+			transform.LookAt (GameObject.Find ("Target").transform);
+		}
         string edges_str = "";
         if (edges.Count > 0)
         {
@@ -137,6 +138,9 @@ public class Four_Tri : MonoBehaviour {
             }
             print(edges_str);
         }
+
+
+
         
         //FoldHorizontal(UP);
 	}

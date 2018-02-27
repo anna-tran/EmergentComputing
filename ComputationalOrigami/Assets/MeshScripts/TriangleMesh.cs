@@ -9,7 +9,7 @@ public class TriangleMesh : MonoBehaviour {
     Vector3[] vertices;
     int[] triangles;
 
-    private void Awake()
+    private void awake()
     {
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
@@ -17,9 +17,9 @@ public class TriangleMesh : MonoBehaviour {
     // Use this for initialization
     void Start () {
     
-        MakeMeshData();
-        CreateMesh();
-
+        //MakeMeshData();
+        //CreateMesh();
+//		GetComponent<MeshRenderer> ().enabled = false;
 	}
 
     void MakeMeshData()
