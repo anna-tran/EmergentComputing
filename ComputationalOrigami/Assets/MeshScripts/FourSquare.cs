@@ -71,8 +71,11 @@ public class FourSquare : MonoBehaviour {
 			}
 		}
 		AddPaperThickness (ref height_to_fold, ref height_folded_on);
+		foreach (Transform t in new List<Transform>{center, t_lowest_z, t_highest_z}) {
+			SetVector3Value(t, "y", (height_to_fold + height_folded_on) / 2.0f);
+		}
 
-		ParentTo (children_to_group, ref c_parent);
+		ParentTo (children_to_group, c_parent);
 
 		float topmost_y = height_folded_on + height_to_fold;
 		c_parent.transform.Rotate(new Vector3(0,0,1),180);
@@ -185,9 +188,15 @@ public class FourSquare : MonoBehaviour {
 		}
 	}
 
-	void RotateDiag()
-	{
-
+	void SetVector3Value(Transform orig, string field, float value) {
+		Vector3 vect = orig.position;
+		if (field.Equals ("x"))
+			vect.x = value;
+		else if (field.Equals ("y"))
+			vect.y = value;
+		else
+			vect.z = value;
+		orig.position = vect;
 	}
 
 	void AddPaperThickness(ref float height_to_fold, ref float height_folded_on) {
@@ -195,13 +204,9 @@ public class FourSquare : MonoBehaviour {
 		height_folded_on += PAPER_THICKNESS / 2;
 		print ("height folded on: " + height_folded_on);
 		print ("height to fold: " + height_to_fold);
-
-		Vector3 vertVect = center.position;
-		vertVect.y = (height_to_fold + height_folded_on) / 2;
-		center.position = vertVect;
 	}
 
-	void ParentTo(List<Transform> children_to_group, ref GameObject c_parent) {
+	void ParentTo(List<Transform> children_to_group, GameObject c_parent) {
 		foreach (Transform child in children_to_group)
 			child.parent = c_parent.transform;
 	}
