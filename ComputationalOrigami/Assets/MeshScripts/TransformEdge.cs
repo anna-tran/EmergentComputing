@@ -2,15 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FoldedEdge {
-	public static Vector3 ORIGIN = Vector3.zero;
-	public Vector3 start { get; set; }
-	public Vector3 end { get; set; }
+public class TransformEdge : MonoBehaviour {
+
+	public Transform start { get; set; }
+	public Transform end { get; set; }
 	EdgeType edge_type { get; set; }
 
-	public FoldedEdge() {}
 
-	public FoldedEdge(Vector3 v_start, Vector3 v_end, EdgeType e_t)
+	public TransformEdge(Transform v_start, Transform v_end, EdgeType e_t)
 	{
 		start = v_start;
 		end = v_end;
@@ -20,17 +19,17 @@ public class FoldedEdge {
 
 	public override bool Equals(object obj)
 	{
-		if (!(obj is FoldedEdge))
+		if (!(obj is TransformEdge))
 		{
 			return false;
 		}
 
-		FoldedEdge e = (FoldedEdge)obj;
+		TransformEdge e = (TransformEdge)obj;
 		if (
 			((start.Equals(e.start) && end.Equals(e.end))
 				|| (start.Equals(e.end) && end.Equals(e.start)))
 			&& edge_type == e.edge_type
-            )
+		)
 		{
 			return true;
 		} else
@@ -54,11 +53,8 @@ public class FoldedEdge {
 
 	public override string ToString()
 	{
-		return "vertice 1: " + start
-			+ "\nvertice 2: " + end
+		return "start v: " + start
+			+ "\nend v: " + end
 			+ "\ntype: " + edge_type;
 	}
-
 }
-
-
