@@ -35,3 +35,16 @@ sysinfo.txt
 
 Temp/
 Library/
+sysinfo.txt
+.hg
+.git
+.vs
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.DS_Store

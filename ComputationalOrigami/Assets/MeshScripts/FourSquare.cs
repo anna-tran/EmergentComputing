@@ -14,7 +14,7 @@ public class FourSquare : MonoBehaviour {
 		center = gameObject.transform.Find ("Center");
 		edges = new List<TransformEdge> ();
         RotateHorz();
-        //RotateVert();
+        RotateVert();
 		foreach (TransformEdge e in edges) {
 			print (e);
 		}
@@ -40,7 +40,6 @@ public class FourSquare : MonoBehaviour {
 
 
     void RotateHorz() {
-        // direction = up
         // temporarily parent each child to a new GameObject
         GameObject c_parent = new GameObject();
         c_parent.transform.position = transform.position;
@@ -76,13 +75,8 @@ public class FourSquare : MonoBehaviour {
 		}
 
 		ParentTo (children_to_group, c_parent);
-
-		float topmost_y = height_folded_on + height_to_fold;
-		c_parent.transform.Rotate(new Vector3(0,0,1),180);
-		c_parent.transform.Translate(new Vector3(0,-topmost_y,0));
-
-        // reparent children to this object
-		ReparentFrom(ref c_parent);
+		DoVisualFold (c_parent.transform, new Vector3 (0, 0, 1), height_folded_on, height_to_fold);
+		ReparentFrom (ref c_parent);
         
 		FlipEdges (EdgeType.HORZ);
 
@@ -94,23 +88,37 @@ public class FourSquare : MonoBehaviour {
         }
 
     }
-	/*
-	void RotateVert() {
-        // direction = up
-        // temporarily parent each child to a new GameObject
-        GameObject c_parent = new GameObject();
-        c_parent.transform.position = transform.position;
 
-        List<Transform> children_to_group = new List<Transform>();
-		float lowest_x = 0, highest_x = 0, height_folded_on = 0, height_to_fold = 0;
+	void DoVisualFold(Transform c_parent_transform, Vector3 rotate_vector, float height_folded_on, float height_to_fold) {
+		float topmost_y = height_folded_on + height_to_fold;
+		c_parent_transform.Rotate(rotate_vector,180);
+		c_parent_transform.Translate(new Vector3(0,-topmost_y,0));
+	}
+
+	void RotateVert() {
+		// temporarily parent each child to a new GameObject
+		GameObject c_parent = new GameObject();
+		c_parent.transform.position = transform.position;
+
+		List<Transform> children_to_group = new List<Transform>();
+		float height_folded_on = 0, height_to_fold = 0;
+		Transform t_lowest_x = center;
+		Transform t_highest_x = center;
+
+		Transform neg_x = transform.Find ("-X");
+		Transform x = transform.Find ("X");
+		if (t_lowest_x.position.x > neg_x.position.x) {
+			t_lowest_x = neg_x;
+		}
+		if (t_highest_x.position.x < x.position.x) {
+			t_highest_x = x;
+		}
+
 		foreach (Transform child in transform) {
-			float y_val = child.GetComponent<MeshRenderer> ().bounds.center.y - transform.position.y;
+			float y_val = child.GetComponent<MeshRenderer>().bounds.center.y - transform.position.y;
 			if (child.position.z < transform.position.z) {
-				// group children south of the center
+				// group children left of the center
 				children_to_group.Add (child);
-				float x_val = child.GetComponent<MeshRenderer> ().bounds.center.x - transform.position.x;
-				AssignLowest (ref lowest_x, x_val);
-				AssignHighest (ref highest_x, x_val);
 				AssignHighest (ref height_to_fold, y_val);
 			} else {
 				// find the highest y coordinate of the children to be folded on
@@ -118,32 +126,25 @@ public class FourSquare : MonoBehaviour {
 			}
 		}
 		AddPaperThickness (ref height_to_fold, ref height_folded_on);
+		foreach (Transform t in new List<Transform>{center, t_lowest_x, t_highest_x}) {
+			SetVector3Value(t, "y", (height_to_fold + height_folded_on) / 2.0f);
+		}
 
-		ParentTo (children_to_group, ref c_parent);
-
-		float topmost_y = height_folded_on + height_to_fold;
-		c_parent.transform.Rotate(new Vector3(1,0,0),180);
-		c_parent.transform.Translate(new Vector3(0,-topmost_y,0));
-
-
-        // reparent children to this object
-		ReparentFrom(ref c_parent);
+		ParentTo (children_to_group, c_parent);
+		DoVisualFold (c_parent.transform, new Vector3 (1, 0, 0), height_folded_on, height_to_fold);
+		ReparentFrom (ref c_parent);
 
 		FlipEdges (EdgeType.VERT);
 
-		if (Mathf.Abs(lowest_x - 0.0f) > Mathf.Epsilon) {
-			Vector3 v = new Vector3(lowest_x, topmost_y/2, 0);
-			edges.Add(new FoldedEdge(FoldedEdge.ORIGIN, v, EdgeType.VERT));
+		if (Mathf.Abs(t_lowest_x.position.x - 0) > Mathf.Epsilon) {
+			edges.Add(new TransformEdge(center, t_lowest_x, EdgeType.VERT));
 		}
-		if (Mathf.Abs(highest_x - 0.0f) > Mathf.Epsilon) {
-			Vector3 v = new Vector3(highest_x, topmost_y/2, 0);
-			edges.Add(new FoldedEdge(FoldedEdge.ORIGIN, v, EdgeType.VERT));
+		if (Mathf.Abs(t_highest_x.position.x - 0) > Mathf.Epsilon) {
+			edges.Add(new TransformEdge(center, t_highest_x, EdgeType.VERT));
 		}
 
+	}
 
-
-    }
-*/
 	void FlipVert(TransformEdge e) {
 		if (e.start.position.z < center.position.z) {
 			string str = "Before\n" + e.start.position;
@@ -178,11 +179,11 @@ public class FourSquare : MonoBehaviour {
 		}
 	}
 
-	void FlipEdges(EdgeType toFlip) {
+	void FlipEdges(EdgeType to_flip) {
 		foreach (TransformEdge e in edges) {
-			if (toFlip == EdgeType.HORZ) {
+			if (to_flip == EdgeType.HORZ) {
 				FlipHorz (e);
-			} else if (toFlip == EdgeType.VERT) {
+			} else if (to_flip == EdgeType.VERT) {
 				FlipVert (e);
 			}
 		}
@@ -222,7 +223,7 @@ public class FourSquare : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		foreach (TransformEdge e in edges) {
-			Debug.DrawLine (transform.position + e.start.position, transform.position + e.end.position, Color.red);
+			Debug.DrawLine (e.start.position, e.end.position, Color.red);
 		}
 	}
 }
