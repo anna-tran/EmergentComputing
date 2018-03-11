@@ -21,34 +21,50 @@ public class FourSquare : MonoBehaviour {
 			EdgeType t = (EdgeType) Enum.ToObject(typeof(EdgeType), type);
 			edges.Add (t, new List<TransformEdge> ());
 		}
+		ChangeColor ();
+
 
         RotateHorz();
         RotateVert();
+		GeneratePockets();
 		foreach (var pocket in pockets) {
 			print (pocket);
 		}
 	}
 
-	void GeneratePockets() {
+	void ChangeColor() {
+		Color rand_color = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
+		foreach (Renderer rend in transform.GetComponentsInChildren<Renderer>()) {
+			rend.material.color = rand_color;
+		}
+	}
+
+	public void GeneratePockets() {
 		var edge_enums = Enum.GetValues (typeof(EdgeType));
 		for (int i = 0; i < edge_enums.Length; i++) {
-			EdgeType t1 = (EdgeType) Enum.ToObject(typeof(EdgeType), edge_enums[i]);
+			EdgeType t1 = (EdgeType) Enum.ToObject(typeof(EdgeType), edge_enums.GetValue(i));
 
 			// only match with the unseen edge types
 			for (int j = i + 1; j < edge_enums.Length; j++) {
-				EdgeType t2 = (EdgeType) Enum.ToObject(typeof(EdgeType), edge_enums[j]);
+				EdgeType t2 = (EdgeType) Enum.ToObject(typeof(EdgeType), edge_enums.GetValue(j));
 
 				foreach (TransformEdge e1 in edges[t1]) {
 					foreach (TransformEdge e2 in edges[t2]) {
-						pockets.Add (new Pocket (e1, e2));
+
+						// add pocket only if folded edges are not on the same x or z plane
+						float angle = Pocket.CalculateAngle (e1,e2);
+						if (Mathf.PI - angle > Mathf.Epsilon)
+							pockets.Add (new Pocket (e1, e2, angle));
 					}
 				}
 			}
 		}
+
 	}
 
 
-    void RotateHorz() {
+
+    public void RotateHorz() {
         // temporarily parent each child to a new GameObject
         GameObject c_parent = new GameObject();
         c_parent.transform.position = transform.position;
@@ -101,7 +117,7 @@ public class FourSquare : MonoBehaviour {
     }
 
 
-	void RotateVert() {
+	public void RotateVert() {
 		// temporarily parent each child to a new GameObject
 		GameObject c_parent = new GameObject();
 		c_parent.transform.position = transform.position;
