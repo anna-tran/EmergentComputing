@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TransformEdge : MonoBehaviour {
+public class TransformEdge {
 
-	public Transform start { get; set; }
-	public Transform end { get; set; }
-	EdgeType edge_type { get; set; }
+	public Transform start { get; private set; }
+	public Transform end { get; private set; }
+	public EdgeType edge_type { get; private set; }
 
 
 	public TransformEdge(Transform v_start, Transform v_end, EdgeType e_t)
