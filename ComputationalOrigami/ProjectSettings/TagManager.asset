@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Vertice
   - 4Tri
+  - Marker
   layers:
   - Default
   - TransparentFX

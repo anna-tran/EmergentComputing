@@ -443,6 +443,42 @@ Prefab:
       propertyPath: m_RootOrder
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 1783411519758724, guid: 791a7d69b0bd3497582c4d87305a173d, type: 2}
+      propertyPath: m_TagString
+      value: Marker
+      objectReference: {fileID: 0}
+    - target: {fileID: 1843220876542302, guid: 791a7d69b0bd3497582c4d87305a173d, type: 2}
+      propertyPath: m_TagString
+      value: Marker
+      objectReference: {fileID: 0}
+    - target: {fileID: 1771052929599562, guid: 791a7d69b0bd3497582c4d87305a173d, type: 2}
+      propertyPath: m_TagString
+      value: Marker
+      objectReference: {fileID: 0}
+    - target: {fileID: 1453079204840976, guid: 791a7d69b0bd3497582c4d87305a173d, type: 2}
+      propertyPath: m_TagString
+      value: Marker
+      objectReference: {fileID: 0}
+    - target: {fileID: 1943233493972792, guid: 791a7d69b0bd3497582c4d87305a173d, type: 2}
+      propertyPath: m_TagString
+      value: Marker
+      objectReference: {fileID: 0}
+    - target: {fileID: 1944858273809730, guid: 791a7d69b0bd3497582c4d87305a173d, type: 2}
+      propertyPath: m_TagString
+      value: Marker
+      objectReference: {fileID: 0}
+    - target: {fileID: 1403855801147436, guid: 791a7d69b0bd3497582c4d87305a173d, type: 2}
+      propertyPath: m_TagString
+      value: Marker
+      objectReference: {fileID: 0}
+    - target: {fileID: 1635447768404400, guid: 791a7d69b0bd3497582c4d87305a173d, type: 2}
+      propertyPath: m_TagString
+      value: Marker
+      objectReference: {fileID: 0}
+    - target: {fileID: 1319754717586734, guid: 791a7d69b0bd3497582c4d87305a173d, type: 2}
+      propertyPath: m_TagString
+      value: Marker
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 791a7d69b0bd3497582c4d87305a173d, type: 2}
   m_IsPrefabParent: 0
