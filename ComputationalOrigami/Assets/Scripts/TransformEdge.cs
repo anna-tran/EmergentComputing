@@ -17,6 +17,8 @@ public class TransformEdge {
 	}
 
 
+
+
 	public override bool Equals(object obj)
 	{
 		if (!(obj is TransformEdge))
