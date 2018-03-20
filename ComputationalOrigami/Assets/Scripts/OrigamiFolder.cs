@@ -31,11 +31,9 @@ public class OrigamiFolder {
 				// group children left of the center
 				children_to_group.Add (child);
 				AssignHighest (ref height_to_fold, y_val);
-				Debug.Log (child.name + "\nheight to fold: " + height_to_fold);
 			} else {
 				// find the highest y coordinate of the children to be folded on
 				AssignHighest (ref height_folded_on, y_val);
-				Debug.Log (child.name + "\nheight folded on:  " + height_folded_on);
 			}
 		}
 
@@ -51,11 +49,11 @@ public class OrigamiFolder {
 		FlipEdges (square, EdgeType.HORZ);
 
 		if (Mathf.Abs(t_lowest_z.position.z - 0) > Mathf.Epsilon) {
-			//edges.Add(new TransformEdge(center, t_lowest_z, EdgeType.HORZ));
-			square.edges[EdgeType.HORZ].Add(new TransformEdge(square.center, t_lowest_z, EdgeType.HORZ));
+			TransformEdge te = new TransformEdge (square.center, t_lowest_z, EdgeType.HORZ);
+			square.edges[EdgeType.HORZ].Add(te);
 		}
 		if (Mathf.Abs(t_highest_z.position.z - 0) > Mathf.Epsilon) {
-			//edges.Add(new TransformEdge(center, t_highest_z, EdgeType.HORZ));
+			TransformEdge te = new TransformEdge (square.center, t_highest_z, EdgeType.HORZ);
 			square.edges[EdgeType.HORZ].Add(new TransformEdge(square.center, t_highest_z, EdgeType.HORZ));
 		}
 
@@ -129,8 +127,8 @@ public class OrigamiFolder {
 	static void AddPaperThickness(ref float height_to_fold, ref float height_folded_on, float PAPER_THICKNESS) {
 		height_to_fold += PAPER_THICKNESS / 2;        
 		height_folded_on += PAPER_THICKNESS / 2;
-		Debug.Log ("height folded on: " + height_folded_on);
-		Debug.Log ("height to fold: " + height_to_fold);
+//		Debug.Log ("height folded on: " + height_folded_on);
+//		Debug.Log ("height to fold: " + height_to_fold);
 	}
 
 	static void ParentTo(List<Transform> children_to_group, GameObject c_parent) {
@@ -147,8 +145,8 @@ public class OrigamiFolder {
 	static void DoVisualFold(Transform c_parent_transform, Vector3 rotate_vector, 
 		float height_folded_on, float height_to_fold) {
 		float topmost_y = height_folded_on + height_to_fold;
-		Debug.Log ("topmost y: " + topmost_y);
-		Debug.Log ("transform position " + c_parent_transform.position);
+//		Debug.Log ("topmost y: " + topmost_y);
+//		Debug.Log ("transform position " + c_parent_transform.position);
 		c_parent_transform.Rotate(rotate_vector,180);
 		c_parent_transform.Translate(new Vector3(0,-topmost_y,0));
 	}
@@ -157,12 +155,12 @@ public class OrigamiFolder {
 		if (e.start.position.z < square.center.position.z) {
 			string str = "Before\n" + e.start.position;
 			SetVector3Value (e.start, "z", -1 * e.start.position.z);
-			Debug.Log (str + "\nFlipped vert\n" + e.start.position);
+//			Debug.Log (str + "\nFlipped vert\n" + e.start.position);
 		}
 		if (e.end.position.z < square.center.position.z) {
 			string str = "Before\n" + e.end.position;
 			SetVector3Value (e.end, "z", -1 * e.end.position.z);
-			Debug.Log (str + "Flipped vert\n" + e.end.position);
+//			Debug.Log (str + "Flipped vert\n" + e.end.position);
 		}
 	}
 
@@ -170,12 +168,12 @@ public class OrigamiFolder {
 		if (e.start.position.x < square.center.position.x) {
 			string str = "Before\n" + e.start.position;
 			SetVector3Value (e.start, "x", -1 * e.start.position.x);
-			Debug.Log (str + "\nFlipped horz\n" + e.start.position);
+//			Debug.Log (str + "\nFlipped horz\n" + e.start.position);
 		}
 		if (e.end.position.x < square.center.position.x) {
 			string str = "Before\n" + e.end.position;
 			SetVector3Value (e.start, "x", -1 * e.start.position.x);
-			Debug.Log (str + "Flipped horz\n" + e.end.position);
+//			Debug.Log (str + "Flipped horz\n" + e.end.position);
 		}
 	}
 

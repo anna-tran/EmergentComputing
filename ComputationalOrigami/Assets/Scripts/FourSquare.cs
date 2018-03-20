@@ -7,15 +7,15 @@ public class FourSquare : MonoBehaviour {
 	public static float PAPER_THICKNESS = 0.01f;
 
     // edges are at local positions, relative to the center
-	public SortedList<EdgeType,List<TransformEdge>> edges { get; set; }
-	public List<Pocket> pockets { get; set; }
-	public Transform center { get; set; }
+	public SortedList<EdgeType,List<TransformEdge>> edges { get; private set; }
+	public List<Pocket> pockets { get; private set; }
+	public Transform center { get; private set; }
 
 	public FourSquare target { get; set; }
 
 	// Use this for initialization
 	void Awake () {
-		center = gameObject.transform.Find ("Center");
+		center = transform.Find ("Center");
 		edges = new SortedList<EdgeType,List<TransformEdge>>();
 		pockets = new List<Pocket> ();
 		foreach (var type in Enum.GetValues(typeof(EdgeType))) {
@@ -23,9 +23,6 @@ public class FourSquare : MonoBehaviour {
 			edges.Add (t, new List<TransformEdge> ());
 		}
 		ChangeColor ();
-
-
-//		GeneratePockets();
 
 	}
 
@@ -50,8 +47,10 @@ public class FourSquare : MonoBehaviour {
 
 						// add pocket only if folded edges are not on the same x or z plane
 						float angle = Pocket.CalculateAngle (e1,e2);
-						if (Mathf.PI - angle > Mathf.Epsilon)
+						if (Mathf.PI - angle > Mathf.Epsilon) {
 							pockets.Add (new Pocket (e1, e2, angle));
+							print ("pocket \n" + e1.ToString () + "\n" + e2.ToString ());
+						}
 					}
 				}
 			}
@@ -71,10 +70,10 @@ public class FourSquare : MonoBehaviour {
 		}
 
 		foreach (var pocket in pockets) {
-			Vector3 v = new Vector3 (Math.Abs(pocket.edge1.end.position.x - pocket.edge2.end.position.x),
-				Math.Abs(pocket.edge1.end.position.y + pocket.edge2.end.position.y)/2,
-				Math.Abs(pocket.edge1.end.position.z - pocket.edge2.end.position.z));
-			Debug.DrawLine (pocket.edge2.start.position, transform.position + v, Color.blue);
+			Vector3 v1 = pocket.edge1.end.position - pocket.edge1.start.position;
+			Vector3 v2 = pocket.edge2.end.position - pocket.edge2.start.position;
+			Debug.DrawLine (pocket.edge2.start.position, pocket.edge2.start.position + v1 + v2, Color.blue);
 		}
+
 	}
 }
