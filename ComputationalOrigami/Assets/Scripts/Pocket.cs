@@ -27,6 +27,21 @@ public class Pocket {
 		filled = false;
 	}
 
+	public Vector3 GetPocketCenter() {
+		return edge1.start.position;
+	}
+
+	public Vector3 GetVectorIn() {
+		Vector3 v1 = edge1.end.position - edge1.start.position;
+		Vector3 v2 = edge2.end.position - edge2.start.position;
+		return v1 + v2;
+	}
+
+	public Vector3 GetVectorPerp() {
+		Vector3 vIn = GetVectorIn ();
+		return (vIn);
+	}
+
 	public override bool Equals(object obj)
 	{
 		if (!(obj is Pocket))

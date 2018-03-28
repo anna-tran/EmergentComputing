@@ -16,8 +16,8 @@ public class OrigamiFolder {
 		Transform t_lowest_z = square.center;
 		Transform t_highest_z = square.center;
 
-		Transform neg_z = square.transform.Find ("-Z");
-		Transform z = square.transform.Find ("Z");
+		Transform neg_z = square.transform.Find ("V3");	// -Z
+		Transform z = square.transform.Find ("V7");		// Z
 		if (t_lowest_z.position.z > neg_z.position.z) {
 			t_lowest_z = neg_z;
 		}
@@ -56,6 +56,7 @@ public class OrigamiFolder {
 			TransformEdge te = new TransformEdge (square.center, t_highest_z, EdgeType.HORZ);
 			square.edges[EdgeType.HORZ].Add(new TransformEdge(square.center, t_highest_z, EdgeType.HORZ));
 		}
+		square.numFolds += 1;
 
 	}
 
@@ -70,8 +71,8 @@ public class OrigamiFolder {
 		Transform t_lowest_x = square.center;
 		Transform t_highest_x = square.center;
 
-		Transform neg_x = square.transform.Find ("-X");
-		Transform x = square.transform.Find ("X");
+		Transform neg_x = square.transform.Find ("V5");	// -X
+		Transform x = square.transform.Find ("V1");		// X
 		if (t_lowest_x.position.x > neg_x.position.x) {
 			t_lowest_x = neg_x;
 		}
@@ -102,13 +103,13 @@ public class OrigamiFolder {
 		FlipEdges (square, EdgeType.VERT);
 
 		if (Mathf.Abs(t_lowest_x.position.x - 0) > Mathf.Epsilon) {
-			//edges.Add(new TransformEdge(center, t_lowest_x, EdgeType.VERT));
 			square.edges[EdgeType.VERT].Add(new TransformEdge(square.center, t_lowest_x, EdgeType.VERT));
 		}
 		if (Mathf.Abs(t_highest_x.position.x - 0) > Mathf.Epsilon) {
-			//edges.Add(new TransformEdge(center, t_highest_x, EdgeType.VERT));
 			square.edges[EdgeType.VERT].Add(new TransformEdge(square.center, t_highest_x, EdgeType.VERT));
 		}
+
+		square.numFolds += 1;
 
 	}
 

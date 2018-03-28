@@ -5,7 +5,10 @@ using UnityEngine;
 
 public class Simulator : MonoBehaviour {
 	public FourSquare square;
-	Vector3 targetDir, fromDir;
+	Vector3 targetDir, fromDir, pocketV, rotatePerp, perp;
+	int stage;
+	float ROTATION_SPEED = 80;
+	Transform point;
 
 	// Use this for initialization
 	void Start () {
@@ -15,10 +18,11 @@ public class Simulator : MonoBehaviour {
 		OrigamiFolder.RotateHorz (squareCopy);
 		OrigamiFolder.RotateVert (squareCopy);
 		squareCopy.GeneratePockets ();
-		squareCopy.transform.Rotate (Vector3.up,180.0f);
+//		squareCopy.transform.Rotate (Vector3.up,180.0f);
 
 		print (square.center.name);
 		OrigamiFolder.RotateHorz (square);
+		OrigamiFolder.RotateVert (square);
 		square.GeneratePockets ();
 		FourSquare[] units = GameObject.FindObjectsOfType<FourSquare> ();
 		foreach (FourSquare unit in units) {
@@ -27,41 +31,112 @@ public class Simulator : MonoBehaviour {
 				break;
 			}
 		}
-		Debug.Log (square.target.name);
 
 
-//		targetDir = square.target.center.transform.position - square.transform.position;
-		Pocket pocket = squareCopy.pockets[0];
-		Vector3 v1 = pocket.edge1.end.position - pocket.edge1.start.position;
-		Vector3 v2 = pocket.edge2.end.position - pocket.edge2.start.position;
-		targetDir = pocket.edge2.start.position + v1 + v2;
+		UnityHelper.getNewRotation(squareCopy.transform, "x", -3);
+		UnityHelper.getNewRotation(squareCopy.transform, "y", 20);
+		UnityHelper.getNewRotation(squareCopy.transform, "z", -14);
+
+//		UnityHelper.setV3Value (squareCopy.transform, "y", 0.5f);
+//		UnityHelper.getNewRotation(square.transform, "x", -10);
+
+
+		point = square.chooseInsertionVertice();
+
+
+		targetDir = square.target.center.transform.position - square.transform.position;
 										// modify this to use a random vertice
-		fromDir = square.transform.Find ("-X-Z").position - square.transform.position;
+		fromDir = point.position - square.transform.position;
 		square.transform.rotation = Quaternion.FromToRotation (fromDir, targetDir);
-		square.transform.Find ("-X-Z").LookAt (square.target.center.transform);
+		point.LookAt (square.target.center.transform);
 
+
+		// perp - vector to rotate around
+		perp = Vector3.Cross (square.transform.position - square.target.center.transform.position, 
+			square.target.pockets [0].GetVectorIn () - square.target.center.transform.position);
+
+
+		Vector3 pToT = square.target.pockets [0].GetPocketCenter () - point.position;
+		Vector3 pToC = square.IVneighbor1.position - square.IVneighbor2.position;
+		rotatePerp = Vector3.Cross (pToT, pToC);
+		print ("rotate perp " + rotatePerp);
+		Vector3 v1 = square.target.pockets [0].GetVectorIn ();
+		Vector3 v2 = square.target.center.transform.position - point.position;
+		print ("vector in " + v1);
+		print ("p to c " + v2);
+		stage = 0;
 	}
 
+	void pdate() {
+		Debug.DrawLine (square.target.pockets [0].GetPocketCenter(),
+			square.target.pockets [0].GetPocketCenter() + perp, 
+			Color.green);
+		Debug.DrawLine (point.position, square.target.center.position, Color.cyan);
+		Debug.DrawLine (square.transform.position, square.transform.position + fromDir, Color.magenta);
+		Debug.DrawLine (square.transform.position, square.transform.position + targetDir, Color.magenta);
+	}
 
-
+	// WORKING!!
 	void Update() {
-		
-		Debug.DrawRay (square.transform.position, targetDir, Color.cyan);
-//		square.transform.Translate (targetDir * Time.deltaTime);
+		Debug.DrawLine (point.position, point.position + rotatePerp, Color.cyan);
+		Debug.DrawLine (point.position, point.position + square.getVectorIn(), Color.magenta);
+		if (stage == 0) {
+			Vector3 v1 = square.getVectorIn ();
+			v1.y = 0;
+			v1.Normalize ();
+			Vector3 v2 = square.target.center.position - point.position;
+			v2.y = 0;
+			v2.Normalize ();
+			if (!UnityHelper.V3Equal (v1, v2)) {
 
-//		Vector3 targetDir = square.target.transform.position - square.transform.position;
-//		float step = 1.0f * Time.deltaTime;
-//		Vector3 newDir = Vector3.RotateTowards (square.transform.forward, targetDir, step, 0.0f);
-//		Debug.DrawRay (square.transform.position, newDir, Color.cyan);
-//		square.transform.rotation = Quaternion.LookRotation (newDir);
+				print ("alignv3 " + v1 + "\nvectIn " + v2);
+				square.transform.RotateAround (point.position, rotatePerp, 40 * Time.deltaTime);
+			} else {
+				stage = 1;
+			}
+		} else if (stage == 1) {
+			Vector3 normRotating = (point.position - square.target.center.transform.position);
+			normRotating.Normalize ();
+			Vector3 normStill = (square.target.pockets [0].GetVectorIn ());
+			normStill.Normalize ();
+
+			if (!UnityHelper.V3Equal(normRotating,normStill)) {
+				print (normRotating + "\n" + normStill);
+				square.transform.RotateAround (square.target.center.position, perp, ROTATION_SPEED * Time.deltaTime);
+			} else {
+				stage = 2;
+			}
+	
+		} else if (stage == 2) {
+			Vector3 acute1 = UnityHelper.acuteAngle (square.transform.eulerAngles);
+			Vector3 acute2 = UnityHelper.acuteAngle (square.target.center.eulerAngles);
+			if (square.alignedWithTarget()) {//(Math.Abs(acute1.x - acute2.x) < 0.3f && Math.Abs(acute1.z - acute2.z) < 1.5f) {
+				stage = 3;
+			} else {
+				print (acute1 + "\n" + acute2);
+				square.transform.RotateAround(point.position, square.target.pockets [0].GetVectorIn (), ROTATION_SPEED * Time.deltaTime);
+			} 
+		} else if (stage == 3) {
+			if ((point.position - square.target.center.position).magnitude > 0.25f) {
+				Vector3 pointToCenter = square.transform.position - point.position;
+//				square.transform.Translate (square.target.center.position - point.position * Time.deltaTime, Space.Self);
+				square.transform.position = Vector3.MoveTowards(square.transform.position, square.target.center.position + pointToCenter, 1.0f * Time.deltaTime);
+			} else {
+				stage = 4;
+			}
+			
+		}
+
+
+		point.LookAt (square.target.center.transform);
+
+//		square.transform.RotateAround (square.target.center.position, square.target.pockets [0].GetVectorPerp (), 20);
+		Debug.DrawLine (square.target.pockets [0].GetPocketCenter(),
+			square.target.pockets [0].GetPocketCenter() - perp, 
+			Color.green);
+		Debug.DrawLine (point.position, square.target.center.position, Color.cyan);
+		
 	}
-//		square.transform.Find("-XZ").LookAt (square.target.center.transform);
-//
-//		Vector3 dir = square.target.transform.position - square.transform.position;
-//		var rot = Quaternion.FromToRotation (dir, -square.transform.position);
-//
-//		square.transform.position += square.transform.forward * Time.deltaTime;
-//	}
 
 
 
