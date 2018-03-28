@@ -10,8 +10,18 @@ public class Simulator : MonoBehaviour {
 	float ROTATION_SPEED = 80;
 	Transform point;
 
+	void Start() {
+		square = GameObject.Find ("4Square").GetComponent<FourSquare> ();
+		OrigamiFolder.RotateHorz (square);
+//		OrigamiFolder.RotateDiagRight (square);
+		OrigamiFolder.RotateVert (square);
+		Transform tri = GameObject.Find("Tri3-1").transform;
+		print (tri.GetComponent<MeshFilter> ().mesh.bounds.center);
+		print (tri.GetComponent<MeshFilter> ().mesh.bounds.extents);
+		print (tri.GetComponent<MeshFilter> ().mesh.bounds.min);
+	}
 	// Use this for initialization
-	void Start () {
+	void tart () {
 		square = GameObject.Find ("4Square").GetComponent<FourSquare> ();
 		FourSquare squareCopy;
 		squareCopy = Instantiate (square, transform.position, transform.rotation) as FourSquare;
@@ -77,7 +87,7 @@ public class Simulator : MonoBehaviour {
 	}
 
 	// WORKING!!
-	void Update() {
+	void Udate() {
 		Debug.DrawLine (point.position, point.position + rotatePerp, Color.cyan);
 		Debug.DrawLine (point.position, point.position + square.getVectorIn(), Color.magenta);
 		if (stage == 0) {

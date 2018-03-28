@@ -46,7 +46,7 @@ public class OrigamiFolder {
 		DoVisualFold (c_parent.transform, new Vector3 (0, 0, 1), height_folded_on, height_to_fold);
 		ReparentFrom (ref c_parent, square);
 
-		FlipEdges (square, EdgeType.HORZ);
+//		FlipEdges (square, EdgeType.HORZ);
 
 		if (Mathf.Abs(t_lowest_z.position.z - 0) > Mathf.Epsilon) {
 			TransformEdge te = new TransformEdge (square.center, t_lowest_z, EdgeType.HORZ);
@@ -100,7 +100,7 @@ public class OrigamiFolder {
 		DoVisualFold (c_parent.transform, new Vector3 (1, 0, 0), height_folded_on, height_to_fold);
 		ReparentFrom (ref c_parent, square);
 
-		FlipEdges (square, EdgeType.VERT);
+//		FlipEdges (square, EdgeType.VERT);
 
 		if (Mathf.Abs(t_lowest_x.position.x - 0) > Mathf.Epsilon) {
 			square.edges[EdgeType.VERT].Add(new TransformEdge(square.center, t_lowest_x, EdgeType.VERT));
@@ -111,6 +111,74 @@ public class OrigamiFolder {
 
 		square.numFolds += 1;
 
+	}
+
+	public static void RotateDiagRight(FourSquare square) {
+		// temporarily parent each child to a new GameObject
+		GameObject c_parent = new GameObject();
+		c_parent.transform.position = square.transform.position;
+
+		List<Transform> children_to_group = new List<Transform>();
+		float height_folded_on = 0, height_to_fold = 0;
+		Transform top_left = square.transform.Find ("V6");		// -X  Y
+		Transform bottom_right = square.transform.Find ("V2");		//  X -Y
+
+		Transform neg_xy = square.transform.Find ("V6");		// -X  Y
+		Transform xneg_y = square.transform.Find ("V2");		//  X -Y
+		if (distanceFromNegF (top_left.GetComponent<MeshRenderer> ().bounds.center) 
+			> distanceFromNegF (square.center.position)) {
+			top_left = square.center;
+		}
+		if (distanceFromNegF (bottom_right.GetComponent<MeshRenderer> ().bounds.center) 
+			> distanceFromNegF (square.center.position)) {
+			bottom_right = square.center;
+		}
+
+		foreach (Transform child in square.transform) {
+			float y_val = child.GetComponent<MeshRenderer>().bounds.center.y - square.transform.position.y;
+			MeshRenderer childR = child.GetComponent<MeshRenderer> ();
+			if (UnityHelper.ApproxSameFloat(childR.bounds.center.z, negf(childR.bounds.center.x)) 
+				|| childR.bounds.center.z < negf(childR.bounds.center.x)) {
+				// group children left-down of the center
+				children_to_group.Add (child);
+				AssignHighest (ref height_to_fold, y_val);
+			} else {
+				// find the highest y coordinate of the children to be folded on
+				AssignHighest (ref height_folded_on, y_val);
+			}
+		}
+		AddPaperThickness (ref height_to_fold, ref height_folded_on, FourSquare.PAPER_THICKNESS);
+		foreach (Transform t in new List<Transform>{square.center, top_left, bottom_right}) {
+			SetVector3Value(t, "y", (height_to_fold + height_folded_on) / 2.0f);
+		}
+
+		ParentTo (children_to_group, c_parent);
+		DoVisualFold (c_parent.transform, new Vector3 (1, 0, -1), height_folded_on, height_to_fold);
+		ReparentFrom (ref c_parent, square);
+
+
+		if (UnityHelper.ApproxSameFloat(
+			Mathf.Abs(distanceFromNegF (top_left.GetComponent<MeshRenderer> ().bounds.center)),
+			0)) {
+			square.edges[EdgeType.DIAG_RIGHT].Add(new TransformEdge(square.center, top_left, EdgeType.DIAG_RIGHT));
+		}
+		if (UnityHelper.ApproxSameFloat(
+			Mathf.Abs(distanceFromNegF (bottom_right.GetComponent<MeshRenderer> ().bounds.center)),
+			0)) {
+			square.edges[EdgeType.DIAG_RIGHT].Add(new TransformEdge(square.center, bottom_right, EdgeType.DIAG_RIGHT));
+		}
+
+		square.numFolds += 1;
+
+	}
+
+	static float negf(float x) {
+		return -x;
+	}
+
+	static float distanceFromNegF(Vector3 v) {
+		float f_z = negf (v.x);
+		return Math.Abs (f_z - v.z);
 	}
 
 

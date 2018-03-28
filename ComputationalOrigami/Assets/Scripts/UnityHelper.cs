@@ -51,5 +51,8 @@ public class UnityHelper : MonoBehaviour {
 		return angle;
 	}
 
+	public static bool ApproxSameFloat(float a, float b) {
+		return (a - b) < 0.0001f;
+	}
 
 }
