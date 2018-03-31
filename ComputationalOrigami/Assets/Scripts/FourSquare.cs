@@ -16,22 +16,22 @@ public class FourSquare : MonoBehaviour {
 	public Transform insertionVertice { get; private set; }
 	public Transform IVneighbor1 { get; private set;}
 	public Transform IVneighbor2 { get; private set; }
-
-	public int numFolds { get; set; }
+	public bool rendMesh;
+	int numFolds;
 
 	// Use this for initialization
 	void Awake () {
 		center = transform.Find ("Center");
 		edges = new SortedList<EdgeType,List<TransformEdge>>();
 		pockets = new List<Pocket> ();
-		foreach (var type in Enum.GetValues(typeof(EdgeType))) {
-			EdgeType t = (EdgeType) Enum.ToObject(typeof(EdgeType), type);
-			edges.Add (t, new List<TransformEdge> ());
-		}
+//		foreach (var type in Enum.GetValues(typeof(EdgeType))) {
+//			EdgeType t = (EdgeType) Enum.ToObject(typeof(EdgeType), type);
+//			edges.Add (t, new List<TransformEdge> ());
+//		}
 		
 		numFolds = 0;
 		insertionVertice = null;
-
+		rendMesh = true;
 		ChangeColor ();
 
 	}
@@ -43,7 +43,95 @@ public class FourSquare : MonoBehaviour {
 		}
 	}
 
-	public void GeneratePockets() {
+	public void insertEdge(TransformEdge e) {
+		EdgeType et = e.edge_type;
+
+		// if there is at least one edge, then we can create pockets
+		if (pockets.Count > 0) {
+			List<Pocket> toDiscard = new List<Pocket> ();
+			List<Pocket> toAdd = new List<Pocket> ();
+			foreach (Pocket p in pockets) {
+				// if edge crosses with pocket in the x,z
+				if (IntersectsPocket (e, p, et)) {
+					// save the two edges of that pocket e1,e2
+					TransformEdge e1 = p.edge1;
+					TransformEdge e2 = p.edge2;
+					// erase the pocket
+					toDiscard.Add (p);
+//					print ("Discarding pocket " + p.ToString());
+					// create 2 new pockets e-e1,e-e2
+
+					toAdd.Add (new Pocket (e, e1)); 
+					toAdd.Add (new Pocket (e, e2));
+//					print ("Adding 2 new pockets");
+				}
+			}
+			pockets.RemoveAll (t => toDiscard.Contains(t));
+			pockets.AddRange(toAdd);
+//			print ("pocket count: " + pockets.Count);
+
+		} else  {
+			// create a pocket with edges not of this type
+			foreach (EdgeType et1 in edges.Keys) {
+				if (et1 != et) {
+					foreach (TransformEdge e1 in edges[et1]) {
+						pockets.Add (new Pocket (e, e1));
+//						print ("Adding new pocket");
+					}
+				}
+			}
+//			print ("init pocket count: " + pockets.Count);
+
+
+		}
+		if (!edges.ContainsKey (et)) {
+			edges.Add (et, new List<TransformEdge> ());
+		}
+		edges [et].Add (e);
+
+	}
+
+
+	private bool IntersectsPocket(TransformEdge e, Pocket p, EdgeType et) {
+		Vector3 s1 = e.start.position;
+		Vector3 e1 = e.end.position;
+		Vector3 s2 = p.edge1.end.position;
+		Vector3 e2 = p.edge2.end.position;
+		float m1 = UnityHelper.getSlope (s1.x, s1.z, e1.x, e1.z);
+		float m2 = UnityHelper.getSlope (s2.x, s2.z, e2.x, e2.z);
+
+		if (UnityHelper.ApproxSameFloat (m1, m2)) {
+//			print ("m1 " + m1 + "  m2 " + m2);
+			return false;
+		}
+		float intx, intz;
+		if (Double.IsInfinity (m1)) {
+			float b2 = UnityHelper.getB (e2.x, e2.z, m2);
+			intx = e1.x;
+			intz = (m2 * intx) + b2;
+		} else if (Double.IsInfinity (m2)) {
+			float b1 = UnityHelper.getB (e1.x, e1.z, m1);
+			intx = e2.x;
+			intz = (m1 * intx) + b1;
+		} else {
+			float b1 = UnityHelper.getB (e1.x, e1.z, m1);
+			float b2 = UnityHelper.getB (e2.x, e2.z, m2);
+			intx = (b2 - b1) / (m1 - m2);
+			intz = (m1 * intx) + b1;
+		}
+		// if not the same as the ends of the pocket
+		if (!UnityHelper.ApproxSameFloat (intx, s2.x)
+			&& !UnityHelper.ApproxSameFloat (intx, e2.x)
+			&& UnityHelper.InBetweenExcl (s2.x, e2.x, intx)) {
+			return true;
+		} else {
+			return false;
+		}
+
+	}
+
+
+	void GeneratePockets() {
 		var edge_enums = Enum.GetValues (typeof(EdgeType));
 		for (int i = 0; i < edge_enums.Length; i++) {
 			EdgeType t1 = (EdgeType) Enum.ToObject(typeof(EdgeType), edge_enums.GetValue(i));
@@ -58,7 +146,7 @@ public class FourSquare : MonoBehaviour {
 						// add pocket only if folded edges are not on the same x or z plane
 						float angle = Pocket.CalculateAngle (e1,e2);
 						if (Mathf.PI - angle > Mathf.Epsilon) {
-							pockets.Add (new Pocket (e1, e2, angle));
+							pockets.Add (new Pocket (e1, e2));
 //							print ("pocket \n" + e1.ToString () + "\n" + e2.ToString ());
 						}
 					}
@@ -76,7 +164,7 @@ public class FourSquare : MonoBehaviour {
 			insertionVertice = transform.Find("V7");
 			getIVNeighbors ();
 		}
-		print ("insertion vertice" + insertionVertice.name);
+//		print ("insertion vertice" + insertionVertice.name);
 		return insertionVertice;
 	}
 
@@ -129,20 +217,32 @@ public class FourSquare : MonoBehaviour {
 		return UnityHelper.V3ApproxEqual (v1, v2);
 	}
 
+	public void incNumFolds() {
+		numFolds += 1;
+	}
+
 	
 	// Update is called once per frame
 	void Update () {
-		foreach (var type in Enum.GetValues(typeof(EdgeType))) {
-			EdgeType t = (EdgeType) Enum.ToObject(typeof(EdgeType), type);
-			foreach (TransformEdge e in edges[t]) {
-				Debug.DrawLine (e.start.position, e.end.position, Color.red);
+		if (rendMesh) {
+			foreach (MeshRenderer mr in transform.GetComponentsInChildren<MeshRenderer>()) {
+				mr.enabled = true;
+			}
+		} else {
+			foreach (MeshRenderer mr in transform.GetComponentsInChildren<MeshRenderer>()) {
+				mr.enabled = false;
 			}
 		}
+//		foreach (List<TransformEdge> l in edges.Values) {
+//			foreach (TransformEdge e in l) {
+//				Debug.DrawLine (e.start.position, e.end.position, Color.black);
+//			}
+//		}
 
 		foreach (var pocket in pockets) {
-			Vector3 v1 = pocket.edge1.end.position - pocket.edge1.start.position;
-			Vector3 v2 = pocket.edge2.end.position - pocket.edge2.start.position;
-			Debug.DrawLine (pocket.edge2.start.position, pocket.edge2.start.position + pocket.GetVectorIn(), Color.blue);
+			Debug.DrawLine (pocket.edge1.start.position, pocket.edge1.end.position, pocket.color);
+			Debug.DrawLine (pocket.edge2.start.position, pocket.edge2.end.position, pocket.color);
+//			Debug.DrawLine (pocket.edge2.start.position, pocket.edge2.start.position + pocket.GetVectorIn(), Color.blue);
 		}
 
 	}

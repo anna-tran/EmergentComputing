@@ -18,7 +18,9 @@ public class UnityHelper : MonoBehaviour {
 
 	}
 
-	public static void setV3Value(Transform orig, string field, float value) {
+
+
+	public static void SetV3Value(Transform orig, string field, float value) {
 		Vector3 vect = orig.position;
 		if (field.ToLower().Equals ("x"))
 			vect.x = value;
@@ -52,7 +54,39 @@ public class UnityHelper : MonoBehaviour {
 	}
 
 	public static bool ApproxSameFloat(float a, float b) {
-		return (a - b) < 0.0001f;
+		return Math.Abs(a - b) < 0.0001f;
+	}
+
+	public static bool V3WithinDec(Vector3 source, Vector3 target, float dec) {
+		return 
+			FloatWithinDec (source.x, target.x, dec)
+			&& FloatWithinDec (source.y, target.y, dec)
+			&& FloatWithinDec (source.z, target.z, dec);
+	}
+
+	public static bool FloatWithinDec(float a, float b, float dec) {
+		return Math.Abs(a - b) < Math.Pow (10, dec);
+	}
+
+
+
+	public static float getSlope(float x1, float z1, float x2, float z2) {
+		return (z1 - z2) / (x1 - x2);
+	}
+
+	public static float getB (float x, float z, float m) {
+		return z - (m * x);
+	}
+
+	public static float PointDistance(float x1, float z1, float x2, float z2) {
+		return (float) Math.Sqrt (Math.Pow(x1-x2,2) + Math.Pow(z1-z2,2));
+	}
+
+	public static bool InBetweenExcl(float v1, float v2, float vToCheck) {
+		float left, right;
+		left = Math.Min (v1, v2);
+		right = Math.Max (v1, v2);
+		return vToCheck > left && vToCheck < right;
 	}
 
 }

@@ -12,28 +12,29 @@ public class Simulator : MonoBehaviour {
 
 	void Start() {
 		square = GameObject.Find ("4Square").GetComponent<FourSquare> ();
-		OrigamiFolder.RotateHorz (square);
-//		OrigamiFolder.RotateDiagRight (square);
-		OrigamiFolder.RotateVert (square);
+//		OrigamiFolder.FoldSquare (EdgeType.HORZ,square);
+
+		OrigamiFolder.FoldSquare (EdgeType.VERT,square);
+		OrigamiFolder.FoldSquare (EdgeType.DIAG_LEFT,square);
+
+
 		Transform tri = GameObject.Find("Tri3-1").transform;
-		print (tri.GetComponent<MeshFilter> ().mesh.bounds.center);
-		print (tri.GetComponent<MeshFilter> ().mesh.bounds.extents);
-		print (tri.GetComponent<MeshFilter> ().mesh.bounds.min);
+//		print (tri.GetComponent<MeshFilter> ().mesh.bounds.center);
+//		print (tri.GetComponent<MeshFilter> ().mesh.bounds.extents);
+//		print (tri.GetComponent<MeshFilter> ().mesh.bounds.min);
 	}
 	// Use this for initialization
 	void tart () {
 		square = GameObject.Find ("4Square").GetComponent<FourSquare> ();
 		FourSquare squareCopy;
 		squareCopy = Instantiate (square, transform.position, transform.rotation) as FourSquare;
-		OrigamiFolder.RotateHorz (squareCopy);
-		OrigamiFolder.RotateVert (squareCopy);
-		squareCopy.GeneratePockets ();
+//		OrigamiFolder.RotateHorz (squareCopy);
+//		OrigamiFolder.RotateVert (squareCopy);
 //		squareCopy.transform.Rotate (Vector3.up,180.0f);
 
 		print (square.center.name);
-		OrigamiFolder.RotateHorz (square);
-		OrigamiFolder.RotateVert (square);
-		square.GeneratePockets ();
+//		OrigamiFolder.RotateHorz (square);
+//		OrigamiFolder.RotateVert (square);
 		FourSquare[] units = GameObject.FindObjectsOfType<FourSquare> ();
 		foreach (FourSquare unit in units) {
 			if (!unit.Equals (square)) {
