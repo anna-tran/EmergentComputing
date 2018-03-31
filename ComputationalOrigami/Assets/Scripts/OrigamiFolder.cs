@@ -5,6 +5,25 @@ using UnityEngine;
 
 public class OrigamiFolder {
 
+	public static void RandomlyFold(FourSquare square) {
+		var edge_enums = Enum.GetValues (typeof(EdgeType));
+
+		System.Random rand = new System.Random ();
+		int numFolds = (int) rand.Next (0, edge_enums.Length);
+
+		// get a random set of folds
+		HashSet<int> set = new HashSet<int> ();
+		for (int i = 0; i < numFolds; i++) {
+			set.Add ((int) rand.Next (0, edge_enums.Length-1));
+		}
+
+		foreach (int i in set) {
+			EdgeType et = (EdgeType) Enum.ToObject(typeof(EdgeType), edge_enums.GetValue(i));
+			FoldSquare (et, square);
+		}
+
+	}
+
 	public static void FoldSquare(EdgeType et, FourSquare square) {
 		// temporarily parent each child to a new GameObject
 

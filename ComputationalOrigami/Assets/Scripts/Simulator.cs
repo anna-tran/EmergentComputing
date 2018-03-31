@@ -4,24 +4,29 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Simulator : MonoBehaviour {
+	float ROTATION_SPEED = 80;
+
+	public int InitUnits;
 	public FourSquare square;
 	Vector3 targetDir, fromDir, pocketV, rotatePerp, perp;
+
 	int stage;
-	float ROTATION_SPEED = 80;
+
 	Transform point;
 
+
 	void Start() {
-		square = GameObject.Find ("4Square").GetComponent<FourSquare> ();
-//		OrigamiFolder.FoldSquare (EdgeType.HORZ,square);
+		Transform zone = GameObject.Find ("Zone").transform;
+		InitUnits = 5;
+		FourSquare squareCopy;
+		for (int i = 0; i < InitUnits; i++) {
+			squareCopy = Instantiate (square, transform.position, transform.rotation) as FourSquare;
+			OrigamiFolder.RandomlyFold (squareCopy);
+			UnityHelper.RandomlyRotate (squareCopy.transform);
+			UnityHelper.RandomlyPosition (squareCopy.transform, zone);
+		}
 
-		OrigamiFolder.FoldSquare (EdgeType.VERT,square);
-		OrigamiFolder.FoldSquare (EdgeType.DIAG_LEFT,square);
 
-
-		Transform tri = GameObject.Find("Tri3-1").transform;
-//		print (tri.GetComponent<MeshFilter> ().mesh.bounds.center);
-//		print (tri.GetComponent<MeshFilter> ().mesh.bounds.extents);
-//		print (tri.GetComponent<MeshFilter> ().mesh.bounds.min);
 	}
 	// Use this for initialization
 	void tart () {
@@ -44,9 +49,9 @@ public class Simulator : MonoBehaviour {
 		}
 
 
-		UnityHelper.getNewRotation(squareCopy.transform, "x", -3);
-		UnityHelper.getNewRotation(squareCopy.transform, "y", 20);
-		UnityHelper.getNewRotation(squareCopy.transform, "z", -14);
+		UnityHelper.GetNewRotation(squareCopy.transform, "x", -3);
+		UnityHelper.GetNewRotation(squareCopy.transform, "y", 20);
+		UnityHelper.GetNewRotation(squareCopy.transform, "z", -14);
 
 //		UnityHelper.setV3Value (squareCopy.transform, "y", 0.5f);
 //		UnityHelper.getNewRotation(square.transform, "x", -10);

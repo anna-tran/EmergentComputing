@@ -4,7 +4,33 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class UnityHelper : MonoBehaviour {
-	public static void getNewRotation(Transform orig, string field, float value) {
+	static System.Random rand = new System.Random ();
+
+	public static void RandomlyPosition(Transform orig, Transform zone) {
+		Vector3 zoneSize = zone.GetComponent<MeshRenderer> ().bounds.size;
+		float xRange = zoneSize.x-5;
+		float yRange = 10;
+		float zRange = zoneSize.z-5;
+		do {
+			float newX = (float) rand.NextDouble() * xRange;
+			SetV3Value(orig,"x",newX-(xRange/2));
+		} while (orig.position.x >= xRange / 2 || orig.position.x <= -xRange / 2);
+
+		SetV3Value(orig,"y", (float) rand.NextDouble() * yRange);
+
+		do {
+			float newZ = (float) rand.NextDouble() * zRange;
+			SetV3Value(orig,"z",newZ-(zRange/2));
+		} while (orig.position.z >= zRange / 2 || orig.position.z <= -zRange / 2);
+	}
+
+	public static void RandomlyRotate(Transform orig) {
+		GetNewRotation (orig, "x", (float) rand.NextDouble () * 360);	
+		GetNewRotation (orig, "y", (float) rand.NextDouble () * 360);	
+		GetNewRotation (orig, "z", (float) rand.NextDouble () * 360);	
+	}
+
+	public static void GetNewRotation(Transform orig, string field, float value) {
 		Vector3 rotationVector = orig.rotation.eulerAngles;
 		if (field == "x") {
 			rotationVector.x = value;
