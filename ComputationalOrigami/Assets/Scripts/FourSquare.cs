@@ -4,37 +4,47 @@ using System;
 using UnityEngine;
 
 public class FourSquare : MonoBehaviour {
-	public static float PAPER_THICKNESS = 0.01f;
-	private static int NUM_VERTICES = 8;
+    public static float PAPER_THICKNESS = 0.01f;
+    private static int NUM_VERTICES = 8;
+
+    private GameObject simulator;
 
     // edges are at local positions, relative to the center
-	public SortedList<EdgeType,List<TransformEdge>> edges { get; private set; }
-	public List<Pocket> pockets { get; private set; }
-	public Transform center { get; private set; }
+    public SortedList<EdgeType, List<TransformEdge>> edges { get; private set; }
+    public List<Pocket> pockets { get; private set; }
+    public Transform center { get; private set; }
 
-	public FourSquare target { get; set; }
-	public Transform insertionVertice { get; private set; }
-	public Transform IVneighbor1 { get; private set;}
-	public Transform IVneighbor2 { get; private set; }
-	public bool rendMesh;
-	int numFolds;
+    public FourSquare target { get; set; }
+    public Pocket targetP { get; set; }
+    // iv   insertion vertice
+    public Transform iv { get; private set; }
+    public Transform ivNeighbor1 { get; private set; }
+    public Transform ivNeighbor2 { get; private set; }
+    public bool rendMesh;
+    public int stage { get; private set; }
+    public Vector3 targetRotationV3 { get; private set; }
+    public Vector3 selfRotationV3 { get; private set; }
 
 	// Use this for initialization
 	void Awake () {
+        simulator = GameObject.Find("Simulator");
 		center = transform.Find ("Center");
 		edges = new SortedList<EdgeType,List<TransformEdge>>();
 		pockets = new List<Pocket> ();
-//		foreach (var type in Enum.GetValues(typeof(EdgeType))) {
-//			EdgeType t = (EdgeType) Enum.ToObject(typeof(EdgeType), type);
-//			edges.Add (t, new List<TransformEdge> ());
-//		}
 		
-		numFolds = 0;
-		insertionVertice = null;
+		iv = null;
 		rendMesh = true;
+        selfRotationV3 = Vector3.zero;
+        targetRotationV3 = Vector3.zero;
+        stage = -1;
 		ChangeColor ();
 
 	}
+
+    public void MoveToNextStage()
+    {
+        stage++;
+    }
 
 	void ChangeColor() {
 		Color rand_color = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
@@ -43,7 +53,8 @@ public class FourSquare : MonoBehaviour {
 		}
 	}
 
-	public void insertEdge(TransformEdge e) {
+    // every time we add a pocket, notify the simulator
+    public void InsertEdge(TransformEdge e) {
 		EdgeType et = e.edge_type;
 
 		// if there is at least one edge, then we can create pockets
@@ -52,17 +63,21 @@ public class FourSquare : MonoBehaviour {
 			List<Pocket> toAdd = new List<Pocket> ();
 			foreach (Pocket p in pockets) {
 				// if edge crosses with pocket in the x,z
-				if (IntersectsPocket (e, p, et)) {
+				if (UnityHelper.IntersectsPocket (e, p, et)) {
 					// save the two edges of that pocket e1,e2
 					TransformEdge e1 = p.edge1;
 					TransformEdge e2 = p.edge2;
 					// erase the pocket
 					toDiscard.Add (p);
-//					print ("Discarding pocket " + p.ToString());
-					// create 2 new pockets e-e1,e-e2
+                    //					print ("Discarding pocket " + p.ToString());
+                    // create 2 new pockets e-e1,e-e2
+                    Pocket p1 = new Pocket(e, e1);
+                    Pocket p2 = new Pocket(e, e2);
+                    toAdd.Add (p1); 
+					toAdd.Add (p2);
+                    simulator.SendMessage("PushPocket", p1);
+                    simulator.SendMessage("PushPocket", p2);
 
-					toAdd.Add (new Pocket (e, e1)); 
-					toAdd.Add (new Pocket (e, e2));
 //					print ("Adding 2 new pockets");
 				}
 			}
@@ -75,7 +90,9 @@ public class FourSquare : MonoBehaviour {
 			foreach (EdgeType et1 in edges.Keys) {
 				if (et1 != et) {
 					foreach (TransformEdge e1 in edges[et1]) {
-						pockets.Add (new Pocket (e, e1));
+                        Pocket p = new Pocket(e, e1);
+						pockets.Add (p);
+                        simulator.SendMessage("PushPocket", p);
 //						print ("Adding new pocket");
 					}
 				}
@@ -91,86 +108,23 @@ public class FourSquare : MonoBehaviour {
 
 	}
 
-
-	private bool IntersectsPocket(TransformEdge e, Pocket p, EdgeType et) {
-		Vector3 s1 = e.start.position;
-		Vector3 e1 = e.end.position;
-		Vector3 s2 = p.edge1.end.position;
-		Vector3 e2 = p.edge2.end.position;
-		float m1 = UnityHelper.getSlope (s1.x, s1.z, e1.x, e1.z);
-		float m2 = UnityHelper.getSlope (s2.x, s2.z, e2.x, e2.z);
-
-		if (UnityHelper.ApproxSameFloat (m1, m2)) {
-//			print ("m1 " + m1 + "  m2 " + m2);
-			return false;
-		}
-		float intx, intz;
-		if (Double.IsInfinity (m1)) {
-			float b2 = UnityHelper.getB (e2.x, e2.z, m2);
-			intx = e1.x;
-			intz = (m2 * intx) + b2;
-		} else if (Double.IsInfinity (m2)) {
-			float b1 = UnityHelper.getB (e1.x, e1.z, m1);
-			intx = e2.x;
-			intz = (m1 * intx) + b1;
-		} else {
-			float b1 = UnityHelper.getB (e1.x, e1.z, m1);
-			float b2 = UnityHelper.getB (e2.x, e2.z, m2);
-			intx = (b2 - b1) / (m1 - m2);
-			intz = (m1 * intx) + b1;
-		}
-		// if not the same as the ends of the pocket
-		if (!UnityHelper.ApproxSameFloat (intx, s2.x)
-			&& !UnityHelper.ApproxSameFloat (intx, e2.x)
-			&& UnityHelper.InBetweenExcl (s2.x, e2.x, intx)) {
-			return true;
-		} else {
-			return false;
-		}
-
-	}
-
-
-	void GeneratePockets() {
-		var edge_enums = Enum.GetValues (typeof(EdgeType));
-		for (int i = 0; i < edge_enums.Length; i++) {
-			EdgeType t1 = (EdgeType) Enum.ToObject(typeof(EdgeType), edge_enums.GetValue(i));
-
-			// only match with the unseen edge types
-			for (int j = i + 1; j < edge_enums.Length; j++) {
-				EdgeType t2 = (EdgeType) Enum.ToObject(typeof(EdgeType), edge_enums.GetValue(j));
-
-				foreach (TransformEdge e1 in edges[t1]) {
-					foreach (TransformEdge e2 in edges[t2]) {
-
-						// add pocket only if folded edges are not on the same x or z plane
-						float angle = Pocket.CalculateAngle (e1,e2);
-						if (Mathf.PI - angle > Mathf.Epsilon) {
-							pockets.Add (new Pocket (e1, e2));
-//							print ("pocket \n" + e1.ToString () + "\n" + e2.ToString ());
-						}
-					}
-				}
-			}
-		}
-
-	}
+    
 
 	// vertices are labelled 'Vx' where x in range 1-8
-	public Transform chooseInsertionVertice() {
-		if (insertionVertice == null) {
+	public Transform ChooseInsertionVertice() {
+		if (iv == null) {
 			int vNum = (int) (UnityEngine.Random.Range(0,NUM_VERTICES-1));
-//			insertionVertice = transform.Find("V" + vNum);
-			insertionVertice = transform.Find("V7");
-			getIVNeighbors ();
+			iv = transform.Find("V" + vNum);
+//			iv = transform.Find("V7");
+			GetIVNeighbors ();
 		}
 //		print ("insertion vertice" + insertionVertice.name);
-		return insertionVertice;
+		return iv;
 	}
 
 	// get the connected vertices to find the fromDir vector
-	private void getIVNeighbors() {
-		int vNum = Int32.Parse(insertionVertice.name.Substring(1));
+	private void GetIVNeighbors() {
+		int vNum = Int32.Parse(iv.name.Substring(1));
 		print (vNum + "\n" + (((vNum - 1 + NUM_VERTICES) % NUM_VERTICES)) + "\n" + ((vNum + 1) % NUM_VERTICES));
 	
 		Transform vBefore = transform.Find("V" + ((vNum - 1 + NUM_VERTICES) % NUM_VERTICES));
@@ -190,17 +144,17 @@ public class FourSquare : MonoBehaviour {
 				temp2 = diffVects [j].position;
 				if (Vector3.Distance (temp1, temp2) > maxDistance) {
 					maxDistance = Vector3.Distance (temp1, temp2);
-					IVneighbor1 = diffVects [i];
-					IVneighbor2 = diffVects [j];
+					ivNeighbor1 = diffVects [i];
+					ivNeighbor2 = diffVects [j];
 				}
 			}
 		}
-		print (IVneighbor1 + "\n" + IVneighbor2);
+		print (ivNeighbor1 + "\n" + ivNeighbor2);
 	}
 
-	public Vector3 getVectorIn() {
-		Vector3 v1 = IVneighbor1.position - insertionVertice.position;
-		Vector3 v2 = IVneighbor2.position - insertionVertice.position;
+	public Vector3 GetAlignmentV3() {
+		Vector3 v1 = ivNeighbor1.position - iv.position;
+		Vector3 v2 = ivNeighbor2.position - iv.position;
 		print("IVs\n" + (v1+v2));
 		Vector3 sum = v1 + v2;
 		sum.x = -sum.x;
@@ -209,21 +163,56 @@ public class FourSquare : MonoBehaviour {
 		return sum;
 	}
 
-	public bool alignedWithTarget() {
-		Vector3 v1 = IVneighbor1.position - target.pockets[0].edge1.end.position;
-		Vector3 v2 = IVneighbor2.position - target.pockets[0].edge2.end.position;
+	public bool AlignedWithTarget() {
+		Vector3 v1 = ivNeighbor1.position - targetP.edge1.end.position;
+		Vector3 v2 = ivNeighbor2.position - targetP.edge2.end.position;
 		print ("n1-e1 " + v1 + "\nn2-e2 " + v2);
 
 		return UnityHelper.V3ApproxEqual (v1, v2);
 	}
 
-	public void incNumFolds() {
-		numFolds += 1;
-	}
 
-	
-	// Update is called once per frame
-	void Update () {
+    public Vector3 GetTargetRotationV3()
+    {
+        if (targetRotationV3.Equals(Vector3.zero))
+        {
+            CalcTargetRotationV3();
+        }
+        return targetRotationV3;
+    }
+
+    public void CalcSelfRotationV3()
+    {
+        // point is iv
+        Vector3 pointToTarget = targetP.pCenter.position - iv.position;
+        Vector3 pointToCenter = ivNeighbor1.position - ivNeighbor2.position;
+        selfRotationV3 = Vector3.Cross(pointToTarget, pointToCenter);
+    }
+
+    public void CalcTargetRotationV3()
+    {
+        Vector3 targetDir = targetP.pCenter.position - transform.position;
+        Vector3 fromDir = iv.position - transform.position;
+        transform.rotation = Quaternion.FromToRotation(fromDir, targetDir);
+        transform.LookAt(targetP.pCenter);
+
+
+        // perpendicular vector to rotate around
+        targetRotationV3 = Vector3.Cross(transform.position - targetP.pCenter.position,
+            targetP.GetVectorIn() - targetP.pCenter.position);
+        
+
+    }
+
+    public void Kill()
+    {
+        stage = -2;
+    }
+
+
+
+    // Update is called once per frame
+    void Update () {
 		if (rendMesh) {
 			foreach (MeshRenderer mr in transform.GetComponentsInChildren<MeshRenderer>()) {
 				mr.enabled = true;

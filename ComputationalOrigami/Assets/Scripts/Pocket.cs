@@ -8,6 +8,7 @@ public class Pocket {
 	public TransformEdge edge2 { get; private set; }
 	public float angle { get; private set; }
 	public Color color {get; private set; }
+    public Transform pCenter { get; private set; }
 
 	public bool filled { get; set; }
 
@@ -24,7 +25,9 @@ public class Pocket {
 	public Pocket(TransformEdge e1, TransformEdge e2) {
 		edge1 = e1;
 		edge2 = e2;
-		angle = Pocket.CalculateAngle (e1,e2);
+		angle = CalculateAngle (e1,e2);
+        // 'start' of either edge is the center
+        pCenter = edge1.start;
 		filled = false;
 //		RandEdgeColor ();
 		color = Color.red;
@@ -34,8 +37,8 @@ public class Pocket {
 		color = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
 	}
 
-	public Vector3 GetPocketCenter() {
-		return edge1.start.position;
+	public Vector3 GetCenterPosition() {
+		return pCenter.position;
 	}
 
 	public Vector3 GetVectorIn() {

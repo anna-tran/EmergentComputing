@@ -4,22 +4,34 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Simulator : MonoBehaviour {
-	float ROTATION_SPEED = 80;
+	private static float ROTATION_SPEED = 80;
+    private static int FPS = 30;
+    private static int DELAY_SECONDS = 5 * FPS;
 
-	public int InitUnits;
+
+    public int initUnits;
 	public FourSquare square;
-	Vector3 targetDir, fromDir, pocketV, rotatePerp, perp;
-
+    private Transform zone;
+	private Vector3 targetDir, fromDir, pocketV, rotatePerp, perp;
+    private Queue<Pocket> pockets;
+    private List<FourSquare> activeUnits;
+    FourSquare squareCopy;
 	int stage;
-
+    int count;
 	Transform point;
 
+    int temp;
 
-	void Start() {
-		Transform zone = GameObject.Find ("Zone").transform;
-		InitUnits = 5;
-		FourSquare squareCopy;
-		for (int i = 0; i < InitUnits; i++) {
+
+	void Start()
+    {
+        count = 0;
+        pockets = new Queue<Pocket>();
+        activeUnits = new List<FourSquare>();
+		zone = GameObject.Find ("Zone").transform;
+		initUnits = 1;
+        // all unactive units
+		for (int i = 0; i < initUnits; i++) {
 			squareCopy = Instantiate (square, transform.position, transform.rotation) as FourSquare;
 			OrigamiFolder.RandomlyFold (squareCopy);
 			UnityHelper.RandomlyRotate (squareCopy.transform);
@@ -28,8 +40,149 @@ public class Simulator : MonoBehaviour {
 
 
 	}
-	// Use this for initialization
-	void tart () {
+
+    void Update()
+    {
+        if (TimeToSpawn() && temp < initUnits)
+        {
+            squareCopy = Instantiate(square, transform.position, transform.rotation) as FourSquare;
+            OrigamiFolder.RandomlyFold(squareCopy);
+            activeUnits.Add(squareCopy);
+            temp++;
+        }
+        List<FourSquare> toRemove = new List<FourSquare>();
+        foreach (FourSquare unit in activeUnits)
+        {
+            // go through each stage
+            if (unit.stage == -1)
+            {
+                Pocket p = PopPocket();
+                unit.targetP = p;
+
+                if (p == null)
+                {
+                    unit.Kill();
+                }
+                else
+                {
+                    unit.ChooseInsertionVertice();
+                    unit.CalcTargetRotationV3();
+                    unit.CalcSelfRotationV3();
+
+                    unit.MoveToNextStage();
+                }
+            } else if (unit.stage == 0)
+            {
+                Vector3 currV3 = unit.GetAlignmentV3();
+                currV3.y = 0;
+                currV3.Normalize();
+                Vector3 alignToV3 = unit.targetP.pCenter.position - unit.iv.position;
+                alignToV3.y = 0;
+                alignToV3.Normalize();
+                if (!UnityHelper.V3Equal(currV3, alignToV3))
+                {
+                    unit.transform.RotateAround(unit.iv.position, unit.selfRotationV3, ROTATION_SPEED * Time.deltaTime);
+                }
+                else
+                {
+                    unit.MoveToNextStage();
+                }
+            } else if (unit.stage == 1)
+            {
+                Vector3 normRotating = (unit.iv.position - unit.targetP.pCenter.position);
+                normRotating.Normalize();
+                Vector3 normStill = (unit.targetP.GetVectorIn());
+                normStill.Normalize();
+
+                if (!UnityHelper.V3Equal(normRotating, normStill))
+                {
+                    print(normRotating + "\n" + normStill);
+                    unit.transform.RotateAround(unit.targetP.pCenter.position, unit.targetRotationV3,ROTATION_SPEED * Time.deltaTime);
+                }
+                else
+                {
+                    unit.MoveToNextStage();
+                }
+            } else if (stage == 2)
+            {
+                Vector3 acute1 = UnityHelper.acuteAngle(unit.transform.eulerAngles);
+                Vector3 acute2 = UnityHelper.acuteAngle(unit.targetP.pCenter.eulerAngles);
+                if (!unit.AlignedWithTarget())
+                {
+                    print(acute1 + "\n" + acute2);
+                    square.transform.RotateAround(unit.iv.position, unit.targetP.GetVectorIn(), ROTATION_SPEED * Time.deltaTime);
+                }
+                else
+                {
+                    unit.MoveToNextStage();
+                }
+            }
+            else if (stage == 3)
+            {
+                Vector3 distFromTarget = unit.iv.position - unit.targetP.pCenter.position;
+                if (distFromTarget.magnitude > 0.25f)
+                {
+                    Vector3 pointToCenter = unit.transform.position - unit.iv.position;
+                    unit.transform.position = Vector3.MoveTowards(unit.transform.position, unit.targetP.pCenter.position + pointToCenter, 1.0f * Time.deltaTime);
+                }
+                else
+                {
+                    unit.MoveToNextStage();
+                }
+
+            } else
+            {
+                toRemove.Add(unit);
+            }
+
+            //            unit.iv.LookAt(unit.targetP.pCenter);
+
+            Debug.DrawLine(unit.targetP.pCenter.position, 
+                unit.targetP.pCenter.position - unit.targetRotationV3,
+                Color.green);
+            Debug.DrawLine(unit.iv.position, unit.targetP.pCenter.position, Color.cyan);
+
+        }
+        activeUnits.RemoveAll(u => toRemove.Contains(u));
+
+    }
+
+    public void PushPocket(Pocket p)
+    {
+        pockets.Enqueue(p);
+
+    }
+
+    public Pocket PopPocket()
+    {
+       if (pockets.Count > 0)
+        {
+
+            Pocket p = pockets.Dequeue();
+            return p;
+        }
+    
+        return null;
+
+    }
+
+    private bool TimeToSpawn()
+    {
+        count++;
+        if (count >= DELAY_SECONDS)
+        {
+            count = 0;
+            return true;
+        }
+        return false;
+    }
+
+
+
+
+
+    // Use this for initialization
+    void tart () {
 		square = GameObject.Find ("4Square").GetComponent<FourSquare> ();
 		FourSquare squareCopy;
 		squareCopy = Instantiate (square, transform.position, transform.rotation) as FourSquare;
@@ -57,7 +210,7 @@ public class Simulator : MonoBehaviour {
 //		UnityHelper.getNewRotation(square.transform, "x", -10);
 
 
-		point = square.chooseInsertionVertice();
+		point = square.ChooseInsertionVertice();
 
 
 		targetDir = square.target.center.transform.position - square.transform.position;
@@ -72,8 +225,8 @@ public class Simulator : MonoBehaviour {
 			square.target.pockets [0].GetVectorIn () - square.target.center.transform.position);
 
 
-		Vector3 pToT = square.target.pockets [0].GetPocketCenter () - point.position;
-		Vector3 pToC = square.IVneighbor1.position - square.IVneighbor2.position;
+		Vector3 pToT = square.target.pockets [0].GetCenterPosition () - point.position;
+		Vector3 pToC = square.ivNeighbor1.position - square.ivNeighbor2.position;
 		rotatePerp = Vector3.Cross (pToT, pToC);
 		print ("rotate perp " + rotatePerp);
 		Vector3 v1 = square.target.pockets [0].GetVectorIn ();
@@ -84,8 +237,8 @@ public class Simulator : MonoBehaviour {
 	}
 
 	void pdate() {
-		Debug.DrawLine (square.target.pockets [0].GetPocketCenter(),
-			square.target.pockets [0].GetPocketCenter() + perp, 
+		Debug.DrawLine (square.target.pockets [0].GetCenterPosition(),
+			square.target.pockets [0].GetCenterPosition() + perp, 
 			Color.green);
 		Debug.DrawLine (point.position, square.target.center.position, Color.cyan);
 		Debug.DrawLine (square.transform.position, square.transform.position + fromDir, Color.magenta);
@@ -95,9 +248,9 @@ public class Simulator : MonoBehaviour {
 	// WORKING!!
 	void Udate() {
 		Debug.DrawLine (point.position, point.position + rotatePerp, Color.cyan);
-		Debug.DrawLine (point.position, point.position + square.getVectorIn(), Color.magenta);
+		Debug.DrawLine (point.position, point.position + square.GetAlignmentV3(), Color.magenta);
 		if (stage == 0) {
-			Vector3 v1 = square.getVectorIn ();
+			Vector3 v1 = square.GetAlignmentV3 ();
 			v1.y = 0;
 			v1.Normalize ();
 			Vector3 v2 = square.target.center.position - point.position;
@@ -126,7 +279,7 @@ public class Simulator : MonoBehaviour {
 		} else if (stage == 2) {
 			Vector3 acute1 = UnityHelper.acuteAngle (square.transform.eulerAngles);
 			Vector3 acute2 = UnityHelper.acuteAngle (square.target.center.eulerAngles);
-			if (square.alignedWithTarget()) {//(Math.Abs(acute1.x - acute2.x) < 0.3f && Math.Abs(acute1.z - acute2.z) < 1.5f) {
+			if (square.AlignedWithTarget()) {//(Math.Abs(acute1.x - acute2.x) < 0.3f && Math.Abs(acute1.z - acute2.z) < 1.5f) {
 				stage = 3;
 			} else {
 				print (acute1 + "\n" + acute2);
@@ -147,8 +300,8 @@ public class Simulator : MonoBehaviour {
 		point.LookAt (square.target.center.transform);
 
 //		square.transform.RotateAround (square.target.center.position, square.target.pockets [0].GetVectorPerp (), 20);
-		Debug.DrawLine (square.target.pockets [0].GetPocketCenter(),
-			square.target.pockets [0].GetPocketCenter() - perp, 
+		Debug.DrawLine (square.target.pockets [0].GetCenterPosition(),
+			square.target.pockets [0].GetCenterPosition() - perp, 
 			Color.green);
 		Debug.DrawLine (point.position, square.target.center.position, Color.cyan);
 		

@@ -4,12 +4,61 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class UnityHelper : MonoBehaviour {
-	static System.Random rand = new System.Random ();
+	public static System.Random rand = new System.Random ();
 
-	public static void RandomlyPosition(Transform orig, Transform zone) {
+
+    public static bool IntersectsPocket(TransformEdge e, Pocket p, EdgeType et)
+    {
+        Vector3 s1 = e.start.position;
+        Vector3 e1 = e.end.position;
+        Vector3 s2 = p.edge1.end.position;
+        Vector3 e2 = p.edge2.end.position;
+        float m1 = GetSlope(s1.x, s1.z, e1.x, e1.z);
+        float m2 = GetSlope(s2.x, s2.z, e2.x, e2.z);
+
+        if (ApproxSameFloat(m1, m2))
+        {
+            //			print ("m1 " + m1 + "  m2 " + m2);
+            return false;
+        }
+        float intx, intz;
+        if (Double.IsInfinity(m1))
+        {
+            float b2 = GetB(e2.x, e2.z, m2);
+            intx = e1.x;
+            intz = (m2 * intx) + b2;
+        }
+        else if (Double.IsInfinity(m2))
+        {
+            float b1 = GetB(e1.x, e1.z, m1);
+            intx = e2.x;
+            intz = (m1 * intx) + b1;
+        }
+        else
+        {
+            float b1 = GetB(e1.x, e1.z, m1);
+            float b2 = GetB(e2.x, e2.z, m2);
+            intx = (b2 - b1) / (m1 - m2);
+            intz = (m1 * intx) + b1;
+        }
+        // if not the same as the ends of the pocket
+        if (!ApproxSameFloat(intx, s2.x)
+            && !ApproxSameFloat(intx, e2.x)
+            && InBetweenExcl(s2.x, e2.x, intx))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+
+    }
+
+    public static void RandomlyPosition(Transform orig, Transform zone) {
 		Vector3 zoneSize = zone.GetComponent<MeshRenderer> ().bounds.size;
 		float xRange = zoneSize.x-5;
-		float yRange = 10;
+		float yRange = 1;
 		float zRange = zoneSize.z-5;
 		do {
 			float newX = (float) rand.NextDouble() * xRange;
@@ -96,11 +145,11 @@ public class UnityHelper : MonoBehaviour {
 
 
 
-	public static float getSlope(float x1, float z1, float x2, float z2) {
+	public static float GetSlope(float x1, float z1, float x2, float z2) {
 		return (z1 - z2) / (x1 - x2);
 	}
 
-	public static float getB (float x, float z, float m) {
+	public static float GetB (float x, float z, float m) {
 		return z - (m * x);
 	}
 
