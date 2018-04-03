@@ -57,18 +57,18 @@ public class UnityHelper : MonoBehaviour {
 
     public static void RandomlyPosition(Transform orig, Transform zone) {
 		Vector3 zoneSize = zone.GetComponent<MeshRenderer> ().bounds.size;
-		float xRange = zoneSize.x-5;
+		float xRange = zoneSize.x;
 		float yRange = 1;
-		float zRange = zoneSize.z-5;
+		float zRange = zoneSize.z;
 		do {
-			float newX = (float) rand.NextDouble() * xRange;
+			float newX = (float) rand.Next(2,(int)xRange);
 			SetV3Value(orig,"x",newX-(xRange/2));
 		} while (orig.position.x >= xRange / 2 || orig.position.x <= -xRange / 2);
 
 		SetV3Value(orig,"y", (float) rand.NextDouble() * yRange);
 
 		do {
-			float newZ = (float) rand.NextDouble() * zRange;
+			float newZ = (float) rand.Next(2,(int)zRange);
 			SetV3Value(orig,"z",newZ-(zRange/2));
 		} while (orig.position.z >= zRange / 2 || orig.position.z <= -zRange / 2);
 	}

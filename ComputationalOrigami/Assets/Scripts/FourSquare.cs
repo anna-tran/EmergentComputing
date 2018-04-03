@@ -155,7 +155,6 @@ public class FourSquare : MonoBehaviour {
 	public Vector3 GetAlignmentV3() {
 		Vector3 v1 = ivNeighbor1.position - iv.position;
 		Vector3 v2 = ivNeighbor2.position - iv.position;
-		print("IVs\n" + (v1+v2));
 		Vector3 sum = v1 + v2;
 		sum.x = -sum.x;
 		sum.z = -sum.z;
@@ -194,13 +193,12 @@ public class FourSquare : MonoBehaviour {
         Vector3 targetDir = targetP.pCenter.position - transform.position;
         Vector3 fromDir = iv.position - transform.position;
         transform.rotation = Quaternion.FromToRotation(fromDir, targetDir);
-        transform.LookAt(targetP.pCenter);
+        iv.LookAt(targetP.pCenter);
 
 
         // perpendicular vector to rotate around
         targetRotationV3 = Vector3.Cross(transform.position - targetP.pCenter.position,
             targetP.GetVectorIn() - targetP.pCenter.position);
-        
 
     }
 
@@ -231,7 +229,7 @@ public class FourSquare : MonoBehaviour {
 		foreach (var pocket in pockets) {
 			Debug.DrawLine (pocket.edge1.start.position, pocket.edge1.end.position, pocket.color);
 			Debug.DrawLine (pocket.edge2.start.position, pocket.edge2.end.position, pocket.color);
-//			Debug.DrawLine (pocket.edge2.start.position, pocket.edge2.start.position + pocket.GetVectorIn(), Color.blue);
+			Debug.DrawLine (pocket.edge2.start.position, pocket.edge2.start.position + pocket.GetVectorIn(), Color.blue);
 		}
 
 	}

@@ -18,6 +18,7 @@ public class OrigamiFolder {
 
 		foreach (int i in set) {
 			EdgeType et = (EdgeType) Enum.ToObject(typeof(EdgeType), edge_enums.GetValue(i));
+			Debug.Log ("folding as " + et.ToString ());
 			FoldSquare (et, square);
 		}
 

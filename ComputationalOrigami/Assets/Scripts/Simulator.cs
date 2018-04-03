@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Simulator : MonoBehaviour {
 	private static float ROTATION_SPEED = 80;
-    private static int FPS = 30;
+    private static int FPS = 1;
     private static int DELAY_SECONDS = 5 * FPS;
 
 
@@ -33,6 +33,8 @@ public class Simulator : MonoBehaviour {
         // all unactive units
 		for (int i = 0; i < initUnits; i++) {
 			squareCopy = Instantiate (square, transform.position, transform.rotation) as FourSquare;
+			squareCopy.rendMesh = true;
+			squareCopy.name = "4Square(Base)";
 			OrigamiFolder.RandomlyFold (squareCopy);
 			UnityHelper.RandomlyRotate (squareCopy.transform);
 			UnityHelper.RandomlyPosition (squareCopy.transform, zone);
@@ -53,7 +55,8 @@ public class Simulator : MonoBehaviour {
         List<FourSquare> toRemove = new List<FourSquare>();
         foreach (FourSquare unit in activeUnits)
         {
-            // go through each stage
+			print ("stage " + unit.stage);
+			
             if (unit.stage == -1)
             {
                 Pocket p = PopPocket();
@@ -61,18 +64,21 @@ public class Simulator : MonoBehaviour {
 
                 if (p == null)
                 {
-                    unit.Kill();
+					GameObject.Destroy (unit.gameObject);
                 }
                 else
                 {
                     unit.ChooseInsertionVertice();
                     unit.CalcTargetRotationV3();
-                    unit.CalcSelfRotationV3();
+//                    unit.CalcSelfRotationV3();
 
                     unit.MoveToNextStage();
                 }
-            } else if (unit.stage == 0)
+            } else if (unit.stage == 10)
             {
+				print ("IV = " + unit.iv.name);
+				print("target p " + unit.targetP.ToString());
+			
                 Vector3 currV3 = unit.GetAlignmentV3();
                 currV3.y = 0;
                 currV3.Normalize();
@@ -114,10 +120,10 @@ public class Simulator : MonoBehaviour {
                 }
                 else
                 {
+					print ("here next stage");
                     unit.MoveToNextStage();
                 }
-            }
-            else if (stage == 3)
+            } else if (stage == 3)
             {
                 Vector3 distFromTarget = unit.iv.position - unit.targetP.pCenter.position;
                 if (distFromTarget.magnitude > 0.25f)
@@ -132,16 +138,18 @@ public class Simulator : MonoBehaviour {
 
             } else
             {
-                toRemove.Add(unit);
+                //toRemove.Add(unit);
             }
 
             //            unit.iv.LookAt(unit.targetP.pCenter);
 
-            Debug.DrawLine(unit.targetP.pCenter.position, 
-                unit.targetP.pCenter.position - unit.targetRotationV3,
-                Color.green);
-            Debug.DrawLine(unit.iv.position, unit.targetP.pCenter.position, Color.cyan);
-
+			if (unit.targetP != null ) {
+					
+	            Debug.DrawLine(unit.targetP.pCenter.position, 
+	                unit.targetP.pCenter.position - unit.targetRotationV3,
+	                Color.green);
+	            Debug.DrawLine(unit.iv.position, unit.targetP.pCenter.position, Color.cyan);
+			}
         }
         activeUnits.RemoveAll(u => toRemove.Contains(u));
 
