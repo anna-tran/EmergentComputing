@@ -68,6 +68,7 @@ public class Simulator : MonoBehaviour {
         }
 		List<FourSquare> toRemove = new List<FourSquare>();
 		List<FourSquare> toDestroy = new List<FourSquare>();
+//		PrintValues (pockets);
 		foreach (Tuple<int,FourSquare> tup in activeUnits)
         {
 			
@@ -76,11 +77,11 @@ public class Simulator : MonoBehaviour {
 			if (tup.first == UNIT_LIFETIME && stage >= 0 && stage < 3) {
 				toDestroy.Add (unit);
 				// put pocket back onto the field
-				pockets.Enqueue (unit.targetP);
+				PushPocket(unit.targetP);
 				continue;
-			} else if (stage < 3) {
-				tup.first++;
-			}
+			} 
+			tup.first++;
+
 			
 			if (unit.stage == -1) {
 				Pocket p = PopPocket ();
@@ -97,7 +98,7 @@ public class Simulator : MonoBehaviour {
 					tup.first = 0;
 				}
 			} else if (unit.stage == 0) {
-				print ("from " + unit.transform.name + " to " + unit.targetP.pCenter.parent.name);
+//				print ("from " + unit.transform.name + " to " + unit.targetP.pCenter.parent.name);
 
 			
 				Vector3 currV3 = unit.GetAlignmentV3 ();
@@ -139,7 +140,7 @@ public class Simulator : MonoBehaviour {
 				}
 			} else if (unit.stage == 3) {
 				Vector3 distFromTarget = unit.iv.position - unit.targetP.pCenter.position;
-				if (distFromTarget.magnitude > 0.35f) {
+				if (distFromTarget.magnitude > 0.45f) {
 					Vector3 pointToCenter = unit.transform.position - unit.iv.position;
 					unit.transform.position = Vector3.MoveTowards (unit.transform.position, unit.targetP.pCenter.position + pointToCenter, INSERTION_SPEED * Time.deltaTime);
 				} else {
@@ -147,13 +148,6 @@ public class Simulator : MonoBehaviour {
 					tup.first = 0;
 				}
 
-			} else if (unit.stage == 4) {
-				// add the fitted unit pockets to the field
-				foreach (Pocket p in unit.pockets) {
-					pockets.Enqueue (p);
-					print ("adding pocket from " + unit.name);
-				}
-				tup.first = 0;
 			}
 			else
             {
@@ -170,8 +164,14 @@ public class Simulator : MonoBehaviour {
 //	            Debug.DrawLine(unit.iv.position, unit.targetP.pCenter.position, Color.cyan);
 //			}
         }
-		activeUnits.RemoveAll(tup => toRemove.Contains(tup.second));
-		activeUnits.RemoveAll(tup => toDestroy.Contains(tup.second));
+		Tuple<int,FourSquare>[] copies = new Tuple<int,FourSquare>[activeUnits.Count];
+		activeUnits.CopyTo (copies);
+		foreach (Tuple<int,FourSquare> tup in copies) {
+			if (toRemove.Contains (tup.second) || toDestroy.Contains (tup.second))
+				activeUnits.Remove (tup);
+		}
+//		activeUnits.RemoveAll(tup => toRemove.Contains(tup.second));
+//		activeUnits.RemoveAll(tup => toDestroy.Contains(tup.second));
 
 		foreach (FourSquare unit in toDestroy) {
 			GameObject.Destroy (unit.gameObject);
@@ -210,5 +210,11 @@ public class Simulator : MonoBehaviour {
     }
 
 
+	public static void PrintValues( IEnumerable myCollection )  {
+		string output = "";
+		foreach (System.Object obj in myCollection)
+			output += " " + ((Pocket) obj).pCenter.parent.name;
+		print (output);
+	}
 
 }

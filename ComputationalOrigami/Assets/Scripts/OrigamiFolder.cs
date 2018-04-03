@@ -57,7 +57,6 @@ public class OrigamiFolder {
 		if (ShouldUpdateHB(et,highBound,square)) {
 			highBound = square.center;
 		}
-		Debug.Log (et);
 		foreach (Transform child in square.transform) {
 			float y_val = child.GetComponent<MeshRenderer>().bounds.center.y - square.transform.position.y;
 			if (ShouldGroupChild(et,child,square)) {
