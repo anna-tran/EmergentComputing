@@ -5,22 +5,36 @@ using UnityEngine;
 
 public class OrigamiFolder {
 
-	public static void RandomlyFold(FourSquare square) {
-		var edge_enums = Enum.GetValues (typeof(EdgeType));
+	public static void RandomlyFold(FourSquare square,
+		float probHorzFold,
+		float probVertFold,
+		float probDiagRightFold,
+		float probDiagLeftFold) {
 
-		int numFolds = UnityHelper.rand.Next (1, edge_enums.Length);
-
-		// get a random set of folds
-		HashSet<int> set = new HashSet<int> ();
-		for (int i = 0; i < numFolds; i++) {
-			set.Add (UnityHelper.rand.Next (0, edge_enums.Length-1));
-		}
-
-		foreach (int i in set) {
-			EdgeType et = (EdgeType) Enum.ToObject(typeof(EdgeType), edge_enums.GetValue(i));
-			Debug.Log ("folding as " + et.ToString ());
-			FoldSquare (et, square);
-		}
+		if (UnityHelper.rand.NextDouble () < probHorzFold)
+			FoldSquare (EdgeType.HORZ, square);
+		if (UnityHelper.rand.NextDouble () < probVertFold)
+			FoldSquare (EdgeType.VERT, square);
+		if (UnityHelper.rand.NextDouble () < probDiagRightFold)
+			FoldSquare (EdgeType.DIAG_RIGHT, square);
+		if (UnityHelper.rand.NextDouble () < probDiagLeftFold)
+			FoldSquare (EdgeType.DIAG_LEFT, square);
+		
+//		var edge_enums = Enum.GetValues (typeof(EdgeType));
+//
+//		int numFolds = UnityHelper.rand.Next (minFolds, edge_enums.Length);
+//
+//		// get a random set of folds
+//		HashSet<int> set = new HashSet<int> ();
+//		for (int i = 0; i < numFolds; i++) {
+//			set.Add (UnityHelper.rand.Next (0, edge_enums.Length-1));
+//		}
+//
+//		foreach (int i in set) {
+//			EdgeType et = (EdgeType) Enum.ToObject(typeof(EdgeType), edge_enums.GetValue(i));
+//			Debug.Log ("folding as " + et.ToString ());
+//			FoldSquare (et, square);
+//		}
 
 	}
 

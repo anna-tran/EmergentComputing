@@ -14,7 +14,6 @@ public class FourSquare : MonoBehaviour {
     public List<Pocket> pockets { get; private set; }
     public Transform center { get; private set; }
 
-    public FourSquare target { get; set; }
     public Pocket targetP { get; set; }
     // iv   insertion vertice
     public Transform iv { get; private set; }
@@ -125,7 +124,7 @@ public class FourSquare : MonoBehaviour {
 	// get the connected vertices to find the fromDir vector
 	private void GetIVNeighbors() {
 		int vNum = Int32.Parse(iv.name.Substring(1));
-		print (vNum + "\n" + (((vNum - 1 + NUM_VERTICES) % NUM_VERTICES)) + "\n" + ((vNum + 1) % NUM_VERTICES));
+//		print (vNum + "\n" + (((vNum - 1 + NUM_VERTICES) % NUM_VERTICES)) + "\n" + ((vNum + 1) % NUM_VERTICES));
 	
 		Transform vBefore = transform.Find("V" + ((vNum - 1 + NUM_VERTICES) % NUM_VERTICES));
 		Transform vAfter = transform.Find("V" + ((vNum + 1) % NUM_VERTICES));
@@ -149,7 +148,7 @@ public class FourSquare : MonoBehaviour {
 				}
 			}
 		}
-		print (ivNeighbor1 + "\n" + ivNeighbor2);
+//		print (ivNeighbor1 + "\n" + ivNeighbor2);
 	}
 
 	public Vector3 GetAlignmentV3() {
@@ -158,16 +157,19 @@ public class FourSquare : MonoBehaviour {
 		Vector3 sum = v1 + v2;
 		sum.x = -sum.x;
 		sum.z = -sum.z;
-		print ("fromDir " + sum);
 		return sum;
 	}
 
 	public bool AlignedWithTarget() {
-		Vector3 v1 = ivNeighbor1.position - targetP.edge1.end.position;
-		Vector3 v2 = ivNeighbor2.position - targetP.edge2.end.position;
-		print ("n1-e1 " + v1 + "\nn2-e2 " + v2);
+		Vector3 v11 = targetP.edge1.end.position - ivNeighbor1.position;
+		Vector3 v12 = iv.position - ivNeighbor1.position;
+		Vector3 v21 = targetP.edge2.end.position - ivNeighbor2.position;
+		Vector3 v22 = iv.position - ivNeighbor2.position;
+		Plane plane1 = new Plane (iv.position, ivNeighbor1.position, ivNeighbor2.position);
+		Plane plane2 = new Plane (targetP.pCenter.position, targetP.edge1.end.position, targetP.edge2.end.position);
 
-		return UnityHelper.V3ApproxEqual (v1, v2);
+//		print ("plane1 " + plane1.normal + "\nplane2 " + plane2.normal);
+		return UnityHelper.V3ApproxEqual (plane1.normal, plane2.normal);
 	}
 
 
@@ -220,17 +222,12 @@ public class FourSquare : MonoBehaviour {
 				mr.enabled = false;
 			}
 		}
-//		foreach (List<TransformEdge> l in edges.Values) {
-//			foreach (TransformEdge e in l) {
-//				Debug.DrawLine (e.start.position, e.end.position, Color.black);
-//			}
-//		}
 
-		foreach (var pocket in pockets) {
-			Debug.DrawLine (pocket.edge1.start.position, pocket.edge1.end.position, pocket.color);
-			Debug.DrawLine (pocket.edge2.start.position, pocket.edge2.end.position, pocket.color);
-			Debug.DrawLine (pocket.edge2.start.position, pocket.edge2.start.position + pocket.GetVectorIn(), Color.blue);
-		}
+//		foreach (var pocket in pockets) {
+//			Debug.DrawLine (pocket.edge1.start.position, pocket.edge1.end.position, pocket.color);
+//			Debug.DrawLine (pocket.edge2.start.position, pocket.edge2.end.position, pocket.color);
+//			Debug.DrawLine (pocket.edge2.start.position, pocket.edge2.start.position + pocket.GetVectorIn(), Color.blue);
+//		}
 
 	}
 
