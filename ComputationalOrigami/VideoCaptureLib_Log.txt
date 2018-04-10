@@ -1,0 +1,27 @@
+[LOG]: [FFmpegLib]: DEST URL: /Users/anna/RockVR/Video/2018-04-03-21-11-50-7AQ6L.mp4
+[LOG]: [FFmpegLib]: Build command: "/Users/anna/Documents/EmergentComputing/ComputationalOrigami/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f rawvideo -pix_fmt rgb24 -r 30 -s 1280x720 -i - -y -preset ultrafast -pix_fmt yuv420p -vcodec libx264 -crf 18 -vf vflip -framerate 30 -tune zerolatency "/Users/anna/RockVR/Video/2018-04-03-21-11-50-7AQ6L.mp4"
+[ERROR]: [FFmpegLib]: Failed to close ffmpeg process
+[LOG]: [FFmpegLib]: DEST URL: /Users/anna/RockVR/Video/2018-04-03-21-13-33-J7M1O.mp4
+[LOG]: [FFmpegLib]: Build command: "/Users/anna/Documents/EmergentComputing/ComputationalOrigami/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f rawvideo -pix_fmt rgb24 -r 30 -s 1280x720 -i - -y -preset ultrafast -pix_fmt yuv420p -vcodec libx264 -crf 18 -vf vflip -framerate 30 -tune zerolatency "/Users/anna/RockVR/Video/2018-04-03-21-13-33-J7M1O.mp4"
+[ERROR]: [FFmpegLib]: Failed to close ffmpeg process
+[LOG]: [FFmpegLib]: DEST URL: /Users/anna/RockVR/Video/2018-04-03-21-14-37-5K9CP.mp4
+[LOG]: [FFmpegLib]: Build command: "/Users/anna/Documents/EmergentComputing/ComputationalOrigami/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f rawvideo -pix_fmt rgb24 -r 30 -s 1280x720 -i - -y -preset ultrafast -pix_fmt yuv420p -vcodec libx264 -crf 18 -vf vflip -framerate 30 -tune zerolatency "/Users/anna/RockVR/Video/2018-04-03-21-14-37-5K9CP.mp4"
+[LOG]: [FFmpegLib]: DEST URL: /Users/anna/RockVR/Video/2018-04-03-21-14-37-C6U1H.wav
+[LOG]: [FFmpegLib]: Build command: "/Users/anna/Documents/EmergentComputing/ComputationalOrigami/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f f32le -ar 44100 -ac 2 -i - -y -preset ultrafast -tune zerolatency "/Users/anna/RockVR/Video/2018-04-03-21-14-37-C6U1H.wav"
+[ERROR]: [FFmpegLib]: Failed to close ffmpeg process
+[ERROR]: [FFmpegLib]: Failed to close ffmpeg process
+[LOG]: [FFmpegLib]: DEST URL: /Users/anna/RockVR/Video/2018-04-03-21-15-52-U836T.mp4
+[LOG]: [FFmpegLib]: Build command: "/Users/anna/Documents/EmergentComputing/ComputationalOrigami/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f rawvideo -pix_fmt rgb24 -r 30 -s 1280x720 -i - -y -preset ultrafast -pix_fmt yuv420p -vcodec libx264 -crf 18 -vf vflip -framerate 30 -tune zerolatency "/Users/anna/RockVR/Video/2018-04-03-21-15-52-U836T.mp4"
+[LOG]: [FFmpegLib]: DEST URL: /Users/anna/RockVR/Video/2018-04-03-21-15-52-1VOVL.wav
+[LOG]: [FFmpegLib]: Build command: "/Users/anna/Documents/EmergentComputing/ComputationalOrigami/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f f32le -ar 44100 -ac 2 -i - -y -preset ultrafast -tune zerolatency "/Users/anna/RockVR/Video/2018-04-03-21-15-52-1VOVL.wav"
+[ERROR]: [FFmpegLib]: Failed to close ffmpeg process
+[ERROR]: [FFmpegLib]: Failed to close ffmpeg process
+[LOG]: [FFmpegLib]: DEST URL: /Users/anna/RockVR/Video/2018-04-03-21-16-45-RW8FA.mp4
+[LOG]: [FFmpegLib]: Build command: "/Users/anna/Documents/EmergentComputing/ComputationalOrigami/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f rawvideo -pix_fmt rgb24 -r 30 -s 1280x720 -i - -y -preset ultrafast -pix_fmt yuv420p -vcodec libx264 -crf 18 -vf vflip -framerate 30 -tune zerolatency "/Users/anna/RockVR/Video/2018-04-03-21-16-45-RW8FA.mp4"
+[LOG]: [FFmpegLib]: DEST URL: /Users/anna/RockVR/Video/2018-04-03-21-16-45-YIU32.wav
+[LOG]: [FFmpegLib]: Build command: "/Users/anna/Documents/EmergentComputing/ComputationalOrigami/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f f32le -ar 44100 -ac 2 -i - -y -preset ultrafast -tune zerolatency "/Users/anna/RockVR/Video/2018-04-03-21-16-45-YIU32.wav"
+[ERROR]: [FFmpegLib]: Failed to close ffmpeg process
+[ERROR]: [FFmpegLib]: Failed to close ffmpeg process
+[LOG]: [FFmpegLib]: DEST URL: /Users/anna/RockVR/Video/2018-04-03-21-17-37-YQRW0.mp4
+[LOG]: [FFmpegLib]: Build command: "/Users/anna/Documents/EmergentComputing/ComputationalOrigami/Assets/StreamingAssets/RockVR/FFmpeg/OSX/ffmpeg" -f rawvideo -pix_fmt rgb24 -r 30 -s 1280x720 -i - -y -preset ultrafast -pix_fmt yuv420p -vcodec libx264 -crf 18 -vf vflip -framerate 30 -tune zerolatency "/Users/anna/RockVR/Video/2018-04-03-21-17-37-YQRW0.mp4"
+[ERROR]: [FFmpegLib]: Failed to close ffmpeg process

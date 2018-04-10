@@ -6,6 +6,15 @@ using UnityEngine;
 public class UnityHelper : MonoBehaviour {
 	public static System.Random rand = new System.Random ();
 
+	public static bool CanFitPocket(FourSquare unit, Pocket p)
+	{
+		float angleU = Vector3.Angle (
+			                 unit.ivNeighbor1.position - unit.iv.position,
+			                 unit.ivNeighbor2.position - unit.iv.position);
+		float angleP = p.angle;
+		print (angleU + "  " + angleP);
+		return angleU < angleP || ApproxSameFloat (angleP, angleU);
+	}
 
     public static bool IntersectsPocket(TransformEdge e, Pocket p, EdgeType et)
     {

@@ -15,7 +15,7 @@ public class FourSquare : MonoBehaviour {
     public Transform center { get; private set; }
 
     public Pocket targetP { get; set; }
-    // iv   insertion vertice
+    // iv   insertion vertex
     public Transform iv { get; private set; }
     public Transform ivNeighbor1 { get; private set; }
     public Transform ivNeighbor2 { get; private set; }
@@ -36,7 +36,8 @@ public class FourSquare : MonoBehaviour {
         selfRotationV3 = Vector3.zero;
         targetRotationV3 = Vector3.zero;
         stage = -1;
-		ChangeColor ();
+
+//		ChangeColor ();
 
 	}
 
@@ -74,8 +75,8 @@ public class FourSquare : MonoBehaviour {
                     Pocket p2 = new Pocket(e, e2);
                     toAdd.Add (p1); 
 					toAdd.Add (p2);
-                    simulator.SendMessage("PushPocket", p1);
-                    simulator.SendMessage("PushPocket", p2);
+//                    simulator.SendMessage("PushPocket", p1);
+//                    simulator.SendMessage("PushPocket", p2);
 
 //					print ("Adding 2 new pockets");
 				}
@@ -91,7 +92,7 @@ public class FourSquare : MonoBehaviour {
 					foreach (TransformEdge e1 in edges[et1]) {
                         Pocket p = new Pocket(e, e1);
 						pockets.Add (p);
-                        simulator.SendMessage("PushPocket", p);
+//                        simulator.SendMessage("PushPocket", p);
 //						print ("Adding new pocket");
 					}
 				}
@@ -111,11 +112,19 @@ public class FourSquare : MonoBehaviour {
 
 	// vertices are labelled 'Vx' where x in range 1-8
 	public Transform ChooseInsertionVertice() {
-		if (iv == null) {
-			int vNum = (int) (UnityEngine.Random.Range(0,NUM_VERTICES-1));
-			iv = transform.Find("V" + vNum);
-//			iv = transform.Find("V7");
-			GetIVNeighbors ();
+		while (iv == null) {
+			int vNum = (int) (UnityEngine.Random.Range(-9,NUM_VERTICES));
+			// -1 means center
+			if (vNum < 0 && pockets.Count > 0) {
+				iv = center;
+				Pocket p = pockets [0];
+				ivNeighbor1 = p.edge1.end;
+				ivNeighbor2 = p.edge2.end;
+			} else if (vNum >= 0) {
+				iv = transform.Find("V" + vNum);
+				GetIVNeighbors ();
+			}
+
 		}
 //		print ("insertion vertice" + insertionVertice.name);
 		return iv;
@@ -193,7 +202,11 @@ public class FourSquare : MonoBehaviour {
     public void CalcTargetRotationV3()
     {
         Vector3 targetDir = targetP.pCenter.position - transform.position;
-        Vector3 fromDir = iv.position - transform.position;
+		Vector3 fromDir;
+		if (iv.Equals (center))
+			fromDir = ivNeighbor1.position - transform.position;
+		else
+        	fromDir = iv.position - transform.position;
         transform.rotation = Quaternion.FromToRotation(fromDir, targetDir);
         iv.LookAt(targetP.pCenter);
 
@@ -223,11 +236,11 @@ public class FourSquare : MonoBehaviour {
 			}
 		}
 
-//		foreach (var pocket in pockets) {
-//			Debug.DrawLine (pocket.edge1.start.position, pocket.edge1.end.position, pocket.color);
-//			Debug.DrawLine (pocket.edge2.start.position, pocket.edge2.end.position, pocket.color);
+		foreach (var pocket in pockets) {
+			Debug.DrawLine (pocket.edge1.start.position, pocket.edge1.end.position, pocket.color);
+			Debug.DrawLine (pocket.edge2.start.position, pocket.edge2.end.position, pocket.color);
 //			Debug.DrawLine (pocket.edge2.start.position, pocket.edge2.start.position + pocket.GetVectorIn(), Color.blue);
-//		}
+		}
 
 	}
 

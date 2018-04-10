@@ -6,13 +6,15 @@ using UnityEngine;
 public class Simulator : MonoBehaviour {
 	private static float ROTATION_SPEED = 80;
     private static int FPS = 30;
-    private static int DELAY_SECONDS = 7 * FPS;
-	private static float INSERTION_SPEED = 7.0f;
-	private static int UNIT_LIFETIME = 30 * FPS;
+	private static int DELAY_SECONDS = 5 * FPS;
+	private static float INSERTION_SPEED = 8.0f;
+	private static int UNIT_LIFETIME = 20 * FPS;
+	private static float STOP_DISTANCE = 0.6f;
 
+	public FourSquare square;
 
     public int initUnits;
-	public FourSquare square;
+	public int unitsToGenerate;
 	public float probVertFold;
 	public float probHorzFold;
 	public float probDiagRightFold;
@@ -25,7 +27,8 @@ public class Simulator : MonoBehaviour {
     int count;
 	Transform point;
 
-    int temp;
+    private int temp;
+	private int numGenerated;
 
 
 	void Start()
@@ -46,16 +49,22 @@ public class Simulator : MonoBehaviour {
 				probDiagLeftFold);
 			UnityHelper.RandomlyRotate (squareCopy.transform);
 			UnityHelper.RandomlyPosition (squareCopy.transform, zone);
+			foreach (Pocket p in squareCopy.pockets) 
+			{
+				PushPocket (p);
+			}
 			temp++;
 		}
+		temp = 0;
 
 
 	}
 
     void Update()
     {
-		if (TimeToSpawn() && pockets.Count > 0)
+		if (TimeToSpawn() && pockets.Count > 0 && temp < unitsToGenerate)
         {
+//			InstantiateUnit();
             squareCopy = Instantiate(square, transform.position, transform.rotation) as FourSquare;
 			squareCopy.name = "4Square " + temp;
 			OrigamiFolder.RandomlyFold(squareCopy,
@@ -74,7 +83,8 @@ public class Simulator : MonoBehaviour {
 			
 			FourSquare unit = tup.second;
 
-			if (tup.first == UNIT_LIFETIME && stage >= 0 && stage < 3) {
+			 if (tup.first == UNIT_LIFETIME && unit.stage >= 0 && unit.stage < 3) {
+//			if (EndLifetime(tup.first,unit.stage)) {
 				toDestroy.Add (unit);
 				// put pocket back onto the field
 				PushPocket(unit.targetP);
@@ -91,6 +101,17 @@ public class Simulator : MonoBehaviour {
 					toDestroy.Add (unit);
 				} else {
 					unit.ChooseInsertionVertice ();
+
+					// if different angles (pocket and insertion point)
+					// put pocket back in queue
+					// don't continue and stay in stage -1
+					if (!UnityHelper.CanFitPocket(unit,unit.targetP)) {
+						PushPocket (unit.targetP);
+						unit.targetP = null;
+						continue;
+					}
+
+					// remove pockets of units that have been destroyed
 					unit.CalcTargetRotationV3 ();
 					unit.CalcSelfRotationV3 ();
 
@@ -99,14 +120,15 @@ public class Simulator : MonoBehaviour {
 				}
 			} else if (unit.stage == 0) {
 //				print ("from " + unit.transform.name + " to " + unit.targetP.pCenter.parent.name);
-
-			
 				Vector3 currV3 = unit.GetAlignmentV3 ();
+//				Debug.DrawLine (unit.iv.position, unit.iv.position + unit.selfRotationV3, Color.cyan);
+
 				currV3.y = 0;
 				currV3.Normalize ();
 				Vector3 alignToV3 = unit.targetP.pCenter.position - unit.iv.position;
 				alignToV3.y = 0;
 				alignToV3.Normalize ();
+//				print (currV3 + "\n" + alignToV3);
 				if (!UnityHelper.V3Equal (currV3, alignToV3)) {
 					unit.transform.RotateAround (unit.iv.position, unit.selfRotationV3, ROTATION_SPEED * Time.deltaTime);
 				} else {
@@ -140,7 +162,7 @@ public class Simulator : MonoBehaviour {
 				}
 			} else if (unit.stage == 3) {
 				Vector3 distFromTarget = unit.iv.position - unit.targetP.pCenter.position;
-				if (distFromTarget.magnitude > 0.45f) {
+				if (distFromTarget.magnitude > STOP_DISTANCE) {
 					Vector3 pointToCenter = unit.transform.position - unit.iv.position;
 					unit.transform.position = Vector3.MoveTowards (unit.transform.position, unit.targetP.pCenter.position + pointToCenter, INSERTION_SPEED * Time.deltaTime);
 				} else {
@@ -151,6 +173,10 @@ public class Simulator : MonoBehaviour {
 			}
 			else
             {
+				foreach (Pocket p in unit.pockets) 
+				{
+					PushPocket (p);
+				}
                 toRemove.Add(unit);
             }
 
@@ -178,6 +204,29 @@ public class Simulator : MonoBehaviour {
 		}
 
     }
+
+	private bool EndLifetime(int life, int stage) 
+	{
+		return life == UNIT_LIFETIME && stage >= 0 && stage < 3;
+	}
+
+	private void InstantiateUnit()
+	{
+		squareCopy = Instantiate(square, transform.position, transform.rotation) as FourSquare;
+		squareCopy.name = "4Square " + temp;
+		OrigamiFolder.RandomlyFold(squareCopy,
+			probHorzFold,
+			probVertFold,
+			probDiagRightFold,
+			probDiagLeftFold);
+		activeUnits.Add(new Tuple<int,FourSquare>(0,squareCopy));
+		temp++;
+	}
+
+	private void setupFolds() 
+	{
+
+	}
 
     public void PushPocket(Pocket p)
     {

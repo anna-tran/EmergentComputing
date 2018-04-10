@@ -13,12 +13,15 @@ public class Pocket {
 	public bool filled { get; set; }
 
 	public static float CalculateAngle(TransformEdge e1, TransformEdge e2) {
-		Vector3 v1 = e1.end.position - e1.start.position;
-		Vector3 v2 = e2.end.position - e2.start.position;
-		float dot_v1v2 = Vector3.Dot (v1, v2);
-		float magn_v1 = Vector3.Magnitude (v1);
-		float magn_v2 = Vector3.Magnitude (v2);
-		float angle = Mathf.Acos (dot_v1v2 / (magn_v1 * magn_v2));
+//		Vector3 v1 = e1.end.position - e1.start.position;
+//		Vector3 v2 = e2.end.position - e2.start.position;
+//		float dot_v1v2 = Vector3.Dot (v1, v2);
+//		float magn_v1 = Vector3.Magnitude (v1);
+//		float magn_v2 = Vector3.Magnitude (v2);
+//		float angle = Mathf.Acos (dot_v1v2 / (magn_v1 * magn_v2));
+		float angle = Vector3.Angle(
+			e1.end.position - e1.start.position, 
+			e2.end.position - e2.start.position);
 		return angle;
 	}
 
