@@ -12,7 +12,6 @@ public class UnityHelper : MonoBehaviour {
 			                 unit.ivNeighbor1.position - unit.iv.position,
 			                 unit.ivNeighbor2.position - unit.iv.position);
 		float angleP = p.angle;
-		print (angleU + "  " + angleP);
 		return angleU < angleP || ApproxSameFloat (angleP, angleU);
 	}
 

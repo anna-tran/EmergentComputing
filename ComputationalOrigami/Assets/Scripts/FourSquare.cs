@@ -35,9 +35,14 @@ public class FourSquare : MonoBehaviour {
 		rendMesh = true;
         selfRotationV3 = Vector3.zero;
         targetRotationV3 = Vector3.zero;
-        stage = -1;
+        stage = 0;
 
-//		ChangeColor ();
+		ChangeColor ();
+		OrigamiFolder.FoldSquare (EdgeType.HORZ, this);
+
+		OrigamiFolder.FoldSquare (EdgeType.DIAG_RIGHT, this);
+
+		OrigamiFolder.FoldSquare (EdgeType.DIAG_LEFT, this);
 
 	}
 
@@ -75,8 +80,6 @@ public class FourSquare : MonoBehaviour {
                     Pocket p2 = new Pocket(e, e2);
                     toAdd.Add (p1); 
 					toAdd.Add (p2);
-//                    simulator.SendMessage("PushPocket", p1);
-//                    simulator.SendMessage("PushPocket", p2);
 
 //					print ("Adding 2 new pockets");
 				}
@@ -92,7 +95,6 @@ public class FourSquare : MonoBehaviour {
 					foreach (TransformEdge e1 in edges[et1]) {
                         Pocket p = new Pocket(e, e1);
 						pockets.Add (p);
-//                        simulator.SendMessage("PushPocket", p);
 //						print ("Adding new pocket");
 					}
 				}

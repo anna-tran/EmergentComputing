@@ -95,6 +95,7 @@ public class OrigamiFolder {
 		ParentTo (children_to_group, c_parent);
 		DoVisualFold (c_parent.transform, GetFoldVector(et), height_folded_on, height_to_fold);
 		ReparentFrom (ref c_parent, square);
+		GameObject.Destroy (c_parent);
 	}
 
 	static Transform GetLowBound(EdgeType et, FourSquare square) {
@@ -278,7 +279,7 @@ public class OrigamiFolder {
 	static void ReparentFrom(ref GameObject c_parent, FourSquare square) {
 		while (c_parent.transform.childCount > 0)
 			c_parent.transform.GetChild(0).parent = square.transform;
-		GameObject.Destroy (c_parent);
+		
 	}
 
 	static void DoVisualFold(Transform c_parent_transform, Vector3 rotate_vector, 
