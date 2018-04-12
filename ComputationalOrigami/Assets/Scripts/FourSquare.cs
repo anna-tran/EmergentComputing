@@ -38,11 +38,12 @@ public class FourSquare : MonoBehaviour {
         stage = 0;
 
 		ChangeColor ();
-		OrigamiFolder.FoldSquare (EdgeType.HORZ, this);
 
 		OrigamiFolder.FoldSquare (EdgeType.DIAG_RIGHT, this);
 
 		OrigamiFolder.FoldSquare (EdgeType.DIAG_LEFT, this);
+//		OrigamiFolder.FoldSquare (EdgeType.HORZ, this);
+
 
 	}
 
@@ -223,6 +224,11 @@ public class FourSquare : MonoBehaviour {
     {
         stage = -2;
     }
+
+	public void Disable() {
+		enabled = false;
+
+	}
 
 
 

@@ -11,6 +11,8 @@ public class OrigamiFolder {
 		float probDiagRightFold,
 		float probDiagLeftFold) {
 
+		//TODO: Randomize order of folds
+
 		if (UnityHelper.rand.NextDouble () < probHorzFold)
 			FoldSquare (EdgeType.HORZ, square);
 		if (UnityHelper.rand.NextDouble () < probVertFold)
@@ -63,8 +65,8 @@ public class OrigamiFolder {
 				// group children left of the center
 				children_to_group.Add (child);
 //				Debug.Log ("added to group " + child.name);
-				if (child.tag.ToLower() != "vertice")
-					AssignHighest (ref height_to_fold, y_val);
+//				if (child.tag.ToLower() != "vertice")
+//					AssignHighest (ref height_to_fold, y_val);
 			} else {
 				children_to_fold_on.Add (child);
 			}
@@ -75,7 +77,9 @@ public class OrigamiFolder {
 				&& children_to_group[0].Equals(square.center)))
 			return;
 
-		height_folded_on = GetHeightFoldedOn (children_to_group, children_to_fold_on, square, et);
+		Tuple<float,float> heights = GetHeightFoldedOn (children_to_group, children_to_fold_on, square, et);
+		height_folded_on = heights.first;
+		height_to_fold = heights.second;
 
 		AddPaperThickness (ref height_to_fold, ref height_folded_on, FourSquare.PAPER_THICKNESS);
 		foreach (Transform t in new List<Transform>{square.center, lowBound, highBound}) {
@@ -196,30 +200,40 @@ public class OrigamiFolder {
 	}
     
 
-	static float GetHeightFoldedOn(List<Transform> children_to_group, List<Transform> children_to_fold_on, FourSquare square, EdgeType et) {
-		float height_folded_on = 0;;
+	static Tuple<float,float> GetHeightFoldedOn(List<Transform> children_to_group, List<Transform> children_to_fold_on, FourSquare square, EdgeType et) {
+		float height_folded_on = 0;
+		float height_to_fold = 0;
 		List<Transform> child_copy = children_to_fold_on;
 		foreach (Transform cg in children_to_group) {
-			Vector3 opp = GetOppositePosition (cg, et);
+			if (cg.tag.ToLower () != "vertice") {
+				Vector3 opp = GetOppositePosition (cg, et);
 
-			foreach (Transform cfo in children_to_fold_on) {
-				float y_val = cfo.GetComponent<MeshRenderer>().bounds.center.y - square.transform.position.y;
 				// loop until found the child on the opposite side
-				if (UnityHelper.V3WithinDec (opp, cfo.GetComponent<MeshRenderer>().bounds.center, -1)
-					&& cfo.tag.ToLower() != "vertice") {
-					AssignHighest (ref height_folded_on, y_val);
+				foreach (Transform cfo in children_to_fold_on) {
+					float cfo_y_val = cfo.GetComponent<MeshRenderer> ().bounds.center.y - square.transform.position.y;
+
+//					if (UnityHelper.V3WithinDec (opp, cfo.GetComponent<MeshRenderer> ().bounds.center, -1)
+					if (cfo.tag.ToLower () != "vertice" && UnityHelper.V3WithinDec (opp, cfo.Find ("Core").position, -1)) {
+						// assign highest heign for pieces to fold on and pieces to fold
+						float cg_y_val = cg.GetComponent<MeshRenderer> ().bounds.center.y - square.transform.position.y;
+						AssignHighest (ref height_folded_on, cfo_y_val);
+						AssignHighest (ref height_to_fold, cg_y_val);
+						Debug.Log (et + "\n" + cg.name + " " + cg.Find("Core").position + "\n" +
+							cfo.name + " " + cfo.Find("Core").position);
+
+					}
+
+
 				}
-
-
 			}
 				 
 		}
-		return height_folded_on;
+		return new Tuple<float,float>(height_folded_on,height_to_fold);
 
 	}
 
 	static Vector3 GetOppositePosition(Transform t, EdgeType et) {
-		Vector3 other = t.GetComponent<MeshRenderer>().bounds.center;
+		Vector3 other = t.Find ("Core").position; //.GetComponent<MeshRenderer>().bounds.center;
 		if (et == EdgeType.HORZ) {
 			other.x = -other.x;
 		} else if (et == EdgeType.VERT) {

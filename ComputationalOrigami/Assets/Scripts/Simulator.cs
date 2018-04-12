@@ -101,6 +101,8 @@ public class Simulator : MonoBehaviour {
 			}
 			else
             {
+				unit.targetP.filled = true;
+				CheckEmptyPocketList (unit);
 				foreach (Pocket p in unit.pockets) 
 				{
 					PushPocket (p);
@@ -234,6 +236,14 @@ public class Simulator : MonoBehaviour {
 		} else {
 			unit.MoveToNextStage ();
 			tup.first = 0;
+		}
+	}
+
+	private void CheckEmptyPocketList(FourSquare unit) {
+		FourSquare target = unit.targetP.edge1.start.parent.GetComponent<FourSquare>();
+		target.pockets.Remove (unit.targetP);
+		if (target.pockets.Count == 0) {
+			target.Disable ();
 		}
 	}
 

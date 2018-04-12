@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.4465785, g: 0.49641252, b: 0.574817, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657868, g: 0.4964127, b: 0.57481724, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -113,6 +113,48 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1001 &90876394
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4003153835229746, guid: 791a7d69b0bd3497582c4d87305a173d, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4003153835229746, guid: 791a7d69b0bd3497582c4d87305a173d, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4003153835229746, guid: 791a7d69b0bd3497582c4d87305a173d, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4003153835229746, guid: 791a7d69b0bd3497582c4d87305a173d, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4003153835229746, guid: 791a7d69b0bd3497582c4d87305a173d, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4003153835229746, guid: 791a7d69b0bd3497582c4d87305a173d, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4003153835229746, guid: 791a7d69b0bd3497582c4d87305a173d, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4003153835229746, guid: 791a7d69b0bd3497582c4d87305a173d, type: 2}
+      propertyPath: m_RootOrder
+      value: 6
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 100100000, guid: 791a7d69b0bd3497582c4d87305a173d, type: 2}
+  m_IsPrefabParent: 0
 --- !u!1 &545159845
 GameObject:
   m_ObjectHideFlags: 0
@@ -370,8 +412,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67840debfabf349cc9bb250c14068577, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initUnits: 1
   square: {fileID: 114599836767610734, guid: 791a7d69b0bd3497582c4d87305a173d, type: 2}
+  initUnits: 0
+  unitsToGenerate: 0
   probVertFold: 1
   probHorzFold: 1
   probDiagRightFold: 0
@@ -427,7 +470,7 @@ MeshRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1520851266}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
