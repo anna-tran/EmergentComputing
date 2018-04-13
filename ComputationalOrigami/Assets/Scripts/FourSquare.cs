@@ -143,8 +143,6 @@ public class FourSquare : MonoBehaviour {
 		}
 
 		while (iv == null) {
-			Debug.Log ("lower bound insertion " + lowerBound + "\n" +
-			"high bound insertion " + higherBound);
 			int vNum = (int) (UnityEngine.Random.Range(lowerBound,higherBound));
 			// -1 means center
 			if (vNum < 0 && pockets.Count > 0) {
@@ -158,14 +156,14 @@ public class FourSquare : MonoBehaviour {
 			}
 
 		}
-//		print ("insertion vertice" + insertionVertice.name);
+		print (ivNeighbor1.name + "\n" + ivNeighbor2.name);
+
 		return iv;
 	}
 
 	// get the connected vertices to find the fromDir vector
 	private void GetIVNeighbors() {
 		int vNum = Int32.Parse(iv.name.Substring(1));
-//		print (vNum + "\n" + (((vNum - 1 + NUM_VERTICES) % NUM_VERTICES)) + "\n" + ((vNum + 1) % NUM_VERTICES));
 	
 		Transform vBefore = transform.Find("V" + ((vNum - 1 + NUM_VERTICES) % NUM_VERTICES));
 		Transform vAfter = transform.Find("V" + ((vNum + 1) % NUM_VERTICES));
@@ -189,7 +187,6 @@ public class FourSquare : MonoBehaviour {
 				}
 			}
 		}
-//		print (ivNeighbor1 + "\n" + ivNeighbor2);
 	}
 
 	public Vector3 GetAlignmentV3() {
@@ -204,14 +201,6 @@ public class FourSquare : MonoBehaviour {
 
 
 
-    public Vector3 GetTargetRotationV3()
-    {
-        if (targetRotationV3.Equals(Vector3.zero))
-        {
-            CalcTargetRotationV3();
-        }
-        return targetRotationV3;
-    }
 
     public void CalcSelfRotationV3()
     {

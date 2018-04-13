@@ -8,7 +8,7 @@ public class Simulator : MonoBehaviour {
     private static int FPS = 30;
 	private static int DELAY_SECONDS = 5 * FPS;
 	private static float INSERTION_SPEED = 8.0f;
-	private static int UNIT_LIFETIME = 60000 * FPS;
+	private static int UNIT_LIFETIME = 10 * FPS;
 	private static float STOP_DISTANCE = 0.6f;
 
 	public FourSquare square;
@@ -78,10 +78,9 @@ public class Simulator : MonoBehaviour {
 			
 			FourSquare unit = tup.second;
 //			print (unit.stage);
-			// check if target pocket is still available
-			// if not, try to find another pocket
-			// if cannot find another target, have unit try to fold on itself
-			if (!CheckPocketAvailable (tup, toDestroy) && !MovedAwayFromTarget(unit)) {
+			// if pocket is no longer available, move the unit backwards first so it has room to move around
+			// and move towards a potentially new target pocket
+			if (!CheckPocketAvailable (tup) && !MovedAwayFromTarget(unit)) {
 				continue;
 			}
 			if (EndLifetime(tup.first,unit.stage)) {
@@ -113,9 +112,11 @@ public class Simulator : MonoBehaviour {
 			else
             {
 				FillPocket (unit);
+				// add new pockets to queue only if they are not filled by the parent
 				foreach (Pocket p in unit.pockets) 
 				{
-					PushPocket (p);
+					if (!p.Intersects(unit.targetP.pCenter.parent))
+						PushPocket (p);
 				}
                 toRemove.Add(unit);
             }
@@ -130,6 +131,7 @@ public class Simulator : MonoBehaviour {
 		}
 
 		foreach (FourSquare unit in toDestroy) {
+			print ("destroying " + unit.name);
 			GameObject.Destroy (unit.gameObject);
 		}
 
@@ -137,7 +139,7 @@ public class Simulator : MonoBehaviour {
 
 	private bool MovedAwayFromTarget(FourSquare unit) {
 		Vector3 distFromTarget = unit.iv.position - unit.targetP.pCenter.position;
-		print (distFromTarget.magnitude);
+//		print (distFromTarget.magnitude);
 		if (distFromTarget.sqrMagnitude < 30.0f) {
 			Vector3 pointToCenter = 3.0f * unit.GetAlignmentV3 ();
 			unit.transform.position = Vector3.MoveTowards (unit.transform.position, unit.targetP.pCenter.position - pointToCenter, INSERTION_SPEED * Time.deltaTime);
@@ -146,14 +148,12 @@ public class Simulator : MonoBehaviour {
 		return true;
 	}
 
-	// check if target pocket is still available
-	// if not, try to find another pocket
-	// if cannot find another target, destroy unit
-	private bool CheckPocketAvailable(Tuple<int,FourSquare> tup,List<FourSquare> toDestroy) {
+
+	// if unit's target pocket is no longer available, try to find another pocket
+	private bool CheckPocketAvailable(Tuple<int,FourSquare> tup) {
 		FourSquare unit = tup.second;
-		// if target pocket is no longer avaiilable, reset the life cycle
 		if (unit.targetP != null && unit.targetP.filled) {
-			print (unit.name + " target filled!");
+//			print (unit.name + " target filled!");
 			unit.ResetStage();
 			return false;
 		}
@@ -238,7 +238,7 @@ public class Simulator : MonoBehaviour {
 		Vector3 normStill = (unit.targetP.GetVectorIn ()).normalized;
 
 		if (!UnityHelper.V3Equal (normRotating, normStill)) {
-			Debug.Log (normRotating + "\n" + normStill);
+//			Debug.Log (normRotating + "\n" + normStill);
 			Debug.DrawLine (unit.targetP.pCenter.position, unit.targetP.pCenter.position + 3.0f*normStill, Color.blue);
 			Debug.DrawLine (unit.iv.position, unit.targetP.pCenter.position, Color.blue);
 			if ((normRotating - normStill).sqrMagnitude < 0.07f) {
@@ -267,13 +267,23 @@ public class Simulator : MonoBehaviour {
 			else
 				unit.transform.RotateAround (unit.iv.position, unit.targetP.GetVectorIn (), ROTATION_SPEED * Time.deltaTime);
 		} else {
+			// before inserting into pocket, translate the unit so that provides a 3rd dimension to the structure
+			Vector3 unitToTarget = unit.center.position - unit.targetP.pCenter.position;
+			Vector3 ivToTarget = unit.iv.position - unit.targetP.pCenter.position;
+			float diff = unitToTarget.y - ivToTarget.y;
+			UnityHelper.SetV3Value(unit.transform,"y",unit.transform.position.y+diff);
+			print ("translated " + unit.name + " by " + diff);
+
+
 			unit.MoveToNextStage ();
 			tup.first = 0;
 			print (unit.stage);
+
 		}
 	}
 
 	private void InsertIntoPocket(Tuple<int,FourSquare> tup,FourSquare unit) {
+		
 		Vector3 distFromTarget = unit.iv.position - unit.targetP.pCenter.position;
 		if (distFromTarget.magnitude > STOP_DISTANCE) {
 			Vector3 pointToCenter = unit.transform.position - unit.iv.position;
