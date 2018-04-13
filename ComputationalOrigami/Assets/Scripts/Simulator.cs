@@ -4,17 +4,18 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Simulator : MonoBehaviour {
-	private static float ROTATION_SPEED = 80;
+	private static float ROTATION_SPEED = 100;
     private static int FPS = 30;
 	private static int DELAY_SECONDS = 5 * FPS;
 	private static float INSERTION_SPEED = 8.0f;
-	private static int UNIT_LIFETIME = 20 * FPS;
+	private static int UNIT_LIFETIME = 60000 * FPS;
 	private static float STOP_DISTANCE = 0.6f;
 
 	public FourSquare square;
 
     public int initUnits;
 	public int unitsToGenerate;
+	public float probCenterInsertion;
 	public float probVertFold;
 	public float probHorzFold;
 	public float probDiagRightFold;
@@ -29,6 +30,8 @@ public class Simulator : MonoBehaviour {
 
     private int temp;
 	private int numGenerated;
+
+
 
 
 	void Start()
@@ -69,11 +72,18 @@ public class Simulator : MonoBehaviour {
 		List<FourSquare> toRemove = new List<FourSquare>();
 		List<FourSquare> toDestroy = new List<FourSquare>();
 //		PrintValues (pockets);
+//		print("num pockets " + pockets.Count);
 		foreach (Tuple<int,FourSquare> tup in activeUnits)
         {
 			
 			FourSquare unit = tup.second;
-
+//			print (unit.stage);
+			// check if target pocket is still available
+			// if not, try to find another pocket
+			// if cannot find another target, have unit try to fold on itself
+			if (!CheckPocketAvailable (tup, toDestroy) && !MovedAwayFromTarget(unit)) {
+				continue;
+			}
 			if (EndLifetime(tup.first,unit.stage)) {
 				toDestroy.Add (unit);
 				// put pocket back onto the field
@@ -82,12 +92,12 @@ public class Simulator : MonoBehaviour {
 			} 
 			tup.first++;
 
-			
+			// unit life cycle
 			if (unit.stage == 0) {
 				SetupFolds (tup, unit,toDestroy);
 
 			} else if (unit.stage == 1) {
-				AlignGroundRotation (tup, unit);
+				AlignLookAtTarget (tup, unit);
 
 			} else if (unit.stage == 2) {
 				RotateAroundTarget (tup, unit);
@@ -99,10 +109,10 @@ public class Simulator : MonoBehaviour {
 				InsertIntoPocket (tup, unit);
 
 			}
+
 			else
             {
-				unit.targetP.filled = true;
-				CheckEmptyPocketList (unit);
+				FillPocket (unit);
 				foreach (Pocket p in unit.pockets) 
 				{
 					PushPocket (p);
@@ -110,15 +120,7 @@ public class Simulator : MonoBehaviour {
                 toRemove.Add(unit);
             }
 
-            //            unit.iv.LookAt(unit.targetP.pCenter);
 
-//			if (unit.targetP != null ) {
-//					
-//	            Debug.DrawLine(unit.targetP.pCenter.position, 
-//	                unit.targetP.pCenter.position - unit.targetRotationV3,
-//	                Color.green);
-//	            Debug.DrawLine(unit.iv.position, unit.targetP.pCenter.position, Color.cyan);
-//			}
         }
 		Tuple<int,FourSquare>[] copies = new Tuple<int,FourSquare>[activeUnits.Count];
 		activeUnits.CopyTo (copies);
@@ -126,14 +128,37 @@ public class Simulator : MonoBehaviour {
 			if (toRemove.Contains (tup.second) || toDestroy.Contains (tup.second))
 				activeUnits.Remove (tup);
 		}
-//		activeUnits.RemoveAll(tup => toRemove.Contains(tup.second));
-//		activeUnits.RemoveAll(tup => toDestroy.Contains(tup.second));
 
 		foreach (FourSquare unit in toDestroy) {
 			GameObject.Destroy (unit.gameObject);
 		}
 
     }
+
+	private bool MovedAwayFromTarget(FourSquare unit) {
+		Vector3 distFromTarget = unit.iv.position - unit.targetP.pCenter.position;
+		print (distFromTarget.magnitude);
+		if (distFromTarget.sqrMagnitude < 30.0f) {
+			Vector3 pointToCenter = 3.0f * unit.GetAlignmentV3 ();
+			unit.transform.position = Vector3.MoveTowards (unit.transform.position, unit.targetP.pCenter.position - pointToCenter, INSERTION_SPEED * Time.deltaTime);
+			return false;
+		}
+		return true;
+	}
+
+	// check if target pocket is still available
+	// if not, try to find another pocket
+	// if cannot find another target, destroy unit
+	private bool CheckPocketAvailable(Tuple<int,FourSquare> tup,List<FourSquare> toDestroy) {
+		FourSquare unit = tup.second;
+		// if target pocket is no longer avaiilable, reset the life cycle
+		if (unit.targetP != null && unit.targetP.filled) {
+			print (unit.name + " target filled!");
+			unit.ResetStage();
+			return false;
+		}
+		return true;
+	}
 
 	private bool EndLifetime(int life, int stage) 
 	{
@@ -149,30 +174,38 @@ public class Simulator : MonoBehaviour {
 			probVertFold,
 			probDiagRightFold,
 			probDiagLeftFold);
+		UnityHelper.RandomlyRotate (squareCopy.transform);
 		activeUnits.Add(new Tuple<int,FourSquare>(0,squareCopy));
 		temp++;
 	}
 
 	private void SetupFolds(Tuple<int,FourSquare> tup,FourSquare unit, List<FourSquare> toDestroy) 
 	{
-		Pocket p = PopPocket ();
-		unit.targetP = p;
+		Pocket p;
+		do {
+			p = PopPocket ();
+			unit.targetP = p;
+		} while (p != null && p.filled);
 
 		if (p == null) {
 			toDestroy.Add (unit);
 		} else {
-			unit.ChooseInsertionVertice ();
+			unit.ChooseInsertionVertice (probCenterInsertion);
+			print (unit.name + " has iv " + unit.iv.name);
 
 			// if different angles (pocket and insertion point)
 			// put pocket back in queue
 			// don't continue and stay in same stage
 			if (!UnityHelper.CanFitPocket (unit, unit.targetP)) {
+				print (unit.name + " put pocket back");
 				PushPocket (unit.targetP);
 				unit.targetP = null;
+				unit.iv = null;
 			} else {
 
-				// remove pockets of units that have been destroyed
-				unit.CalcTargetRotationV3 ();
+
+//				unit.CalcTargetRotationV3 ();
+
 				unit.CalcSelfRotationV3 ();
 
 				unit.MoveToNextStage ();
@@ -182,37 +215,41 @@ public class Simulator : MonoBehaviour {
 		}
 	}
 
-	private void AlignGroundRotation(Tuple<int,FourSquare> tup, FourSquare unit) {
-		Vector3 currV3 = unit.GetAlignmentV3 ();
-		//				Debug.DrawLine (unit.iv.position, unit.iv.position + unit.selfRotationV3, Color.cyan);
+	private void AlignLookAtTarget(Tuple<int,FourSquare> tup, FourSquare unit) {
+		
 
-		currV3.y = 0;
-		currV3.Normalize ();
-		Vector3 alignToV3 = unit.targetP.pCenter.position - unit.iv.position;
-		alignToV3.y = 0;
-		alignToV3.Normalize ();
-		//				print (currV3 + "\n" + alignToV3);
+		Vector3 currV3 = unit.GetAlignmentV3 ().normalized;
+						Debug.DrawLine (unit.iv.position, unit.iv.position + unit.selfRotationV3, Color.cyan);
+		Debug.DrawLine (unit.iv.position, unit.targetP.pCenter.position, Color.blue);
+		Vector3 alignToV3 = (unit.targetP.pCenter.position - unit.iv.position).normalized;
 		if (!UnityHelper.V3Equal (currV3, alignToV3)) {
 			unit.transform.RotateAround (unit.iv.position, unit.selfRotationV3, ROTATION_SPEED * Time.deltaTime);
 		} else {
 			unit.MoveToNextStage ();
+							unit.CalcTargetRotationV3 ();
 			tup.first = 0;
+			print (unit.stage);
 		}
 	}
 
 	private void RotateAroundTarget(Tuple<int,FourSquare> tup,FourSquare unit) {
 
-		Vector3 normRotating = (unit.iv.position - unit.targetP.pCenter.position);
-		normRotating.Normalize ();
-		Vector3 normStill = (unit.targetP.GetVectorIn ());
-		normStill.Normalize ();
+		Vector3 normRotating = (unit.iv.position - unit.targetP.pCenter.position).normalized;
+		Vector3 normStill = (unit.targetP.GetVectorIn ()).normalized;
 
-		if (!UnityHelper.V3Equal (normRotating, normStill)) {
-			//					print (normRotating + "\n" + normStill);
-			unit.transform.RotateAround (unit.targetP.pCenter.position, unit.targetRotationV3, ROTATION_SPEED * Time.deltaTime);
+		if (!UnityHelper.V3ApproxEqual (normRotating, normStill)) {
+			Debug.Log (normRotating + "\n" + normStill);
+			Debug.DrawLine (unit.targetP.pCenter.position, unit.targetP.pCenter.position + 3.0f*normStill, Color.blue);
+			Debug.DrawLine (unit.iv.position, unit.targetP.pCenter.position, Color.blue);
+			if ((normRotating - normStill).sqrMagnitude < 0.1f) {
+				unit.transform.RotateAround (unit.targetP.pCenter.position, unit.targetRotationV3, 0.1f * ROTATION_SPEED * Time.deltaTime);
+			} else {
+				unit.transform.RotateAround (unit.targetP.pCenter.position, unit.targetRotationV3, ROTATION_SPEED * Time.deltaTime);
+			}
 		} else {
 			unit.MoveToNextStage ();
 			tup.first = 0;
+			print (unit.stage);
 		}
 	}
 
@@ -220,11 +257,12 @@ public class Simulator : MonoBehaviour {
 		Vector3 acute1 = UnityHelper.acuteAngle (unit.transform.eulerAngles);
 		Vector3 acute2 = UnityHelper.acuteAngle (unit.targetP.pCenter.eulerAngles);
 		if (!unit.AlignedWithTarget ()) {
+//			print("unit " + unit.name + "\niv " + unit.iv.name + "\nunit vector in " + unit.GetAlignmentV3() + "\ntarget vector in " + unit.targetP.GetVectorIn());
 			unit.transform.RotateAround (unit.iv.position, unit.targetP.GetVectorIn (), ROTATION_SPEED * Time.deltaTime);                   
 		} else {
-			print("unit " + unit.name + "\niv " + unit.iv.name + "\nunit vector in " + unit.GetAlignmentV3() + "\ntarget vector in " + unit.targetP.GetVectorIn());
 			unit.MoveToNextStage ();
 			tup.first = 0;
+			print (unit.stage);
 		}
 	}
 
@@ -239,10 +277,25 @@ public class Simulator : MonoBehaviour {
 		}
 	}
 
-	private void CheckEmptyPocketList(FourSquare unit) {
-		FourSquare target = unit.targetP.edge1.start.parent.GetComponent<FourSquare>();
-		target.pockets.Remove (unit.targetP);
-		if (target.pockets.Count == 0) {
+	private void FillPocket(FourSquare unit) {
+		// fill the target pocket and remove from list of pockets in the target unit
+		unit.targetP.filled = true;
+		FourSquare target = unit.targetP.pCenter.parent.GetComponent<FourSquare>();
+
+		// check if any of the other target's pockets are filled by this unit
+		// if so, mark it as filled
+		target.pockets.ForEach (p => {
+			if (p.Intersects (unit.transform))
+				p.filled = true;
+		});
+
+		bool allFilled = true;
+		target.pockets.ForEach (p => {
+			allFilled &= p.filled;
+		});
+		// disable script of unit if it has no pockets
+		if (allFilled) {
+			print (target.name + " has no more pockets");
 			target.Disable ();
 		}
 	}

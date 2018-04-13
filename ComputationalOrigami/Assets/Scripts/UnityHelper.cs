@@ -121,7 +121,7 @@ public class UnityHelper : MonoBehaviour {
 	}
 
 	public static bool V3ApproxEqual(Vector3 a, Vector3 b){
-		return Vector3.SqrMagnitude(a - b) < 0.0003f;
+		return Vector3.SqrMagnitude(a - b) < 0.0004f;
 	}
 
 	public static Vector3 acuteAngle(Vector3 a) {
@@ -172,6 +172,16 @@ public class UnityHelper : MonoBehaviour {
 		left = Math.Min (v1, v2);
 		right = Math.Max (v1, v2);
 		return vToCheck > left && vToCheck < right;
+	}
+
+	// taken from 
+	// https://answers.unity.com/questions/532297/rotate-a-vector-around-a-certain-point.html
+
+	public static Vector3 RotatePointAroundPivot(Vector3 point, Vector3 pivot, Vector3 angles) {
+		Vector3 dir = point - pivot; // get point direction relative to pivot
+		dir = Quaternion.Euler(angles) * dir; // rotate it
+		point = dir + pivot; // calculate rotated point
+		return point; // return it
 	}
 
 }

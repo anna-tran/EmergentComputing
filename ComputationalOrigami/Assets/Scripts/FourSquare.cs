@@ -16,13 +16,15 @@ public class FourSquare : MonoBehaviour {
 
     public Pocket targetP { get; set; }
     // iv   insertion vertex
-    public Transform iv { get; private set; }
+    public Transform iv { get; set; }
     public Transform ivNeighbor1 { get; private set; }
     public Transform ivNeighbor2 { get; private set; }
     public bool rendMesh;
     public int stage { get; private set; }
     public Vector3 targetRotationV3 { get; private set; }
     public Vector3 selfRotationV3 { get; private set; }
+	public Bounds bounds {get;private set;}
+	public Quaternion lookRot;
 
 	// Use this for initialization
 	void Awake () {
@@ -36,21 +38,36 @@ public class FourSquare : MonoBehaviour {
         selfRotationV3 = Vector3.zero;
         targetRotationV3 = Vector3.zero;
         stage = 0;
+		targetP = null;
 
 		ChangeColor ();
+		CollectChildBounds ();
+//		OrigamiFolder.FoldSquare (EdgeType.DIAG_RIGHT, this);
 
-		OrigamiFolder.FoldSquare (EdgeType.DIAG_RIGHT, this);
-
-		OrigamiFolder.FoldSquare (EdgeType.DIAG_LEFT, this);
+//		OrigamiFolder.FoldSquare (EdgeType.DIAG_LEFT, this);
 //		OrigamiFolder.FoldSquare (EdgeType.HORZ, this);
 
 
+	}
+
+	public void ResetStage() {
+		stage = 0;
 	}
 
     public void MoveToNextStage()
     {
         stage++;
     }
+
+	void CollectChildBounds() {
+		gameObject.AddComponent<MeshFilter> ();
+		Bounds bounds = transform.GetComponent<MeshFilter> ().mesh.bounds;
+		foreach(MeshFilter mr in transform.GetComponentsInChildren<MeshFilter>())
+		{
+			bounds.Encapsulate(mr.mesh.bounds);
+		}
+		transform.GetComponent<MeshFilter> ().mesh.bounds = bounds;
+	}
 
 	void ChangeColor() {
 		Color rand_color = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
@@ -114,9 +131,21 @@ public class FourSquare : MonoBehaviour {
     
 
 	// vertices are labelled 'Vx' where x in range 1-8
-	public Transform ChooseInsertionVertice() {
+	public Transform ChooseInsertionVertice(float probCenterInsertion) {
+		int lowerBound = 0;
+		int higherBound = 0;
+		if (UnityHelper.ApproxSameFloat (probCenterInsertion, 1)) {
+			lowerBound = -1;
+		} else {
+			int centerChoice = (int) ( (NUM_VERTICES * probCenterInsertion) / (1 - probCenterInsertion));
+			lowerBound = -centerChoice;
+			higherBound = NUM_VERTICES;
+		}
+
 		while (iv == null) {
-			int vNum = (int) (UnityEngine.Random.Range(-9,NUM_VERTICES));
+			Debug.Log ("lower bound insertion " + lowerBound + "\n" +
+			"high bound insertion " + higherBound);
+			int vNum = (int) (UnityEngine.Random.Range(lowerBound,higherBound));
 			// -1 means center
 			if (vNum < 0 && pockets.Count > 0) {
 				iv = center;
@@ -168,6 +197,7 @@ public class FourSquare : MonoBehaviour {
 		Vector3 v2 = ivNeighbor2.position - iv.position;
 		Vector3 sum = v1 + v2;
 		sum.x = -sum.x;
+		sum.y = -sum.y;
 		sum.z = -sum.z;
 		return sum;
 	}
@@ -178,9 +208,8 @@ public class FourSquare : MonoBehaviour {
 		Vector3 v21 = targetP.edge2.end.position - ivNeighbor2.position;
 		Vector3 v22 = iv.position - ivNeighbor2.position;
 		Plane plane1 = new Plane (iv.position, ivNeighbor1.position, ivNeighbor2.position);
-		Plane plane2 = new Plane (targetP.pCenter.position, targetP.edge1.end.position, targetP.edge2.end.position);
-
-//		print ("plane1 " + plane1.normal + "\nplane2 " + plane2.normal);
+		Plane plane2 = targetP.GetPocketPlane ();
+			print ("plane1 " + plane1.normal + "\nplane2 " + plane2.normal);
 		return UnityHelper.V3ApproxEqual (plane1.normal, plane2.normal);
 	}
 
@@ -196,26 +225,27 @@ public class FourSquare : MonoBehaviour {
 
     public void CalcSelfRotationV3()
     {
-        // point is iv
         Vector3 pointToTarget = targetP.pCenter.position - iv.position;
-        Vector3 pointToCenter = ivNeighbor1.position - ivNeighbor2.position;
+//        Vector3 pointToCenter = ivNeighbor1.position - ivNeighbor2.position;
+		Vector3 pointToCenter = GetAlignmentV3();
         selfRotationV3 = Vector3.Cross(pointToTarget, pointToCenter);
     }
 
     public void CalcTargetRotationV3()
     {
-        Vector3 targetDir = targetP.pCenter.position - transform.position;
-		Vector3 fromDir;
-		if (iv.Equals (center))
-			fromDir = ivNeighbor1.position - transform.position;
-		else
-        	fromDir = iv.position - transform.position;
-        transform.rotation = Quaternion.FromToRotation(fromDir, targetDir);
-        iv.LookAt(targetP.pCenter);
+//        Vector3 targetDir = targetP.pCenter.position - transform.position;
+//		Vector3 fromDir;
+//		if (iv.Equals (center))
+//			fromDir = ivNeighbor1.position - transform.position;
+//		else
+//        	fromDir = iv.position - transform.position;
+//        transform.rotation = Quaternion.FromToRotation(fromDir, targetDir);
+//        iv.LookAt(targetP.pCenter);
 
 
         // perpendicular vector to rotate around
-        targetRotationV3 = Vector3.Cross(transform.position - targetP.pCenter.position,
+        targetRotationV3 = Vector3.Cross(
+			iv.position - targetP.pCenter.position,
             targetP.GetVectorIn() - targetP.pCenter.position);
 
     }

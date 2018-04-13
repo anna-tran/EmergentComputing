@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class OrigamiFolder {
+public class OrigamiFolder : MonoBehaviour{
 
 	public static void RandomlyFold(FourSquare square,
 		float probHorzFold,
@@ -53,30 +53,32 @@ public class OrigamiFolder {
 		Transform lowBound = GetLowBound (et, square);
 		Transform highBound = GetHighBound (et, square);
 
+		// get the vertice of the lower and higher bound of the fold line
 		if (ShouldUpdateLB(et,lowBound,square)) {
 			lowBound = square.center;
 		}
 		if (ShouldUpdateHB(et,highBound,square)) {
 			highBound = square.center;
 		}
+		// group the triangle of the square unit to be folded on, and to fold over
 		foreach (Transform child in square.transform) {
 			float y_val = child.GetComponent<MeshRenderer>().bounds.center.y - square.transform.position.y;
 			if (ShouldGroupChild(et,child,square)) {
-				// group children left of the center
+				// group children on folding side
 				children_to_group.Add (child);
-//				Debug.Log ("added to group " + child.name);
-//				if (child.tag.ToLower() != "vertice")
-//					AssignHighest (ref height_to_fold, y_val);
 			} else {
+				// group children on folded on side
 				children_to_fold_on.Add (child);
 			}
 		}
 
+		// if there's no child on the side to fold, skip doing any fold
 		if (children_to_group.Count == 0 
 			|| (children_to_group.Count == 1 
 				&& children_to_group[0].Equals(square.center)))
 			return;
 
+		// get the height of the unit to translate along the y-axis 
 		Tuple<float,float> heights = GetHeightFoldedOn (children_to_group, children_to_fold_on, square, et);
 		height_folded_on = heights.first;
 		height_to_fold = heights.second;
@@ -86,7 +88,7 @@ public class OrigamiFolder {
 			UnityHelper.SetV3Value (t, "y", (height_to_fold + height_folded_on) / 2.0f);
 		}
 
-
+		// insert an edge from the center to the upper/lower bound only if the bounding vertice was not the center
 		if (!lowBound.Equals(square.center)) {
 			TransformEdge te = new TransformEdge (square.center, lowBound, et);
 			square.InsertEdge(te);
@@ -96,6 +98,7 @@ public class OrigamiFolder {
 			square.InsertEdge(te);
 		}
 
+		// remove the temporary parent and reparent to original object
 		ParentTo (children_to_group, c_parent);
 		DoVisualFold (c_parent.transform, GetFoldVector(et), height_folded_on, height_to_fold);
 		ReparentFrom (ref c_parent, square);
@@ -218,8 +221,8 @@ public class OrigamiFolder {
 						float cg_y_val = cg.GetComponent<MeshRenderer> ().bounds.center.y - square.transform.position.y;
 						AssignHighest (ref height_folded_on, cfo_y_val);
 						AssignHighest (ref height_to_fold, cg_y_val);
-						Debug.Log (et + "\n" + cg.name + " " + cg.Find("Core").position + "\n" +
-							cfo.name + " " + cfo.Find("Core").position);
+//						Debug.Log (et + "\n" + cg.name + " " + cg.Find("Core").position + "\n" +
+//							cfo.name + " " + cfo.Find("Core").position);
 
 					}
 

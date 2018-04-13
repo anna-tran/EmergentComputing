@@ -13,17 +13,13 @@ public class Pocket {
 	public bool filled { get; set; }
 
 	public static float CalculateAngle(TransformEdge e1, TransformEdge e2) {
-//		Vector3 v1 = e1.end.position - e1.start.position;
-//		Vector3 v2 = e2.end.position - e2.start.position;
-//		float dot_v1v2 = Vector3.Dot (v1, v2);
-//		float magn_v1 = Vector3.Magnitude (v1);
-//		float magn_v2 = Vector3.Magnitude (v2);
-//		float angle = Mathf.Acos (dot_v1v2 / (magn_v1 * magn_v2));
 		float angle = Vector3.Angle(
 			e1.end.position - e1.start.position, 
 			e2.end.position - e2.start.position);
 		return angle;
 	}
+
+
 
 	public Pocket(TransformEdge e1, TransformEdge e2) {
 		edge1 = e1;
@@ -53,6 +49,34 @@ public class Pocket {
 	public Vector3 GetVectorPerp() {
 		Vector3 vIn = GetVectorIn ();
 		return (vIn);
+	}
+
+	public Plane GetPocketPlane() {
+		return new Plane (pCenter.position, edge1.end.position, edge2.end.position);
+	}
+
+	public bool Intersects(Transform other) {
+		Vector3 orig = edge1.end.position;
+		Vector3 dir = edge2.end.position - edge1.end.position;
+		float dist = Vector3.Distance (edge1.end.position, edge2.end.position);
+		Debug.DrawRay (orig, dir,Color.yellow);
+		RaycastHit[] hits = Physics.RaycastAll (orig, dir, dist);
+//		Debug.Log ("num colliders: " +
+//		hits.Length);
+		foreach (RaycastHit hit in hits) {
+			if (!hit.collider.transform.parent.Equals (pCenter.transform.parent)) {
+//				Debug.Log (this.ToString () + " intersected with " + hit.collider.transform.parent.name);
+				return true;
+			}
+		}
+		return false;
+//			Ray pocketRay = new Ray (edge1.end.position, edge2.end.position - edge1.end.position);
+//		Bounds origBounds = orig.GetComponent<MeshFilter>().mesh.bounds;
+//		Debug.DrawRay(edge1.end.position, edge2.end.position - edge1.end.position,Color.black);
+//		Debug.Log (pocketRay);
+//		Debug.Log (origBounds);
+//		Debug.Log (origBounds.IntersectRay (pocketRay));
+//		return origBounds.IntersectRay (pocketRay);
 	}
 
 	public override bool Equals(object obj)
