@@ -121,7 +121,7 @@ public class UnityHelper : MonoBehaviour {
 	}
 
 	public static bool V3ApproxEqual(Vector3 a, Vector3 b){
-		return Vector3.SqrMagnitude(a - b) < 0.0004f;
+		return Vector3.SqrMagnitude(a - b) < 0.0003f;
 	}
 
 	public static Vector3 acuteAngle(Vector3 a) {

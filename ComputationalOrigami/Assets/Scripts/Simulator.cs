@@ -202,12 +202,7 @@ public class Simulator : MonoBehaviour {
 				unit.targetP = null;
 				unit.iv = null;
 			} else {
-
-
-//				unit.CalcTargetRotationV3 ();
-
 				unit.CalcSelfRotationV3 ();
-
 				unit.MoveToNextStage ();
 				tup.first = 0;
 				print ("unit: " + unit.name + "\ntarget: " + unit.targetP.ToString ());
@@ -219,14 +214,19 @@ public class Simulator : MonoBehaviour {
 		
 
 		Vector3 currV3 = unit.GetAlignmentV3 ().normalized;
-						Debug.DrawLine (unit.iv.position, unit.iv.position + unit.selfRotationV3, Color.cyan);
+
+		Debug.DrawLine (unit.iv.position, unit.iv.position + unit.selfRotationV3, Color.cyan);
 		Debug.DrawLine (unit.iv.position, unit.targetP.pCenter.position, Color.blue);
+
 		Vector3 alignToV3 = (unit.targetP.pCenter.position - unit.iv.position).normalized;
 		if (!UnityHelper.V3Equal (currV3, alignToV3)) {
-			unit.transform.RotateAround (unit.iv.position, unit.selfRotationV3, ROTATION_SPEED * Time.deltaTime);
+			if ((currV3 - alignToV3).sqrMagnitude < 0.07f)
+				unit.transform.RotateAround (unit.iv.position, unit.selfRotationV3, 0.2f * ROTATION_SPEED * Time.deltaTime);	
+			else
+				unit.transform.RotateAround (unit.iv.position, unit.selfRotationV3, ROTATION_SPEED * Time.deltaTime);
 		} else {
+			unit.CalcTargetRotationV3 ();
 			unit.MoveToNextStage ();
-							unit.CalcTargetRotationV3 ();
 			tup.first = 0;
 			print (unit.stage);
 		}
@@ -237,12 +237,12 @@ public class Simulator : MonoBehaviour {
 		Vector3 normRotating = (unit.iv.position - unit.targetP.pCenter.position).normalized;
 		Vector3 normStill = (unit.targetP.GetVectorIn ()).normalized;
 
-		if (!UnityHelper.V3ApproxEqual (normRotating, normStill)) {
+		if (!UnityHelper.V3Equal (normRotating, normStill)) {
 			Debug.Log (normRotating + "\n" + normStill);
 			Debug.DrawLine (unit.targetP.pCenter.position, unit.targetP.pCenter.position + 3.0f*normStill, Color.blue);
 			Debug.DrawLine (unit.iv.position, unit.targetP.pCenter.position, Color.blue);
-			if ((normRotating - normStill).sqrMagnitude < 0.1f) {
-				unit.transform.RotateAround (unit.targetP.pCenter.position, unit.targetRotationV3, 0.1f * ROTATION_SPEED * Time.deltaTime);
+			if ((normRotating - normStill).sqrMagnitude < 0.07f) {
+				unit.transform.RotateAround (unit.targetP.pCenter.position, unit.targetRotationV3, 0.2f * ROTATION_SPEED * Time.deltaTime);
 			} else {
 				unit.transform.RotateAround (unit.targetP.pCenter.position, unit.targetRotationV3, ROTATION_SPEED * Time.deltaTime);
 			}
@@ -254,11 +254,18 @@ public class Simulator : MonoBehaviour {
 	}
 
 	private void AlignRotationToTarget(Tuple<int,FourSquare> tup,FourSquare unit) {
-		Vector3 acute1 = UnityHelper.acuteAngle (unit.transform.eulerAngles);
-		Vector3 acute2 = UnityHelper.acuteAngle (unit.targetP.pCenter.eulerAngles);
-		if (!unit.AlignedWithTarget ()) {
-//			print("unit " + unit.name + "\niv " + unit.iv.name + "\nunit vector in " + unit.GetAlignmentV3() + "\ntarget vector in " + unit.targetP.GetVectorIn());
-			unit.transform.RotateAround (unit.iv.position, unit.targetP.GetVectorIn (), ROTATION_SPEED * Time.deltaTime);                   
+		Vector3 v11 = unit.targetP.edge1.end.position - unit.ivNeighbor1.position;
+		Vector3 v12 = unit.iv.position - unit.ivNeighbor1.position;
+		Vector3 v21 = unit.targetP.edge2.end.position - unit.ivNeighbor2.position;
+		Vector3 v22 = unit.iv.position - unit.ivNeighbor2.position;
+		Plane plane1 = new Plane (unit.iv.position, unit.ivNeighbor1.position, unit.ivNeighbor2.position);
+		Plane plane2 = unit.targetP.GetPocketPlane ();
+//		print ("plane1 " + plane1.normal + "\nplane2 " + plane2.normal);
+		if (!UnityHelper.V3ApproxEqual (plane1.normal, plane2.normal)) {
+			if ((plane1.normal - plane2.normal).sqrMagnitude < 0.07f)
+				unit.transform.RotateAround (unit.iv.position, unit.targetP.GetVectorIn (), 0.2f * ROTATION_SPEED * Time.deltaTime);	
+			else
+				unit.transform.RotateAround (unit.iv.position, unit.targetP.GetVectorIn (), ROTATION_SPEED * Time.deltaTime);
 		} else {
 			unit.MoveToNextStage ();
 			tup.first = 0;
@@ -339,4 +346,5 @@ public class Simulator : MonoBehaviour {
 		print (output);
 	}
 
+	
 }

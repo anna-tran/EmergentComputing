@@ -202,16 +202,6 @@ public class FourSquare : MonoBehaviour {
 		return sum;
 	}
 
-	public bool AlignedWithTarget() {
-		Vector3 v11 = targetP.edge1.end.position - ivNeighbor1.position;
-		Vector3 v12 = iv.position - ivNeighbor1.position;
-		Vector3 v21 = targetP.edge2.end.position - ivNeighbor2.position;
-		Vector3 v22 = iv.position - ivNeighbor2.position;
-		Plane plane1 = new Plane (iv.position, ivNeighbor1.position, ivNeighbor2.position);
-		Plane plane2 = targetP.GetPocketPlane ();
-			print ("plane1 " + plane1.normal + "\nplane2 " + plane2.normal);
-		return UnityHelper.V3ApproxEqual (plane1.normal, plane2.normal);
-	}
 
 
     public Vector3 GetTargetRotationV3()
@@ -226,27 +216,16 @@ public class FourSquare : MonoBehaviour {
     public void CalcSelfRotationV3()
     {
         Vector3 pointToTarget = targetP.pCenter.position - iv.position;
-//        Vector3 pointToCenter = ivNeighbor1.position - ivNeighbor2.position;
 		Vector3 pointToCenter = GetAlignmentV3();
         selfRotationV3 = Vector3.Cross(pointToTarget, pointToCenter);
     }
 
     public void CalcTargetRotationV3()
     {
-//        Vector3 targetDir = targetP.pCenter.position - transform.position;
-//		Vector3 fromDir;
-//		if (iv.Equals (center))
-//			fromDir = ivNeighbor1.position - transform.position;
-//		else
-//        	fromDir = iv.position - transform.position;
-//        transform.rotation = Quaternion.FromToRotation(fromDir, targetDir);
-//        iv.LookAt(targetP.pCenter);
-
-
-        // perpendicular vector to rotate around
+		// perpendicular vector to rotate around
         targetRotationV3 = Vector3.Cross(
 			iv.position - targetP.pCenter.position,
-            targetP.GetVectorIn() - targetP.pCenter.position);
+            targetP.GetVectorIn());
 
     }
 
