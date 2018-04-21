@@ -135,7 +135,7 @@ public class OrigamiFolder : MonoBehaviour{
 		ParentTo (children_to_group, c_parent);
 		DoVisualFold (c_parent.transform, GetFoldVector(et), height_folded_on, height_to_fold);
 		ReparentFrom (ref c_parent, square);
-		GameObject.Destroy (c_parent);
+		Destroy (c_parent);
 	}
 
 	static Transform GetLowBound(EdgeType et, FourSquare square) {
@@ -240,11 +240,13 @@ public class OrigamiFolder : MonoBehaviour{
 		float height_folded_on = 0;
 		float height_to_fold = 0;
 		List<Transform> child_copy = children_to_fold_on;
+//		Debug.Log ("Getting heights for " + et.ToString ());
+		// for each child to group, find 
 		foreach (Transform cg in children_to_group) {
 			if (cg.tag.ToLower () != "vertice") {
 				Vector3 opp = GetOppositePosition (cg, et);
 
-				// loop until found the child on the opposite side
+				// loop and find triangle children that would be folded on
 				foreach (Transform cfo in children_to_fold_on) {
 					float cfo_y_val = cfo.GetComponent<MeshRenderer> ().bounds.center.y - square.transform.position.y;
 
@@ -254,10 +256,14 @@ public class OrigamiFolder : MonoBehaviour{
 						float cg_y_val = cg.GetComponent<MeshRenderer> ().bounds.center.y - square.transform.position.y;
 						AssignHighest (ref height_folded_on, cfo_y_val);
 						AssignHighest (ref height_to_fold, cg_y_val);
-						Debug.Log (et + "\n" + cg.name + " " + cg.Find("Core").position + "\n" +
-							cfo.name + " " + cfo.Find("Core").position);
-
+//						Debug.Log (et + "\n" + cg.name + " " + cg.Find ("Core").position + "\n" +
+//						cfo.name + " " + cfo.Find ("Core").position);
+//
+//					} else if (cfo.tag.ToLower () != "vertice") {
+//						Debug.Log (et + "\n" + cg.name + " " + cg.Find("Core").position + "\n" +
+//							cfo.name + " " + cfo.Find("Core").position);
 					}
+
 
 
 				}
@@ -273,7 +279,7 @@ public class OrigamiFolder : MonoBehaviour{
 		if (et == EdgeType.HORZ) {
 			other.x = -other.x;
 		} else if (et == EdgeType.VERT) {
-			other.y = -other.y;
+			other.z = -other.z;
 		} else if (et == EdgeType.DIAG_RIGHT) {
 			float tempx = other.x;
 			other.x = -other.z;

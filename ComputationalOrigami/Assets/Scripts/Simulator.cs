@@ -118,10 +118,13 @@ public class Simulator : MonoBehaviour {
             {
 				FillPocket (unit);
 				// add new pockets to queue only if they are not filled by the parent
+//				unit.pockets.ForEach( p => );
 				foreach (Pocket p in unit.pockets) 
 				{
-					if (!p.Intersects(unit.targetP.pCenter.parent))
+					if (!p.Intersects (unit.targetP.pCenter.parent))
 						PushPocket (p);
+					else 
+						p.filled = true;
 				}
                 toRemove.Add(unit);
             }
@@ -136,7 +139,7 @@ public class Simulator : MonoBehaviour {
 		}
 
 		foreach (FourSquare unit in toDestroy) {
-			print ("destroying " + unit.name);
+//			print ("destroying " + unit.name);
 			GameObject.Destroy (unit.gameObject);
 		}
 
@@ -196,13 +199,13 @@ public class Simulator : MonoBehaviour {
 			toDestroy.Add (unit);
 		} else {
 			unit.ChooseInsertionVertice (probCenterInsertion);
-			print (unit.name + " has iv " + unit.iv.name);
+//			print (unit.name + " has iv " + unit.iv.name);
 
 			// if different angles (pocket and insertion point)
 			// put pocket back in queue
 			// don't continue and stay in same stage
 			if (!UnityHelper.CanFitPocket (unit, unit.targetP)) {
-				print (unit.name + " put pocket back");
+//				print (unit.name + " put pocket back");
 				PushPocket (unit.targetP);
 				unit.targetP = null;
 				unit.iv = null;
@@ -210,7 +213,7 @@ public class Simulator : MonoBehaviour {
 				unit.CalcSelfRotationV3 ();
 				unit.MoveToNextStage ();
 				tup.first = 0;
-				print ("unit: " + unit.name + "\ntarget: " + unit.targetP.ToString ());
+//				print ("unit: " + unit.name + "\ntarget: " + unit.targetP.ToString ());
 			}
 		}
 	}
@@ -233,7 +236,7 @@ public class Simulator : MonoBehaviour {
 			unit.CalcTargetRotationV3 ();
 			unit.MoveToNextStage ();
 			tup.first = 0;
-			print (unit.stage);
+//			print (unit.stage);
 		}
 	}
 
@@ -244,8 +247,8 @@ public class Simulator : MonoBehaviour {
 
 		if (!UnityHelper.V3Equal (normRotating, normStill)) {
 //			Debug.Log (normRotating + "\n" + normStill);
-			Debug.DrawLine (unit.targetP.pCenter.position, unit.targetP.pCenter.position + 3.0f*normStill, Color.blue);
-			Debug.DrawLine (unit.iv.position, unit.targetP.pCenter.position, Color.blue);
+//			Debug.DrawLine (unit.targetP.pCenter.position, unit.targetP.pCenter.position + 3.0f*normStill, Color.blue);
+//			Debug.DrawLine (unit.iv.position, unit.targetP.pCenter.position, Color.blue);
 			if ((normRotating - normStill).sqrMagnitude < 0.07f) {
 				unit.transform.RotateAround (unit.targetP.pCenter.position, unit.targetRotationV3, 0.2f * ROTATION_SPEED * Time.deltaTime);
 			} else {
@@ -254,7 +257,7 @@ public class Simulator : MonoBehaviour {
 		} else {
 			unit.MoveToNextStage ();
 			tup.first = 0;
-			print (unit.stage);
+//			print (unit.stage);
 		}
 	}
 
@@ -282,7 +285,7 @@ public class Simulator : MonoBehaviour {
 
 			unit.MoveToNextStage ();
 			tup.first = 0;
-			print (unit.stage);
+//			print (unit.stage);
 
 		}
 	}
@@ -317,7 +320,7 @@ public class Simulator : MonoBehaviour {
 		});
 		// disable script of unit if it has no pockets
 		if (allFilled) {
-			print (target.name + " has no more pockets");
+//			print (target.name + " has no more pockets");
 			target.Disable ();
 		}
 	}

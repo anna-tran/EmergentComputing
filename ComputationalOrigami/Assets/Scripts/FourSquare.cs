@@ -43,9 +43,9 @@ public class FourSquare : MonoBehaviour {
 		ChangeColor ();
 		CollectChildBounds ();
 
-		OrigamiFolder.FoldSquare (EdgeType.DIAG_LEFT, this);
-		OrigamiFolder.FoldSquare (EdgeType.HORZ, this);
-		OrigamiFolder.FoldSquare (EdgeType.VERT, this);
+//		OrigamiFolder.FoldSquare (EdgeType.DIAG_LEFT, this);
+//		OrigamiFolder.FoldSquare (EdgeType.HORZ, this);
+//		OrigamiFolder.FoldSquare (EdgeType.VERT, this);
 //		OrigamiFolder.FoldSquare (EdgeType.DIAG_RIGHT, this);
 
 
@@ -160,7 +160,7 @@ public class FourSquare : MonoBehaviour {
 			}
 
 		}
-		print (ivNeighbor1.name + "\n" + ivNeighbor2.name);
+//		print (ivNeighbor1.name + "\n" + ivNeighbor2.name);
 
 		return iv;
 	}
@@ -247,9 +247,11 @@ public class FourSquare : MonoBehaviour {
 		}
 
 		foreach (var pocket in pockets) {
-			Debug.DrawLine (pocket.edge1.start.position, pocket.edge1.end.position, pocket.color);
-			Debug.DrawLine (pocket.edge2.start.position, pocket.edge2.end.position, pocket.color);
-//			Debug.DrawLine (pocket.edge2.start.position, pocket.edge2.start.position + pocket.GetVectorIn(), Color.blue);
+			if (!pocket.filled) {
+				Debug.DrawLine (pocket.edge1.start.position, pocket.edge1.end.position, pocket.color);
+				Debug.DrawLine (pocket.edge2.start.position, pocket.edge2.end.position, pocket.color);
+	//			Debug.DrawLine (pocket.edge2.start.position, pocket.edge2.start.position + pocket.GetVectorIn(), Color.blue);
+			}
 		}
 
 	}
