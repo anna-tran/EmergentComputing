@@ -13,15 +13,47 @@ public class OrigamiFolder : MonoBehaviour{
 
 		//TODO: Randomize order of folds
 
-		if (UnityHelper.rand.NextDouble () < probHorzFold)
-			FoldSquare (EdgeType.HORZ, square);
-		if (UnityHelper.rand.NextDouble () < probVertFold)
-			FoldSquare (EdgeType.VERT, square);
-		if (UnityHelper.rand.NextDouble () < probDiagRightFold)
-			FoldSquare (EdgeType.DIAG_RIGHT, square);
-		if (UnityHelper.rand.NextDouble () < probDiagLeftFold)
-			FoldSquare (EdgeType.DIAG_LEFT, square);
-		
+
+		EdgeType[] edgeTypes = (EdgeType[]) Enum.GetValues(typeof(EdgeType));
+		UnityHelper.ShuffleEdgeTypes (ref edgeTypes);
+		int i = 0;
+		do {
+			EdgeType et = edgeTypes[i];
+			switch (et) {
+			case EdgeType.HORZ:
+				if (UnityHelper.rand.NextDouble () < probHorzFold)
+					FoldSquare (EdgeType.HORZ, square);
+				break;
+			case EdgeType.VERT:
+				if (UnityHelper.rand.NextDouble () < probVertFold)
+					FoldSquare (EdgeType.VERT, square);
+				break;
+			case EdgeType.DIAG_LEFT:
+				if (UnityHelper.rand.NextDouble () < probDiagLeftFold)
+					FoldSquare (EdgeType.DIAG_LEFT, square);
+				break;
+			case EdgeType.DIAG_RIGHT:
+				if (UnityHelper.rand.NextDouble () < probDiagRightFold)
+					FoldSquare (EdgeType.DIAG_RIGHT, square);
+				break;
+			default:
+				break;
+			}
+			i++;
+		} while (i < edgeTypes.Length);
+
+
+//
+//
+//		if (UnityHelper.rand.NextDouble () < probHorzFold)
+//			FoldSquare (EdgeType.HORZ, square);
+//		if (UnityHelper.rand.NextDouble () < probVertFold)
+//			FoldSquare (EdgeType.VERT, square);
+//		if (UnityHelper.rand.NextDouble () < probDiagRightFold)
+//			FoldSquare (EdgeType.DIAG_RIGHT, square);
+//		if (UnityHelper.rand.NextDouble () < probDiagLeftFold)
+//			FoldSquare (EdgeType.DIAG_LEFT, square);
+//		
 //		var edge_enums = Enum.GetValues (typeof(EdgeType));
 //
 //		int numFolds = UnityHelper.rand.Next (minFolds, edge_enums.Length);
@@ -39,6 +71,7 @@ public class OrigamiFolder : MonoBehaviour{
 //		}
 
 	}
+
 
 	public static void FoldSquare(EdgeType et, FourSquare square) {
 		// temporarily parent each child to a new GameObject
@@ -217,12 +250,12 @@ public class OrigamiFolder : MonoBehaviour{
 
 //					if (UnityHelper.V3WithinDec (opp, cfo.GetComponent<MeshRenderer> ().bounds.center, -1)
 					if (cfo.tag.ToLower () != "vertice" && UnityHelper.V3WithinDec (opp, cfo.Find ("Core").position, -1)) {
-						// assign highest heign for pieces to fold on and pieces to fold
+						// assign highest height for pieces to fold on and pieces to fold
 						float cg_y_val = cg.GetComponent<MeshRenderer> ().bounds.center.y - square.transform.position.y;
 						AssignHighest (ref height_folded_on, cfo_y_val);
 						AssignHighest (ref height_to_fold, cg_y_val);
-//						Debug.Log (et + "\n" + cg.name + " " + cg.Find("Core").position + "\n" +
-//							cfo.name + " " + cfo.Find("Core").position);
+						Debug.Log (et + "\n" + cg.name + " " + cg.Find("Core").position + "\n" +
+							cfo.name + " " + cfo.Find("Core").position);
 
 					}
 

@@ -4,9 +4,9 @@ g OriTriangle
 v 0 0 0
 v 0 0 1
 v 1 0 0
-v 0 0.01 0
-v 0 0.01 1
-v 1 0.01 0
+v 0 0.03 0
+v 0 0.03 1
+v 1 0.03 0
 
 # List of faces
 

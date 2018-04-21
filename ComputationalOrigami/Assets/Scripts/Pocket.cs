@@ -55,28 +55,35 @@ public class Pocket {
 		return new Plane (pCenter.position, edge1.end.position, edge2.end.position);
 	}
 
+	// intersection of a pocket only if there are at least 3 vertices on each side of
+	// the pocket line
 	public bool Intersects(Transform other) {
-		Vector3 orig = edge1.end.position;
-		Vector3 dir = edge2.end.position - edge1.end.position;
-		float dist = Vector3.Distance (edge1.end.position, edge2.end.position);
-		Debug.DrawRay (orig, dir,Color.yellow);
-		RaycastHit[] hits = Physics.RaycastAll (orig, dir, dist);
-//		Debug.Log ("num colliders: " +
-//		hits.Length);
-		foreach (RaycastHit hit in hits) {
-			if (!hit.collider.transform.parent.Equals (pCenter.transform.parent)) {
-//				Debug.Log (this.ToString () + " intersected with " + hit.collider.transform.parent.name);
-				return true;
+		Plane plane = GetPocketPlane ();
+		int numPos = 0;
+		int numNeg = 0;
+		foreach (Transform child in other.GetComponentsInChildren<Transform>()) {
+			if (child.tag.ToLower() == "vertice") {
+				if (plane.GetSide (child.position))
+					numPos++;
+				else
+					numNeg++;
 			}
 		}
-		return false;
-//			Ray pocketRay = new Ray (edge1.end.position, edge2.end.position - edge1.end.position);
-//		Bounds origBounds = orig.GetComponent<MeshFilter>().mesh.bounds;
-//		Debug.DrawRay(edge1.end.position, edge2.end.position - edge1.end.position,Color.black);
-//		Debug.Log (pocketRay);
-//		Debug.Log (origBounds);
-//		Debug.Log (origBounds.IntersectRay (pocketRay));
-//		return origBounds.IntersectRay (pocketRay);
+		return numPos >= 3 && numNeg >= 3;
+
+		// intersection if anything crosses the line between the pocket end points
+
+//		Vector3 orig = edge1.end.position;
+//		Vector3 dir = edge2.end.position - edge1.end.position;
+//		float dist = Vector3.Distance (edge1.end.position, edge2.end.position);
+//		Debug.DrawRay (orig, dir,Color.yellow);
+//		RaycastHit[] hits = Physics.RaycastAll (orig, dir, dist);
+//		foreach (RaycastHit hit in hits) {
+//			if (!hit.collider.transform.parent.Equals (pCenter.transform.parent)) {
+//				return true;
+//			}
+//		}
+//		return false;
 	}
 
 	public override bool Equals(object obj)

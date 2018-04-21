@@ -4,7 +4,7 @@ using System;
 using UnityEngine;
 
 public class FourSquare : MonoBehaviour {
-    public static float PAPER_THICKNESS = 0.01f;
+    public static float PAPER_THICKNESS = 0.03f;
     private static int NUM_VERTICES = 8;
 
     private GameObject simulator;
@@ -42,10 +42,14 @@ public class FourSquare : MonoBehaviour {
 
 		ChangeColor ();
 		CollectChildBounds ();
+
+		OrigamiFolder.FoldSquare (EdgeType.DIAG_LEFT, this);
+		OrigamiFolder.FoldSquare (EdgeType.HORZ, this);
+		OrigamiFolder.FoldSquare (EdgeType.VERT, this);
 //		OrigamiFolder.FoldSquare (EdgeType.DIAG_RIGHT, this);
 
-//		OrigamiFolder.FoldSquare (EdgeType.DIAG_LEFT, this);
-//		OrigamiFolder.FoldSquare (EdgeType.HORZ, this);
+
+
 
 
 	}

@@ -65,10 +65,14 @@ public class Simulator : MonoBehaviour {
 
     void Update()
     {
+		// spawn a new origami unit over set intervals and only if there are enough pockets
+		// on the field for a new unit to insert into
 		if (TimeToSpawn() && pockets.Count > 0 && temp < unitsToGenerate)
         {
 			InstantiateUnit();
         }
+		// toRemove - remove inactive units after the frame
+		// toDestroy - if the unit has been trying to insert itself into the target pocket for too long, kill it
 		List<FourSquare> toRemove = new List<FourSquare>();
 		List<FourSquare> toDestroy = new List<FourSquare>();
 //		PrintValues (pockets);
@@ -83,6 +87,7 @@ public class Simulator : MonoBehaviour {
 			if (!CheckPocketAvailable (tup) && !MovedAwayFromTarget(unit)) {
 				continue;
 			}
+			// if unit has reached the end of its lifetime while trying to insert, destroy it
 			if (EndLifetime(tup.first,unit.stage)) {
 				toDestroy.Add (unit);
 				// put pocket back onto the field
@@ -91,7 +96,7 @@ public class Simulator : MonoBehaviour {
 			} 
 			tup.first++;
 
-			// unit life cycle
+			// unit stages
 			if (unit.stage == 0) {
 				SetupFolds (tup, unit,toDestroy);
 
@@ -268,11 +273,11 @@ public class Simulator : MonoBehaviour {
 				unit.transform.RotateAround (unit.iv.position, unit.targetP.GetVectorIn (), ROTATION_SPEED * Time.deltaTime);
 		} else {
 			// before inserting into pocket, translate the unit so that provides a 3rd dimension to the structure
-			Vector3 unitToTarget = unit.center.position - unit.targetP.pCenter.position;
-			Vector3 ivToTarget = unit.iv.position - unit.targetP.pCenter.position;
-			float diff = unitToTarget.y - ivToTarget.y;
-			UnityHelper.SetV3Value(unit.transform,"y",unit.transform.position.y+diff);
-			print ("translated " + unit.name + " by " + diff);
+//			Vector3 unitToTarget = unit.center.position - unit.targetP.pCenter.position;
+//			Vector3 ivToTarget = unit.iv.position - unit.targetP.pCenter.position;
+//			float diff = unitToTarget.y - ivToTarget.y;
+//			UnityHelper.SetV3Value(unit.transform,"y",unit.transform.position.y+2*diff);
+//			print ("translated " + unit.name + " by " + diff);
 
 
 			unit.MoveToNextStage ();

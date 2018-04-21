@@ -371,11 +371,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   square: {fileID: 114599836767610734, guid: 791a7d69b0bd3497582c4d87305a173d, type: 2}
-  initUnits: 1
-  unitsToGenerate: 6
-  probCenterInsertion: 0.5
-  probVertFold: 0.2
-  probHorzFold: 0.2
+  initUnits: 5
+  unitsToGenerate: 100
+  probCenterInsertion: 0
+  probVertFold: 1
+  probHorzFold: 1
   probDiagRightFold: 1
   probDiagLeftFold: 1
 --- !u!1 &1239281987
@@ -429,7 +429,7 @@ MeshRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1520851266}
-  m_Enabled: 0
+  m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1

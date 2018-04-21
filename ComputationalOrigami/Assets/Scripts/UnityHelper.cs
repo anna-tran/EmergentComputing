@@ -6,6 +6,19 @@ using UnityEngine;
 public class UnityHelper : MonoBehaviour {
 	public static System.Random rand = new System.Random ();
 
+	// taken from https://stackoverflow.com/questions/273313/randomize-a-listt
+	public static void ShuffleEdgeTypes(ref EdgeType[] list)  
+	{  
+		int n = list.Length;  
+		while (n > 1) {  
+			n--;  
+			int k = rand.Next(n + 1);  
+			var value = list[k];  
+			list[k] = list[n];  
+			list[n] = value;  
+		}  
+	}
+
 	public static bool CanFitPocket(FourSquare unit, Pocket p)
 	{
 		float angleU = Vector3.Angle (
