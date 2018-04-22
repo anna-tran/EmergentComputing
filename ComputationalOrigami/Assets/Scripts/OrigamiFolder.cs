@@ -11,64 +11,15 @@ public class OrigamiFolder : MonoBehaviour{
 		float probDiagRightFold,
 		float probDiagLeftFold) {
 
-		//TODO: Randomize order of folds
-
-
-		EdgeType[] edgeTypes = (EdgeType[]) Enum.GetValues(typeof(EdgeType));
-		UnityHelper.ShuffleEdgeTypes (ref edgeTypes);
-		int i = 0;
-		do {
-			EdgeType et = edgeTypes[i];
-			switch (et) {
-			case EdgeType.HORZ:
-				if (UnityHelper.rand.NextDouble () < probHorzFold)
-					FoldSquare (EdgeType.HORZ, square);
-				break;
-			case EdgeType.VERT:
-				if (UnityHelper.rand.NextDouble () < probVertFold)
-					FoldSquare (EdgeType.VERT, square);
-				break;
-			case EdgeType.DIAG_LEFT:
-				if (UnityHelper.rand.NextDouble () < probDiagLeftFold)
-					FoldSquare (EdgeType.DIAG_LEFT, square);
-				break;
-			case EdgeType.DIAG_RIGHT:
-				if (UnityHelper.rand.NextDouble () < probDiagRightFold)
-					FoldSquare (EdgeType.DIAG_RIGHT, square);
-				break;
-			default:
-				break;
-			}
-			i++;
-		} while (i < edgeTypes.Length);
-
-
-//
-//
-//		if (UnityHelper.rand.NextDouble () < probHorzFold)
-//			FoldSquare (EdgeType.HORZ, square);
-//		if (UnityHelper.rand.NextDouble () < probVertFold)
-//			FoldSquare (EdgeType.VERT, square);
-//		if (UnityHelper.rand.NextDouble () < probDiagRightFold)
-//			FoldSquare (EdgeType.DIAG_RIGHT, square);
-//		if (UnityHelper.rand.NextDouble () < probDiagLeftFold)
-//			FoldSquare (EdgeType.DIAG_LEFT, square);
-//		
-//		var edge_enums = Enum.GetValues (typeof(EdgeType));
-//
-//		int numFolds = UnityHelper.rand.Next (minFolds, edge_enums.Length);
-//
-//		// get a random set of folds
-//		HashSet<int> set = new HashSet<int> ();
-//		for (int i = 0; i < numFolds; i++) {
-//			set.Add (UnityHelper.rand.Next (0, edge_enums.Length-1));
-//		}
-//
-//		foreach (int i in set) {
-//			EdgeType et = (EdgeType) Enum.ToObject(typeof(EdgeType), edge_enums.GetValue(i));
-//			Debug.Log ("folding as " + et.ToString ());
-//			FoldSquare (et, square);
-//		}
+		// Produces 2^4 = 16 possible modular units
+		if (UnityHelper.rand.NextDouble () < probHorzFold)
+			FoldSquare (EdgeType.HORZ, square);
+		if (UnityHelper.rand.NextDouble () < probVertFold)
+			FoldSquare (EdgeType.VERT, square);
+		if (UnityHelper.rand.NextDouble () < probDiagRightFold)
+			FoldSquare (EdgeType.DIAG_RIGHT, square);
+		if (UnityHelper.rand.NextDouble () < probDiagLeftFold)
+			FoldSquare (EdgeType.DIAG_LEFT, square);
 
 	}
 
@@ -77,6 +28,7 @@ public class OrigamiFolder : MonoBehaviour{
 		// temporarily parent each child to a new GameObject
 
 		GameObject c_parent = new GameObject();
+		c_parent.name = "parent";
 		c_parent.transform.position = square.transform.position;
 
 		List<Transform> children_to_group = new List<Transform>();
@@ -95,7 +47,6 @@ public class OrigamiFolder : MonoBehaviour{
 		}
 		// group the triangle of the square unit to be folded on, and to fold over
 		foreach (Transform child in square.transform) {
-			float y_val = child.GetComponent<MeshRenderer>().bounds.center.y - square.transform.position.y;
 			if (ShouldGroupChild(et,child,square)) {
 				// group children on folding side
 				children_to_group.Add (child);
@@ -135,7 +86,9 @@ public class OrigamiFolder : MonoBehaviour{
 		ParentTo (children_to_group, c_parent);
 		DoVisualFold (c_parent.transform, GetFoldVector(et), height_folded_on, height_to_fold);
 		ReparentFrom (ref c_parent, square);
-		Destroy (c_parent);
+		GameObject.DestroyImmediate (c_parent);
+
+		square.AddFold ();
 	}
 
 	static Transform GetLowBound(EdgeType et, FourSquare square) {

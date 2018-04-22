@@ -5,27 +5,91 @@ using UnityEngine;
 
 public class UnityHelper : MonoBehaviour {
 	public static System.Random rand = new System.Random ();
-
-	// taken from https://stackoverflow.com/questions/273313/randomize-a-listt
-	public static void ShuffleEdgeTypes(ref EdgeType[] list)  
-	{  
-		int n = list.Length;  
-		while (n > 1) {  
-			n--;  
-			int k = rand.Next(n + 1);  
-			var value = list[k];  
-			list[k] = list[n];  
-			list[n] = value;  
-		}  
-	}
+	public static float EDGE_POCKET_DISTANCE = 0.06f;
 
 	public static bool CanFitPocket(FourSquare unit, Pocket p)
 	{
+		Transform iv = unit.GetIV ();
+		Transform ivn1 = unit.GetIVNeighbour1 ();
+		Transform ivn2 = unit.GetIVNeighbour2 ();
 		float angleU = Vector3.Angle (
-			                 unit.ivNeighbor1.position - unit.iv.position,
-			                 unit.ivNeighbor2.position - unit.iv.position);
+			ivn1.position - iv.position,
+			ivn2.position - iv.position);
 		float angleP = p.angle;
 		return angleU < angleP || ApproxSameFloat (angleP, angleU);
+	}
+
+	public static bool CorrectTargetPocket(FourSquare unit, Pocket p) {
+		// end1			end of pocket edge 1
+		// end2			end of pocket edge 2
+		// fartherEnd	the edge of the pocket that is farther away from the center
+		//				along the y axis
+		Vector3 end1, end2, fartherEnd;
+		switch (unit.numFolds) {
+		case 0:
+		case 1:
+			return true;
+
+		case 2:
+			end1 = p.edge1.end.localPosition - p.pCenter.localPosition;
+			end2 = p.edge2.end.localPosition - p.pCenter.localPosition;
+			fartherEnd = (Math.Abs (end1.y) > Math.Abs (end2.y)) ? end1 : end2;
+//			print (unit.name + " pocket distance " + fartherEnd.y);
+			return Math.Abs(fartherEnd.y) < EDGE_POCKET_DISTANCE;
+
+		case 3:
+		case 4:
+			end1 = p.edge1.end.localPosition - p.pCenter.localPosition;
+			end2 = p.edge2.end.localPosition - p.pCenter.localPosition;
+			fartherEnd = (Math.Abs (end1.y) > Math.Abs (end2.y)) ? end1 : end2;
+			print (unit.name + " pocket distance " + fartherEnd.y);
+			return Math.Abs(fartherEnd.y) > EDGE_POCKET_DISTANCE;
+			
+		default:
+			return true;
+		}
+
+	}
+
+	public static bool CorrectOverlap(FourSquare unit) {
+		switch (unit.numFolds) {
+		case 0:
+		case 1:
+			return true;
+		case 2:
+			return true;
+		case 3:
+		case 4:
+			Plane pl = new Plane (unit.GetIV ().position, unit.targetP.edge1.end.position, unit.targetP.edge2.end.position);
+			Transform targetParent = unit.targetP.pCenter.parent;
+			int numTargetPos = 0;
+			int numUnitPos = 0;
+			for (int i = 0; i < targetParent.childCount; i++) {
+				if (pl.GetSide (targetParent.GetChild (i).position)) {
+					numTargetPos++;
+					targetParent.GetChild (i).GetComponent<Renderer> ().material.color = Color.blue;
+				}
+			}
+			Debug.Log (unit.name + "  numTargetPos: " + numTargetPos);
+			Color rand_color = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
+			for (int i = 0; i < unit.transform.childCount; i++) {
+				if (pl.GetSide (unit.transform.GetChild (i).position)) {
+					unit.transform.GetChild (i).GetComponent<Renderer> ().material.color = rand_color;
+					numUnitPos++;
+				}
+			}
+			Debug.Log (unit.name + "  numUnitPos: " + numUnitPos);
+
+			float targetPosRatio = numTargetPos / (float)targetParent.childCount;
+			float unitPosRatio = numUnitPos / (float)unit.transform.childCount;
+			return (
+			    (GreaterEqualFloat (targetPosRatio, 0.5f) && (unitPosRatio < 0.5f)) ||
+			    (GreaterEqualFloat (unitPosRatio, 0.5f) && (targetPosRatio < 0.5f))
+			);
+		default:
+			return true;
+		}
+
 	}
 
     public static bool IntersectsPocket(TransformEdge e, Pocket p, EdgeType et)
@@ -37,26 +101,22 @@ public class UnityHelper : MonoBehaviour {
         float m1 = GetSlope(s1.x, s1.z, e1.x, e1.z);
         float m2 = GetSlope(s2.x, s2.z, e2.x, e2.z);
 
-        if (ApproxSameFloat(m1, m2))
-        {
+        if (ApproxSameFloat(m1, m2)) {
             //			print ("m1 " + m1 + "  m2 " + m2);
             return false;
         }
         float intx, intz;
-        if (Double.IsInfinity(m1))
-        {
+        if (Double.IsInfinity(m1)) {
             float b2 = GetB(e2.x, e2.z, m2);
             intx = e1.x;
             intz = (m2 * intx) + b2;
         }
-        else if (Double.IsInfinity(m2))
-        {
+        else if (Double.IsInfinity(m2)) {
             float b1 = GetB(e1.x, e1.z, m1);
             intx = e2.x;
             intz = (m1 * intx) + b1;
         }
-        else
-        {
+        else {
             float b1 = GetB(e1.x, e1.z, m1);
             float b2 = GetB(e2.x, e2.z, m2);
             intx = (b2 - b1) / (m1 - m2);
@@ -65,12 +125,10 @@ public class UnityHelper : MonoBehaviour {
         // if not the same as the ends of the pocket
         if (!ApproxSameFloat(intx, s2.x)
             && !ApproxSameFloat(intx, e2.x)
-            && InBetweenExcl(s2.x, e2.x, intx))
-        {
+            && InBetweenExcl(s2.x, e2.x, intx)) {
             return true;
         }
-        else
-        {
+        else {
             return false;
         }
 
@@ -130,11 +188,23 @@ public class UnityHelper : MonoBehaviour {
 	}
 
 	public static bool V3Equal(Vector3 a, Vector3 b){
-		return Vector3.SqrMagnitude(a - b) < 0.0001f;
+		return Vector3.SqrMagnitude(a - b) < 0.000007f;
 	}
 
 	public static bool V3ApproxEqual(Vector3 a, Vector3 b){
 		return Vector3.SqrMagnitude(a - b) < 0.00025f;
+	}
+
+	public static Vector3 GetOppositeV3(Vector3 v) {
+		Vector3 oppV3 = new Vector3 ();
+		oppV3.x = -v.x;
+		oppV3.y = -v.y;
+		oppV3.z = -v.z;
+		return oppV3;
+	}
+
+	public static bool V3AbsEqual(Vector3 a, Vector3 b) {
+		return (V3Equal (a, b) || V3Equal (GetOppositeV3 (a), b));
 	}
 
 	public static Vector3 acuteAngle(Vector3 a) {
@@ -149,6 +219,14 @@ public class UnityHelper : MonoBehaviour {
 			angle.z = 360 - angle.z;
 		}
 		return angle;
+	}
+
+	public static bool GreaterEqualFloat(float a, float b) {
+		return (ApproxSameFloat (a, b) || a > b);
+	}
+
+	public static bool LessThanEqualFloat(float a, float b) {
+		return (ApproxSameFloat (a, b) || a < b);
 	}
 
 	public static bool ApproxSameFloat(float a, float b) {

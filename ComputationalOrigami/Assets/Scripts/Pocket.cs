@@ -120,8 +120,7 @@ public class Pocket {
 
 	public override string ToString()
 	{
-		return "edge1: " + edge1.ToString()
-			+ "\nedge2: " + edge2.ToString()
-			+ "\nangle: " + angle;
+		return "edge1: " + edge1.end.name
+		+ "\nedge2: " + edge2.end.name;
 	}
 }

@@ -14,12 +14,11 @@ public class Simulator : MonoBehaviour {
 	public FourSquare square;
 
     public int initUnits;
-	public int unitsToGenerate;
-	public float probCenterInsertion;
 	public float probVertFold;
 	public float probHorzFold;
 	public float probDiagRightFold;
 	public float probDiagLeftFold;
+	private int unitsToGenerate = 1;
     private Transform zone;
     private Queue<Pocket> pockets;
     private List<Tuple<int,FourSquare>> activeUnits;
@@ -98,7 +97,7 @@ public class Simulator : MonoBehaviour {
 
 			// unit stages
 			if (unit.stage == 0) {
-				SetupFolds (tup, unit,toDestroy);
+				SetupFolds (tup, unit, toDestroy);
 
 			} else if (unit.stage == 1) {
 				AlignLookAtTarget (tup, unit);
@@ -111,14 +110,13 @@ public class Simulator : MonoBehaviour {
 
 			} else if (unit.stage == 4) {
 				InsertIntoPocket (tup, unit);
-
+			
 			}
 
 			else
             {
 				FillPocket (unit);
 				// add new pockets to queue only if they are not filled by the parent
-//				unit.pockets.ForEach( p => );
 				foreach (Pocket p in unit.pockets) 
 				{
 					if (!p.Intersects (unit.targetP.pCenter.parent))
@@ -146,7 +144,7 @@ public class Simulator : MonoBehaviour {
     }
 
 	private bool MovedAwayFromTarget(FourSquare unit) {
-		Vector3 distFromTarget = unit.iv.position - unit.targetP.pCenter.position;
+		Vector3 distFromTarget = unit.GetIV().position - unit.targetP.pCenter.position;
 //		print (distFromTarget.magnitude);
 		if (distFromTarget.sqrMagnitude < 30.0f) {
 			Vector3 pointToCenter = 3.0f * unit.GetAlignmentV3 ();
@@ -192,24 +190,30 @@ public class Simulator : MonoBehaviour {
 		Pocket p;
 		do {
 			p = PopPocket ();
-			unit.targetP = p;
 		} while (p != null && p.filled);
 
 		if (p == null) {
 			toDestroy.Add (unit);
 		} else {
-			unit.ChooseInsertionVertice (probCenterInsertion);
-//			print (unit.name + " has iv " + unit.iv.name);
+			
+//			unit.ChooseInsertionVertice (probCenterInsertion);
+//			print (unit.name + " has iv " + unit.GetIV().name);
 
 			// if different angles (pocket and insertion point)
 			// put pocket back in queue
 			// don't continue and stay in same stage
-			if (!UnityHelper.CanFitPocket (unit, unit.targetP)) {
-//				print (unit.name + " put pocket back");
+			if (!UnityHelper.CanFitPocket (unit, p) 
+				&& !UnityHelper.CorrectTargetPocket(unit, p)) {
+				print (unit.name + " put pocket back");
 				PushPocket (unit.targetP);
-				unit.targetP = null;
-				unit.iv = null;
+				unit.ResetTargetPocket ();
+				unit.ResetIV ();
 			} else {
+				unit.targetP = p;
+				print (unit.name + " iv: " + unit.GetIV ().name
+				+ "\n" + unit.targetP.edge1.end.name + " " + unit.targetP.edge2.end.name
+				);
+
 				unit.CalcSelfRotationV3 ();
 				unit.MoveToNextStage ();
 				tup.first = 0;
@@ -223,15 +227,15 @@ public class Simulator : MonoBehaviour {
 
 		Vector3 currV3 = unit.GetAlignmentV3 ().normalized;
 
-		Debug.DrawLine (unit.iv.position, unit.iv.position + unit.selfRotationV3, Color.cyan);
-		Debug.DrawLine (unit.iv.position, unit.targetP.pCenter.position, Color.blue);
+//		Debug.DrawLine (unit.GetIV().position, unit.GetIV().position + unit.selfRotationV3, Color.cyan);
+//		Debug.DrawLine (unit.GetIV().position, unit.targetP.pCenter.position, Color.blue);
 
-		Vector3 alignToV3 = (unit.targetP.pCenter.position - unit.iv.position).normalized;
+		Vector3 alignToV3 = (unit.targetP.pCenter.position - unit.GetIV().position).normalized;
 		if (!UnityHelper.V3Equal (currV3, alignToV3)) {
 			if ((currV3 - alignToV3).sqrMagnitude < 0.07f)
-				unit.transform.RotateAround (unit.iv.position, unit.selfRotationV3, 0.2f * ROTATION_SPEED * Time.deltaTime);	
+				unit.transform.RotateAround (unit.GetIV().position, unit.selfRotationV3, 0.2f * ROTATION_SPEED * Time.deltaTime);	
 			else
-				unit.transform.RotateAround (unit.iv.position, unit.selfRotationV3, ROTATION_SPEED * Time.deltaTime);
+				unit.transform.RotateAround (unit.GetIV().position, unit.selfRotationV3, ROTATION_SPEED * Time.deltaTime);
 		} else {
 			unit.CalcTargetRotationV3 ();
 			unit.MoveToNextStage ();
@@ -242,13 +246,13 @@ public class Simulator : MonoBehaviour {
 
 	private void RotateAroundTarget(Tuple<int,FourSquare> tup,FourSquare unit) {
 
-		Vector3 normRotating = (unit.iv.position - unit.targetP.pCenter.position).normalized;
+		Vector3 normRotating = (unit.GetIV().position - unit.targetP.pCenter.position).normalized;
 		Vector3 normStill = (unit.targetP.GetVectorIn ()).normalized;
 
 		if (!UnityHelper.V3Equal (normRotating, normStill)) {
 //			Debug.Log (normRotating + "\n" + normStill);
-//			Debug.DrawLine (unit.targetP.pCenter.position, unit.targetP.pCenter.position + 3.0f*normStill, Color.blue);
-//			Debug.DrawLine (unit.iv.position, unit.targetP.pCenter.position, Color.blue);
+			Debug.DrawLine (unit.targetP.pCenter.position, unit.targetP.pCenter.position + 3.0f*normStill, Color.blue);
+			Debug.DrawLine (unit.GetIV().position, unit.targetP.pCenter.position, Color.blue);
 			if ((normRotating - normStill).sqrMagnitude < 0.07f) {
 				unit.transform.RotateAround (unit.targetP.pCenter.position, unit.targetRotationV3, 0.2f * ROTATION_SPEED * Time.deltaTime);
 			} else {
@@ -262,44 +266,52 @@ public class Simulator : MonoBehaviour {
 	}
 
 	private void AlignRotationToTarget(Tuple<int,FourSquare> tup,FourSquare unit) {
-		Vector3 v11 = unit.targetP.edge1.end.position - unit.ivNeighbor1.position;
-		Vector3 v12 = unit.iv.position - unit.ivNeighbor1.position;
-		Vector3 v21 = unit.targetP.edge2.end.position - unit.ivNeighbor2.position;
-		Vector3 v22 = unit.iv.position - unit.ivNeighbor2.position;
-		Plane plane1 = new Plane (unit.iv.position, unit.ivNeighbor1.position, unit.ivNeighbor2.position);
+		Transform iv = unit.GetIV ();
+		Transform ivn1 = unit.GetIVNeighbour1 ();
+		Transform ivn2 = unit.GetIVNeighbour2 ();
+
+		Plane plane1 = new Plane (iv.position, ivn1.position, ivn2.position);
 		Plane plane2 = unit.targetP.GetPocketPlane ();
-//		print ("plane1 " + plane1.normal + "\nplane2 " + plane2.normal);
-		if (!UnityHelper.V3ApproxEqual (plane1.normal, plane2.normal)) {
-			if ((plane1.normal - plane2.normal).sqrMagnitude < 0.07f)
-				unit.transform.RotateAround (unit.iv.position, unit.targetP.GetVectorIn (), 0.2f * ROTATION_SPEED * Time.deltaTime);	
-			else
-				unit.transform.RotateAround (unit.iv.position, unit.targetP.GetVectorIn (), ROTATION_SPEED * Time.deltaTime);
+
+		if (!UnityHelper.V3AbsEqual (plane1.normal, plane2.normal)//) {
+			|| !UnityHelper.CorrectOverlap(unit)) {
+
+			if ((plane1.normal - plane2.normal).sqrMagnitude < 0.07f ||
+				(UnityHelper.GetOppositeV3(plane1.normal) - plane2.normal).sqrMagnitude < 0.07f
+				) {
+				unit.transform.RotateAround (unit.GetIV ().position, unit.targetP.GetVectorIn (), -0.2f * ROTATION_SPEED * Time.deltaTime);	
+				print (unit.name + " cross plane " + plane1.normal + "  " + plane2.normal);
+			} else {
+				unit.transform.RotateAround (unit.GetIV ().position, unit.targetP.GetVectorIn (), -ROTATION_SPEED * Time.deltaTime);
+				print(unit.name + " cross plane " +  plane1.normal + "  " + plane2.normal);
+				print (unit.name + " sqr magnitude " + (plane1.normal - plane2.normal).sqrMagnitude);
+			}
 		} else {
-			// before inserting into pocket, translate the unit so that provides a 3rd dimension to the structure
-//			Vector3 unitToTarget = unit.center.position - unit.targetP.pCenter.position;
-//			Vector3 ivToTarget = unit.iv.position - unit.targetP.pCenter.position;
-//			float diff = unitToTarget.y - ivToTarget.y;
-//			UnityHelper.SetV3Value(unit.transform,"y",unit.transform.position.y+2*diff);
-//			print ("translated " + unit.name + " by " + diff);
-
-
 			unit.MoveToNextStage ();
 			tup.first = 0;
-//			print (unit.stage);
 
 		}
 	}
 
 	private void InsertIntoPocket(Tuple<int,FourSquare> tup,FourSquare unit) {
 		
-		Vector3 distFromTarget = unit.iv.position - unit.targetP.pCenter.position;
+		Vector3 distFromTarget = unit.GetIV().position - unit.targetP.pCenter.position;
 		if (distFromTarget.magnitude > STOP_DISTANCE) {
-			Vector3 pointToCenter = unit.transform.position - unit.iv.position;
+			Vector3 pointToCenter = unit.transform.position - unit.GetIV().position;
 			unit.transform.position = Vector3.MoveTowards (unit.transform.position, unit.targetP.pCenter.position + pointToCenter, INSERTION_SPEED * Time.deltaTime);
 		} else {
 			unit.MoveToNextStage ();
 			tup.first = 0;
 		}
+	}
+
+	private void Tilt(Tuple<int,FourSquare> tup,FourSquare unit) {
+//		Vector3 tiltV3 = (unit.targetP.edge1.end.position +
+//			unit.targetP.edge2.end.position - 
+//			unit.targetP.pCenter).normalized;
+//		if (unit.transform.position
+		
+		
 	}
 
 	private void FillPocket(FourSquare unit) {
