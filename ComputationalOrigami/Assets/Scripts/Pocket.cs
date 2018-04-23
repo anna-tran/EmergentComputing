@@ -55,7 +55,7 @@ public class Pocket {
 		return new Plane (pCenter.position, edge1.end.position, edge2.end.position);
 	}
 
-	// intersection of a pocket only if there are at least 3 vertices on each side of
+	// intersection of a pocket only if there are at least 4 vertices on each side of
 	// the pocket line
 	public bool Intersects(Transform other) {
 		Plane plane = GetPocketPlane ();
@@ -69,7 +69,7 @@ public class Pocket {
 					numNeg++;
 			}
 		}
-		return numPos >= 3 && numNeg >= 3;
+		return numPos >= 4 && numNeg >= 4;
 
 		// intersection if anything crosses the line between the pocket end points
 

@@ -228,8 +228,8 @@ public class Simulator : MonoBehaviour {
 
 		Vector3 currV3 = unit.GetAlignmentV3 ().normalized;
 
-//		Debug.DrawLine (unit.GetIV().position, unit.GetIV().position + unit.selfRotationV3, Color.cyan);
-//		Debug.DrawLine (unit.GetIV().position, unit.targetP.pCenter.position, Color.blue);
+		Debug.DrawLine (unit.GetIV().position, unit.GetIV().position + unit.selfRotationV3, Color.cyan);
+		Debug.DrawLine (unit.GetIV().position, unit.targetP.pCenter.position, Color.blue);
 
 		Vector3 alignToV3 = (unit.targetP.pCenter.position - unit.GetIV().position).normalized;
 		if (!UnityHelper.V3EqualMagn (currV3, alignToV3)) {
@@ -273,29 +273,27 @@ public class Simulator : MonoBehaviour {
 	}
 
 	private void AlignRotationToTarget(Tuple<int,FourSquare> tup,FourSquare unit) {
-		Transform iv = unit.GetIV ();
-		Transform ivn1 = unit.GetIVNeighbour1 ();
-		Transform ivn2 = unit.GetIVNeighbour2 ();
+		FourSquare target = unit.targetP.pCenter.parent.GetComponent<FourSquare> ();
+		Plane plane1 = UnityHelper.GetPlaneOfVertex (unit,unit.GetIV());
+		Plane plane2 = UnityHelper.GetPlaneOfVertex (target, unit.targetP.edge1.end);
+		Debug.DrawRay (unit.targetP.pCenter.position, plane1.normal, Color.red);
+		Debug.DrawRay (unit.targetP.pCenter.position, plane2.normal, Color.red);
+		print ("plane1,plane2");
+		print ( UnityHelper.LogV3 (plane1.normal) + "\n" +
+			UnityHelper.LogV3 (plane2.normal));
+		print (unit.name + " sqr magnitude " + (plane1.normal - plane2.normal).sqrMagnitude + "   " +
+			" sqr magnitude2 " + (UnityHelper.GetOppositeV3(plane1.normal) - plane2.normal).sqrMagnitude);
 
-		Plane plane1 = new Plane (iv.position, ivn1.position, ivn2.position);
-		Plane plane2 = unit.targetP.GetPocketPlane ();
-//		print ("plane1,plane2");
-//		UnityHelper.DebugLogV3 (plane1.normal);
-//		UnityHelper.DebugLogV3 (plane2.normal);
 
-		if (!(UnityHelper.V3AbsEqual(plane1.normal,plane2.normal) 
-			&& (UnityHelper.V3WithinDec (plane1.normal, plane2.normal,2.6f) 
-				|| UnityHelper.V3WithinDec(UnityHelper.GetOppositeV3(plane1.normal),plane2.normal,2.6f))) //&&
-//			!UnityHelper.V3EqualFields (Vector3.Cross(plane1.normal,plane2.normal),Vector3.zero) //){
-			|| !UnityHelper.CorrectOverlap(unit)) {
+		if (!UnityHelper.ApproxEqualPlane(plane1,plane2)
+			|| !UnityHelper.CorrectOverlap(unit)) { 
 			if ((plane1.normal - plane2.normal).sqrMagnitude < 0.08f ||
 				(UnityHelper.GetOppositeV3(plane1.normal) - plane2.normal).sqrMagnitude < 0.08f
 				) {
-				unit.transform.RotateAround (unit.GetIV ().position, unit.targetP.GetVectorIn (), -0.2f * ROTATION_SPEED * Time.deltaTime);	
+				unit.transform.RotateAround (unit.GetIV ().position, unit.GetIV().position - unit.targetP.pCenter.position, -0.2f * ROTATION_SPEED * Time.deltaTime);	
 			} else {
-				unit.transform.RotateAround (unit.GetIV ().position, unit.targetP.GetVectorIn (), -ROTATION_SPEED * Time.deltaTime);
+				unit.transform.RotateAround (unit.GetIV ().position, unit.GetIV().position - unit.targetP.pCenter.position, -ROTATION_SPEED * Time.deltaTime);
 //				print(unit.name + " cross plane " +  plane1.normal + "  " + plane2.normal);
-//				print (unit.name + " sqr magnitude " + (plane1.normal - plane2.normal).sqrMagnitude);
 			}
 
 
@@ -308,9 +306,6 @@ public class Simulator : MonoBehaviour {
 	}
 
 	private void InsertIntoPocket(Tuple<int,FourSquare> tup,FourSquare unit) {
-		Vector3 end1 = unit.targetP.edge1.end.position - unit.targetP.pCenter.position;
-		Vector3 end2 = unit.targetP.edge2.end.position - unit.targetP.pCenter.position;
-		Vector3 mid = unit.targetP.pCenter.position + (end1 + end2).normalized;
 		Vector3 distFromTarget = unit.GetIV().position - unit.targetP.pCenter.position;
 		if (distFromTarget.magnitude > STOP_DISTANCE) {
 			Vector3 pointToCenter = unit.transform.position - unit.GetIV().position;

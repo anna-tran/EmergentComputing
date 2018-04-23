@@ -67,24 +67,26 @@ public class UnityHelper : MonoBehaviour {
 			for (int i = 0; i < targetParent.childCount; i++) {
 				if (pl.GetSide (targetParent.GetChild (i).position)) {
 					numTargetPos++;
-//					targetParent.GetChild (i).GetComponent<Renderer> ().material.color = Color.blue;
+					targetParent.GetChild (i).GetComponent<Renderer> ().material.color = Color.blue;
 				}
 			}
 			Debug.Log (unit.name + "  numTargetPos: " + numTargetPos);
 			Color rand_color = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
 			for (int i = 0; i < unit.transform.childCount; i++) {
 				if (pl.GetSide (unit.transform.GetChild (i).position)) {
-//					unit.transform.GetChild (i).GetComponent<Renderer> ().material.color = rand_color;
+					unit.transform.GetChild (i).GetComponent<Renderer> ().material.color = rand_color;
 					numUnitPos++;
 				}
 			}
-			Debug.Log (unit.name + "  numUnitPos: " + numUnitPos);
+//			Debug.Log (unit.name + "  numUnitPos: " + numUnitPos);
 
 			float targetPosRatio = numTargetPos / (float)targetParent.childCount;
 			float unitPosRatio = numUnitPos / (float)unit.transform.childCount;
+			Debug.Log(unit.name + "  ratioTargetPos: " + targetPosRatio);
+			Debug.Log(unit.name + "  ratioUnitPos: " + unitPosRatio);
 			return (
-			    (GreaterEqualFloat (targetPosRatio, 0.5f) && (unitPosRatio < 0.5f)) ||
-			    (GreaterEqualFloat (unitPosRatio, 0.5f) && (targetPosRatio < 0.5f))
+			    (GreaterEqualFloat (targetPosRatio, 0.4f) && (unitPosRatio < 0.5f)) ||
+			    (GreaterEqualFloat (unitPosRatio, 0.4f) && (targetPosRatio < 0.5f))
 			);
 		default:
 			return true;
@@ -134,15 +136,15 @@ public class UnityHelper : MonoBehaviour {
 
     }
 
-	public static Plane GetPlaneInsideTri(FourSquare unit) {
-		Transform iv = unit.GetIV ();
-		Collider[] overlaps = Physics.OverlapSphere (iv.position, FourSquare.PAPER_THICKNESS / 2);
+	public static Plane GetPlaneOfVertex(FourSquare unit, Transform vertex) {
+		Collider[] overlaps = Physics.OverlapSphere (vertex.position, FourSquare.PAPER_THICKNESS / 4);
 		Transform overlappingTri = null;
 		foreach (Collider col in overlaps) {
 			if (col.name.Contains ("Tri"))
 				overlappingTri = col.transform;
 		}
-		Vector3 v1 = iv.position;
+//		print ("overlapping tri" + overlappingTri.name);
+		Vector3 v1 = vertex.position;
 		Vector3 v2 = overlappingTri.Find ("Core").position;
 		Vector3 v3 = overlappingTri.position;
 		return new Plane (v1, v2, v3);
@@ -208,7 +210,7 @@ public class UnityHelper : MonoBehaviour {
 	}
 
 	public static bool V3ApproxEqualMagn(Vector3 a, Vector3 b){
-		return Vector3.SqrMagnitude(a - b) < 0.00001f;
+		return Vector3.SqrMagnitude(a - b) < 0.0025f;
 	}
 
 	public static bool V3EqualFields(Vector3 a, Vector3 b) {
@@ -223,8 +225,9 @@ public class UnityHelper : MonoBehaviour {
 		return oppV3;
 	}
 
-	public static bool V3AbsEqual(Vector3 a, Vector3 b) {
-		return (V3EqualMagn (a, b) || V3EqualMagn (GetOppositeV3 (a), b));
+	public static bool ApproxEqualPlane(Plane a, Plane b) {
+		return (V3ApproxEqualMagn (a.normal, b.normal) 
+			|| V3ApproxEqualMagn (GetOppositeV3 (a.normal), b.normal));
 	}
 
 	public static Vector3 acuteAngle(Vector3 a) {
@@ -299,14 +302,13 @@ public class UnityHelper : MonoBehaviour {
 		return point; // return it
 	}
 
-	public static void DebugLogV3(Vector3 v) {
+	public static String LogV3(Vector3 v) {
 		string output = "(";
 		output += v.x + ",";
 		output += v.y + ",";
 		output += v.z + ",";
 		output += ")";
-		print (output);
-
+		return output;
 	}
 
 }

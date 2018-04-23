@@ -192,7 +192,6 @@ public class OrigamiFolder : MonoBehaviour{
 	static Tuple<float,float> GetHeightFoldedOn(List<Transform> children_to_group, List<Transform> children_to_fold_on, FourSquare square, EdgeType et) {
 		float height_folded_on = 0;
 		float height_to_fold = 0;
-		List<Transform> child_copy = children_to_fold_on;
 //		Debug.Log ("Getting heights for " + et.ToString ());
 		// for each child to group, find 
 		foreach (Transform cg in children_to_group) {
