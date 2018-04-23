@@ -86,6 +86,20 @@ public class Pocket {
 //		return false;
 	}
 
+	public bool CutsThrough(Transform other) {
+		Vector3 orig = edge1.end.position;
+		Vector3 dir = edge2.end.position - edge1.end.position;
+		float dist = Vector3.Distance (edge1.end.position, edge2.end.position);
+		Debug.DrawRay (orig, dir,Color.yellow);
+		RaycastHit[] hits = Physics.RaycastAll (orig, dir, dist);
+		foreach (RaycastHit hit in hits) {
+			if (hit.collider.transform.parent.Equals (other)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public override bool Equals(object obj)
 	{
 		if (!(obj is Pocket))

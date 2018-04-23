@@ -5,7 +5,20 @@ using UnityEngine;
 
 public class UnityHelper : MonoBehaviour {
 	public static System.Random rand = new System.Random ();
-	public static float EDGE_POCKET_DISTANCE = 0.08f;
+	public static float EDGE_POCKET_DISTANCE = 0.05f;
+
+	// source : https://stackoverflow.com/questions/273313/randomize-a-listt
+	public static void Shuffle<T>(ref List<T> list)  
+	{  
+		int n = list.Count;  
+		while (n > 1) {  
+			n--;  
+			int k = rand.Next(n + 1);  
+			T value = list[k];  
+			list[k] = list[n];  
+			list[n] = value;  
+		}  
+	}
 
 	public static bool CanFitPocket(FourSquare unit, Pocket p)
 	{
@@ -60,34 +73,41 @@ public class UnityHelper : MonoBehaviour {
 			return true;
 		case 3:
 		case 4:
-			Plane pl = new Plane (unit.targetP.pCenter.position, unit.targetP.edge1.end.position, unit.targetP.edge2.end.position);
+			Plane pl = new Plane(unit.GetIV().position, unit.targetP.edge1.end.position, unit.targetP.edge2.end.position);
+				//new Plane (unit.targetP.pCenter.position, unit.targetP.edge1.end.position, unit.targetP.edge2.end.position);
 			Transform targetParent = unit.targetP.pCenter.parent;
-			int numTargetPos = 0;
-			int numUnitPos = 0;
+			int numPos = 0;
+			int numNeg = 0;
 			for (int i = 0; i < targetParent.childCount; i++) {
 				if (pl.GetSide (targetParent.GetChild (i).position)) {
-					numTargetPos++;
+					numPos++;
 					targetParent.GetChild (i).GetComponent<Renderer> ().material.color = Color.blue;
+				} else {
+					numNeg++;
 				}
 			}
-			Debug.Log (unit.name + "  numTargetPos: " + numTargetPos);
+//			Debug.Log (unit.name + "  numTargetPos: " + numTargetPos);
 			Color rand_color = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
 			for (int i = 0; i < unit.transform.childCount; i++) {
 				if (pl.GetSide (unit.transform.GetChild (i).position)) {
 					unit.transform.GetChild (i).GetComponent<Renderer> ().material.color = rand_color;
-					numUnitPos++;
+					numPos++;
+				} else {
+					numNeg++;
 				}
 			}
 //			Debug.Log (unit.name + "  numUnitPos: " + numUnitPos);
 
-			float targetPosRatio = numTargetPos / (float)targetParent.childCount;
-			float unitPosRatio = numUnitPos / (float)unit.transform.childCount;
-			Debug.Log(unit.name + "  ratioTargetPos: " + targetPosRatio);
-			Debug.Log(unit.name + "  ratioUnitPos: " + unitPosRatio);
-			return (
-			    (GreaterEqualFloat (targetPosRatio, 0.4f) && (unitPosRatio < 0.5f)) ||
-			    (GreaterEqualFloat (unitPosRatio, 0.4f) && (targetPosRatio < 0.5f))
-			);
+//			float targetPosRatio = numTargetPos / (float)targetParent.childCount;
+//			float unitPosRatio = numUnitPos / (float)unit.transform.childCount;
+//			Debug.Log(unit.name + "  ratioTargetPos: " + targetPosRatio);
+//			Debug.Log(unit.name + "  ratioUnitPos: " + unitPosRatio);
+//			return (
+//			    (GreaterEqualFloat (targetPosRatio, 0.4f) && (unitPosRatio < 0.5f)) ||
+//			    (GreaterEqualFloat (unitPosRatio, 0.4f) && (targetPosRatio < 0.5f))
+//			);
+			Debug.Log("num pos " + numPos + "  num neg " + numNeg);
+			return (Math.Abs(numNeg-numPos) < unit.transform.childCount/2);
 		default:
 			return true;
 		}
@@ -206,11 +226,11 @@ public class UnityHelper : MonoBehaviour {
 	}
 
 	public static bool V3EqualMagn(Vector3 a, Vector3 b){
-		return Vector3.SqrMagnitude(a - b) < 0.0000075f;
+		return Vector3.SqrMagnitude(a - b) < 0.00001f;
 	}
 
 	public static bool V3ApproxEqualMagn(Vector3 a, Vector3 b){
-		return Vector3.SqrMagnitude(a - b) < 0.0025f;
+		return Vector3.SqrMagnitude(a - b) < 0.005f;
 	}
 
 	public static bool V3EqualFields(Vector3 a, Vector3 b) {

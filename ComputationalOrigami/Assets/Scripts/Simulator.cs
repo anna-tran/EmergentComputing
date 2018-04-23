@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Simulator : MonoBehaviour {
-	private static float ROTATION_SPEED = 100;
+	private static float ROTATION_SPEED = 120;
     private static int FPS = 30;
 	private static int DELAY_SECONDS = 5 * FPS;
 	private static float INSERTION_SPEED = 8.0f;
-	private static int UNIT_LIFETIME = 15 * FPS;
+	private static int UNIT_LIFETIME = 20 * FPS;
 	private static float STOP_DISTANCE = 0.6f;
 
 	public FourSquare square;
@@ -168,7 +168,7 @@ public class Simulator : MonoBehaviour {
 
 	private bool EndLifetime(int life, int stage) 
 	{
-		return life == UNIT_LIFETIME && stage >= 0 && stage < 3;
+		return life == UNIT_LIFETIME && stage >= 0 && stage < 4;
 	}
 
 	private void InstantiateUnit()
@@ -182,6 +182,7 @@ public class Simulator : MonoBehaviour {
 			probDiagLeftFold);
 		GameObject.Destroy(GameObject.Find ("parent"));
 		UnityHelper.RandomlyRotate (squareCopy.transform);
+		UnityHelper.RandomlyPosition (squareCopy.transform, zone);
 		activeUnits.Add(new Tuple<int,FourSquare>(0,squareCopy));
 		temp++;
 	}
@@ -197,9 +198,6 @@ public class Simulator : MonoBehaviour {
 			toDestroy.Add (unit);
 		} else {
 			
-//			unit.ChooseInsertionVertice (probCenterInsertion);
-//			print (unit.name + " has iv " + unit.GetIV().name);
-
 			// if different angles (pocket and insertion point)
 			// put pocket back in queue
 			// don't continue and stay in same stage
@@ -278,17 +276,22 @@ public class Simulator : MonoBehaviour {
 		Plane plane2 = UnityHelper.GetPlaneOfVertex (target, unit.targetP.edge1.end);
 		Debug.DrawRay (unit.targetP.pCenter.position, plane1.normal, Color.red);
 		Debug.DrawRay (unit.targetP.pCenter.position, plane2.normal, Color.red);
-		print ("plane1,plane2");
-		print ( UnityHelper.LogV3 (plane1.normal) + "\n" +
-			UnityHelper.LogV3 (plane2.normal));
-		print (unit.name + " sqr magnitude " + (plane1.normal - plane2.normal).sqrMagnitude + "   " +
-			" sqr magnitude2 " + (UnityHelper.GetOppositeV3(plane1.normal) - plane2.normal).sqrMagnitude);
+//		print ("plane1,plane2");
+//		print ( UnityHelper.LogV3 (plane1.normal) + "\n" +
+//			UnityHelper.LogV3 (plane2.normal));
+//		print (unit.name + " sqr magnitude " + (plane1.normal - plane2.normal).sqrMagnitude + "   " +
+//			" sqr magnitude2 " + (UnityHelper.GetOppositeV3(plane1.normal) - plane2.normal).sqrMagnitude);
+//		Transform iv = unit.GetIV ();
+//		Transform ivn1 = unit.GetIVNeighbour1 ();
+//		Transform ivn2 = unit.GetIVNeighbour2 ();
+//
+//		Plane plane1 = new Plane (iv.position, ivn1.position, ivn2.position);
+//		Plane plane2 = unit.targetP.GetPocketPlane ();
 
-
-		if (!UnityHelper.ApproxEqualPlane(plane1,plane2)
+		if (!UnityHelper.ApproxEqualPlane(plane1,plane2)//){
 			|| !UnityHelper.CorrectOverlap(unit)) { 
-			if ((plane1.normal - plane2.normal).sqrMagnitude < 0.08f ||
-				(UnityHelper.GetOppositeV3(plane1.normal) - plane2.normal).sqrMagnitude < 0.08f
+			if ((plane1.normal - plane2.normal).sqrMagnitude < 0.1f ||
+				(UnityHelper.GetOppositeV3(plane1.normal) - plane2.normal).sqrMagnitude < 0.1f
 				) {
 				unit.transform.RotateAround (unit.GetIV ().position, unit.GetIV().position - unit.targetP.pCenter.position, -0.2f * ROTATION_SPEED * Time.deltaTime);	
 			} else {

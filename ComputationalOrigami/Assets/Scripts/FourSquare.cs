@@ -215,24 +215,24 @@ public class FourSquare : MonoBehaviour {
 
 	/*
 	 * Set iv to a vertex on the outside of the unit (not in between vertices).
-	 * ASSUMPTION: a vertex with the least number of colliders is on the edge
 	 */
 	private void ChooseEdgeIV() {
-		List<Tuple<int,Transform>> vColliders = new List<Tuple<int,Transform>> ();
+		List<Tuple<float,Transform>> vertDistances = new List<Tuple<float,Transform>> ();
 		for (int i = 0; i < NUM_VERTICES; i++) {
-			Transform vertice = transform.Find ("V" + i);
-			Collider[] cols = Physics.OverlapSphere (vertice.position, FourSquare.PAPER_THICKNESS);
-			vColliders.Add (new Tuple<int,Transform> (cols.Length, vertice));
+			Transform vertex = transform.Find ("V" + i);
+			float distFromCenter = (vertex.localPosition - center.localPosition).sqrMagnitude;
+			print (vertex.name + " from center " + distFromCenter);
+			vertDistances.Add (new Tuple<float,Transform> (distFromCenter, vertex));
 		}
-		vColliders.Sort(delegate(Tuple<int, Transform> x, Tuple<int, Transform> y) {
-			if (x.first < y.first)
+		vertDistances.Sort(delegate(Tuple<float, Transform> x, Tuple<float, Transform> y) {
+			if (x.first > y.first)
 				return -1;
 			else if (x.first == y.first)
 				return 0;
 			else
 				return 1;
 		});
-		iv = vColliders [0].second;
+		iv = vertDistances [0].second;
 	}
 
     
@@ -363,8 +363,8 @@ public class FourSquare : MonoBehaviour {
 
 		foreach (var pocket in pockets) {
 			if (!pocket.filled) {
-				Debug.DrawLine (pocket.edge1.start.position, pocket.edge1.end.position, pocket.color);
-				Debug.DrawLine (pocket.edge2.start.position, pocket.edge2.end.position, pocket.color);
+				Debug.DrawLine (pocket.edge2.end.position, pocket.edge1.end.position, pocket.color);
+//				Debug.DrawLine (pocket.edge2.start.position, pocket.edge2.end.position, pocket.color);
 	//			Debug.DrawLine (pocket.edge2.start.position, pocket.edge2.start.position + pocket.GetVectorIn(), Color.blue);
 			}
 		}
