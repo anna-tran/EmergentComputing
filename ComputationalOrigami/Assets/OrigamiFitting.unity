@@ -372,11 +372,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   square: {fileID: 114599836767610734, guid: 791a7d69b0bd3497582c4d87305a173d, type: 2}
   initUnits: 1
-  unitsToGenerate: 1000
-  probCenterInsertion: 0.6
   probVertFold: 1
   probHorzFold: 1
-  probDiagRightFold: 0.5
+  probDiagRightFold: 1
   probDiagLeftFold: 0.5
 --- !u!1 &1239281987
 GameObject:

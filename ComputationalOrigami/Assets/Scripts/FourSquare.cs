@@ -5,12 +5,13 @@ using UnityEngine;
 
 public class FourSquare : MonoBehaviour {
     public static float PAPER_THICKNESS = 0.03f;
-    private static int NUM_VERTICES = 8;
+    public static int NUM_VERTICES = 8;
 
     // edges are at local positions, relative to the center
     public SortedList<EdgeType, List<TransformEdge>> edges { get; private set; }
     public List<Pocket> pockets { get; private set; }
     public Transform center { get; private set; }
+	public Color defaultColor { get; private set; }
 
     public Pocket targetP { get; set; }
     // iv   insertion vertex
@@ -26,6 +27,7 @@ public class FourSquare : MonoBehaviour {
 	// Use this for initialization
 	void Awake () {
 		center = transform.Find ("Center");
+		defaultColor = transform.Find ("Tri1-1").GetComponent<Renderer> ().material.color;
 		edges = new SortedList<EdgeType,List<TransformEdge>>();
 		pockets = new List<Pocket> ();
 		
@@ -39,7 +41,7 @@ public class FourSquare : MonoBehaviour {
 		numFolds = 0;
 		targetP = null;
 
-//		ChangeColor ();
+		ChangeColor ();
 		CollectChildBounds ();
 
 		// only uncomment for sandbox
@@ -49,8 +51,8 @@ public class FourSquare : MonoBehaviour {
 //		OrigamiFolder.FoldSquare (EdgeType.DIAG_LEFT, this);
 
 
-
-
+//		UnityHelper.RandomlyRotate (transform);
+//		print( transform.Find ("Tri1-1").GetComponent<MeshFilter> ().mesh.normals [0]);
 	}
 
 	public void ResetStage() {
@@ -63,6 +65,12 @@ public class FourSquare : MonoBehaviour {
 
 	public void ResetIV() {
 		iv = null;
+	}
+
+	public void ResetColor() {
+		foreach (Renderer rend in transform.GetComponentsInChildren<Renderer>()) {
+			rend.material.color = defaultColor;
+		}
 	}
 
     public void MoveToNextStage()

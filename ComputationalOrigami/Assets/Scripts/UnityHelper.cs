@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class UnityHelper : MonoBehaviour {
 	public static System.Random rand = new System.Random ();
-	public static float EDGE_POCKET_DISTANCE = 0.06f;
+	public static float EDGE_POCKET_DISTANCE = 0.08f;
 
 	public static bool CanFitPocket(FourSquare unit, Pocket p)
 	{
@@ -60,21 +60,21 @@ public class UnityHelper : MonoBehaviour {
 			return true;
 		case 3:
 		case 4:
-			Plane pl = new Plane (unit.GetIV ().position, unit.targetP.edge1.end.position, unit.targetP.edge2.end.position);
+			Plane pl = new Plane (unit.targetP.pCenter.position, unit.targetP.edge1.end.position, unit.targetP.edge2.end.position);
 			Transform targetParent = unit.targetP.pCenter.parent;
 			int numTargetPos = 0;
 			int numUnitPos = 0;
 			for (int i = 0; i < targetParent.childCount; i++) {
 				if (pl.GetSide (targetParent.GetChild (i).position)) {
 					numTargetPos++;
-					targetParent.GetChild (i).GetComponent<Renderer> ().material.color = Color.blue;
+//					targetParent.GetChild (i).GetComponent<Renderer> ().material.color = Color.blue;
 				}
 			}
 			Debug.Log (unit.name + "  numTargetPos: " + numTargetPos);
 			Color rand_color = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
 			for (int i = 0; i < unit.transform.childCount; i++) {
 				if (pl.GetSide (unit.transform.GetChild (i).position)) {
-					unit.transform.GetChild (i).GetComponent<Renderer> ().material.color = rand_color;
+//					unit.transform.GetChild (i).GetComponent<Renderer> ().material.color = rand_color;
 					numUnitPos++;
 				}
 			}
@@ -134,6 +134,22 @@ public class UnityHelper : MonoBehaviour {
 
     }
 
+	public static Plane GetPlaneInsideTri(FourSquare unit) {
+		Transform iv = unit.GetIV ();
+		Collider[] overlaps = Physics.OverlapSphere (iv.position, FourSquare.PAPER_THICKNESS / 2);
+		Transform overlappingTri = null;
+		foreach (Collider col in overlaps) {
+			if (col.name.Contains ("Tri"))
+				overlappingTri = col.transform;
+		}
+		Vector3 v1 = iv.position;
+		Vector3 v2 = overlappingTri.Find ("Core").position;
+		Vector3 v3 = overlappingTri.position;
+		return new Plane (v1, v2, v3);
+
+
+	}
+
     public static void RandomlyPosition(Transform orig, Transform zone) {
 		Vector3 zoneSize = zone.GetComponent<MeshRenderer> ().bounds.size;
 		float xRange = zoneSize.x;
@@ -187,12 +203,16 @@ public class UnityHelper : MonoBehaviour {
 		orig.position = vect;
 	}
 
-	public static bool V3Equal(Vector3 a, Vector3 b){
-		return Vector3.SqrMagnitude(a - b) < 0.000007f;
+	public static bool V3EqualMagn(Vector3 a, Vector3 b){
+		return Vector3.SqrMagnitude(a - b) < 0.0000075f;
 	}
 
-	public static bool V3ApproxEqual(Vector3 a, Vector3 b){
-		return Vector3.SqrMagnitude(a - b) < 0.00025f;
+	public static bool V3ApproxEqualMagn(Vector3 a, Vector3 b){
+		return Vector3.SqrMagnitude(a - b) < 0.00001f;
+	}
+
+	public static bool V3EqualFields(Vector3 a, Vector3 b) {
+		return V3WithinDec (a, b, 3);
 	}
 
 	public static Vector3 GetOppositeV3(Vector3 v) {
@@ -204,7 +224,7 @@ public class UnityHelper : MonoBehaviour {
 	}
 
 	public static bool V3AbsEqual(Vector3 a, Vector3 b) {
-		return (V3Equal (a, b) || V3Equal (GetOppositeV3 (a), b));
+		return (V3EqualMagn (a, b) || V3EqualMagn (GetOppositeV3 (a), b));
 	}
 
 	public static Vector3 acuteAngle(Vector3 a) {
@@ -233,6 +253,10 @@ public class UnityHelper : MonoBehaviour {
 		return Math.Abs(a - b) < 0.0001f;
 	}
 
+	public static bool CloseFloats(float a, float b) {
+		return Math.Abs (a - b) < 0.001f;
+	}
+
 	public static bool V3WithinDec(Vector3 source, Vector3 target, float dec) {
 		return 
 			FloatWithinDec (source.x, target.x, dec)
@@ -241,7 +265,7 @@ public class UnityHelper : MonoBehaviour {
 	}
 
 	public static bool FloatWithinDec(float a, float b, float dec) {
-		return Math.Abs(a - b) < Math.Pow (10, dec);
+		return Math.Abs(a - b) < Math.Pow (10, -dec);
 	}
 
 
@@ -273,6 +297,16 @@ public class UnityHelper : MonoBehaviour {
 		dir = Quaternion.Euler(angles) * dir; // rotate it
 		point = dir + pivot; // calculate rotated point
 		return point; // return it
+	}
+
+	public static void DebugLogV3(Vector3 v) {
+		string output = "(";
+		output += v.x + ",";
+		output += v.y + ",";
+		output += v.z + ",";
+		output += ")";
+		print (output);
+
 	}
 
 }
