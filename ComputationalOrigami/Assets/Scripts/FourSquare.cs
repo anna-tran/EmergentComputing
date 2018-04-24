@@ -215,13 +215,14 @@ public class FourSquare : MonoBehaviour {
 
 	/*
 	 * Set iv to a vertex on the outside of the unit (not in between vertices).
+	 * This vertex is assumed to be the furthest of all vertice from the center.
 	 */
 	private void ChooseEdgeIV() {
 		List<Tuple<float,Transform>> vertDistances = new List<Tuple<float,Transform>> ();
 		for (int i = 0; i < NUM_VERTICES; i++) {
 			Transform vertex = transform.Find ("V" + i);
 			float distFromCenter = (vertex.localPosition - center.localPosition).sqrMagnitude;
-			print (vertex.name + " from center " + distFromCenter);
+//			print (vertex.name + " from center " + distFromCenter);
 			vertDistances.Add (new Tuple<float,Transform> (distFromCenter, vertex));
 		}
 		vertDistances.Sort(delegate(Tuple<float, Transform> x, Tuple<float, Transform> y) {

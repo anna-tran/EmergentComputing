@@ -62,14 +62,14 @@ public class Pocket {
 		int numPos = 0;
 		int numNeg = 0;
 		foreach (Transform child in other.GetComponentsInChildren<Transform>()) {
-			if (child.tag.ToLower() == "vertice") {
+			if (child.name.Contains("Tri")) {
 				if (plane.GetSide (child.position))
 					numPos++;
 				else
 					numNeg++;
 			}
 		}
-		return numPos >= 4 && numNeg >= 4;
+		return numPos >= 2 && numNeg >= 2;
 
 		// intersection if anything crosses the line between the pocket end points
 

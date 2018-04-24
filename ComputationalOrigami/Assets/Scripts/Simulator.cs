@@ -18,7 +18,7 @@ public class Simulator : MonoBehaviour {
 	public float probHorzFold;
 	public float probDiagRightFold;
 	public float probDiagLeftFold;
-	private int unitsToGenerate = 1000;
+	private int unitsToGenerate = 1;
     private Transform zone;
     private Queue<Pocket> pockets;
     private List<Tuple<int,FourSquare>> activeUnits;
@@ -107,9 +107,12 @@ public class Simulator : MonoBehaviour {
 
 			} else if (unit.stage == 3) {
 				AlignRotationToTarget (tup, unit);
-
+				// add translation stage where unit is shifted over by the mid of the pocket
 			} else if (unit.stage == 4) {
 				InsertIntoPocket (tup, unit);
+
+			} else if (unit.stage == 5) {
+				ShiftToMatchTarget (tup, unit);
 			
 			}
 
@@ -276,19 +279,8 @@ public class Simulator : MonoBehaviour {
 		Plane plane2 = UnityHelper.GetPlaneOfVertex (target, unit.targetP.edge1.end);
 		Debug.DrawRay (unit.targetP.pCenter.position, plane1.normal, Color.red);
 		Debug.DrawRay (unit.targetP.pCenter.position, plane2.normal, Color.red);
-//		print ("plane1,plane2");
-//		print ( UnityHelper.LogV3 (plane1.normal) + "\n" +
-//			UnityHelper.LogV3 (plane2.normal));
-//		print (unit.name + " sqr magnitude " + (plane1.normal - plane2.normal).sqrMagnitude + "   " +
-//			" sqr magnitude2 " + (UnityHelper.GetOppositeV3(plane1.normal) - plane2.normal).sqrMagnitude);
-//		Transform iv = unit.GetIV ();
-//		Transform ivn1 = unit.GetIVNeighbour1 ();
-//		Transform ivn2 = unit.GetIVNeighbour2 ();
-//
-//		Plane plane1 = new Plane (iv.position, ivn1.position, ivn2.position);
-//		Plane plane2 = unit.targetP.GetPocketPlane ();
 
-		if (!UnityHelper.ApproxEqualPlane(plane1,plane2)//){
+		if (!UnityHelper.ApproxEqualPlane(plane1,plane2)
 			|| !UnityHelper.CorrectOverlap(unit)) { 
 			if ((plane1.normal - plane2.normal).sqrMagnitude < 0.1f ||
 				(UnityHelper.GetOppositeV3(plane1.normal) - plane2.normal).sqrMagnitude < 0.1f
@@ -296,7 +288,6 @@ public class Simulator : MonoBehaviour {
 				unit.transform.RotateAround (unit.GetIV ().position, unit.GetIV().position - unit.targetP.pCenter.position, -0.2f * ROTATION_SPEED * Time.deltaTime);	
 			} else {
 				unit.transform.RotateAround (unit.GetIV ().position, unit.GetIV().position - unit.targetP.pCenter.position, -ROTATION_SPEED * Time.deltaTime);
-//				print(unit.name + " cross plane " +  plane1.normal + "  " + plane2.normal);
 			}
 
 
@@ -305,6 +296,24 @@ public class Simulator : MonoBehaviour {
 			unit.MoveToNextStage ();
 			tup.first = 0;
 
+		}
+	}
+
+	private void ShiftToMatchTarget(Tuple<int,FourSquare> tup,FourSquare unit) {
+		Vector3 end1 = unit.targetP.edge1.end.localPosition - unit.targetP.pCenter.localPosition;
+		Vector3 end2 = unit.targetP.edge2.end.localPosition - unit.targetP.pCenter.localPosition;
+		float yDiff = (Math.Abs (end1.y) > Math.Abs (end2.y)) ? end1.y : end2.y;
+		Plane plane = unit.targetP.GetPocketPlane ();
+		Transform iv = unit.GetIV ();
+		Debug.DrawLine (unit.targetP.pCenter.position, unit.targetP.pCenter.position + plane.normal,Color.cyan);
+		print("distance " + plane.GetDistanceToPoint(iv.position));
+		if (Math.Abs(plane.GetDistanceToPoint(iv.position)) < 2*yDiff) {
+			Vector3 dir = plane.normal;
+			dir = (plane.GetSide(iv.position)) ? dir : UnityHelper.GetOppositeV3 (dir);
+			unit.transform.position = Vector3.MoveTowards (unit.transform.position, unit.transform.position + dir, INSERTION_SPEED/5 * Time.deltaTime);
+		} else {
+			unit.MoveToNextStage();
+			tup.first = 0;
 		}
 	}
 
