@@ -208,12 +208,12 @@ public class OrigamiFolder : MonoBehaviour{
 						float cg_y_val = cg.GetComponent<MeshRenderer> ().bounds.center.y - square.transform.position.y;
 						AssignHighest (ref height_folded_on, cfo_y_val);
 						AssignHighest (ref height_to_fold, cg_y_val);
-//						Debug.Log (et + "\n" + cg.name + " " + cg.Find ("Core").position + "\n" +
-//						cfo.name + " " + cfo.Find ("Core").position);
-//
-//					} else if (cfo.tag.ToLower () != "vertice") {
-//						Debug.Log (et + "\n" + cg.name + " " + cg.Find("Core").position + "\n" +
-//							cfo.name + " " + cfo.Find("Core").position);
+						Debug.Log (et + "\n" + cg.name + " " + cg.Find ("Core").position + "\n" +
+						cfo.name + " " + cfo.Find ("Core").position);
+
+					} else if (cfo.tag.ToLower () != "vertice") {
+						Debug.Log (et + "\n" + cg.name + " " + cg.Find("Core").position + "\n" +
+							cfo.name + " " + cfo.Find("Core").position);
 					}
 
 

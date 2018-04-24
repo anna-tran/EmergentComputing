@@ -7,6 +7,32 @@ public class UnityHelper : MonoBehaviour {
 	public static System.Random rand = new System.Random ();
 	public static float EDGE_POCKET_DISTANCE = 0.05f;
 
+	public static bool Encapsulates (Bounds b1, Bounds b2) {
+//		Vector3 maxB1 = b1.max;
+//		Vector3 minB1 = b1.min;
+//		Vector3 maxB2 = b2.max;
+//		Vector3 minB2 = b2.min;
+//		print (maxB1 + "\n" + maxB2 + "\n" + minB1 + "\n" + minB2);
+//		bool maxEncapsulates = 
+//			maxB2.x < maxB1.x &&
+//			maxB2.y < maxB1.y &&
+//			maxB2.z < maxB1.z;
+//		bool minEncapsulates = 
+//			minB2.x > minB1.x &&
+//			minB2.y > minB1.y &&
+//			minB2.z > minB1.z;
+//
+//		return maxEncapsulates && minEncapsulates;
+		Vector3 b1Extents = b1.center + b1.extents;
+		Vector3 b2Extents = b2.center + b2.extents;
+		print (b1Extents + "\n" + b2Extents);
+		return b1Extents.x > b2Extents.x
+		&& b1Extents.y > b2Extents.y
+		&& b1Extents.z > b2Extents.z;
+
+		
+	}
+
 	// source : https://stackoverflow.com/questions/273313/randomize-a-listt
 	public static void Shuffle<T>(ref List<T> list)  
 	{  
@@ -234,7 +260,7 @@ public class UnityHelper : MonoBehaviour {
 	}
 
 	public static bool V3EqualFields(Vector3 a, Vector3 b) {
-		return V3WithinDec (a, b, 3);
+		return V3WithinDec (a, b, -3);
 	}
 
 	public static Vector3 GetOppositeV3(Vector3 v) {
@@ -288,7 +314,7 @@ public class UnityHelper : MonoBehaviour {
 	}
 
 	public static bool FloatWithinDec(float a, float b, float dec) {
-		return Math.Abs(a - b) < Math.Pow (10, -dec);
+		return Math.Abs(a - b) < Math.Pow (10, dec);
 	}
 
 

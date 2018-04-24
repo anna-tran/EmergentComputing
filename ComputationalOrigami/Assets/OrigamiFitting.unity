@@ -372,9 +372,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   square: {fileID: 114599836767610734, guid: 791a7d69b0bd3497582c4d87305a173d, type: 2}
   initUnits: 1
-  probVertFold: 1
   probHorzFold: 1
-  probDiagRightFold: 0
+  probVertFold: 0.5
+  probDiagRightFold: 0.5
   probDiagLeftFold: 1
 --- !u!1 &1239281987
 GameObject:
@@ -427,7 +427,7 @@ MeshRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1520851266}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
