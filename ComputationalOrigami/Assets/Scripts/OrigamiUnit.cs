@@ -3,26 +3,26 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 
-public class FourSquare : MonoBehaviour {
+public class OrigamiUnit : MonoBehaviour {
     public static float PAPER_THICKNESS = 0.03f;
     public static int NUM_VERTICES = 8;
 
-    // edges are at local positions, relative to the center
-    public SortedList<EdgeType, List<TransformEdge>> edges { get; private set; }
-    public List<Pocket> pockets { get; private set; }
-    public Transform center { get; private set; }
-	public Color defaultColor { get; private set; }
+   
+	public SortedList<EdgeType, List<TransformEdge>> edges { get; private set; }	 	// edges are at local positions, relative to the center
+    public List<Pocket> pockets { get; private set; }									// pockets formed by unit's folds
+	public Transform center { get; private set; }										// center (vertex) of unit
+	public Color defaultColor { get; private set; }										// default color of unit
 
-    public Pocket targetP { get; set; }
+    public Pocket targetP { get; set; }						// target pocket to insert into
     // iv   insertion vertex
-	private Transform iv;
-	private Transform ivNeighbor1;
-	private Transform ivNeighbor2;
-    public bool rendMesh;
-    public int stage { get; private set; }
-    public Vector3 targetRotationV3 { get; private set; }
-    public Vector3 selfRotationV3 { get; private set; }
-	public int numFolds { get; private set; }
+	private Transform iv;									// insertion vertex (vertex at which the unit will be inserted into the pocket)
+	private Transform ivNeighbor1;							// neighbours are used to help calculate the self rotation vector
+	private Transform ivNeighbor2;							
+    public bool rendMesh;									// flag to render the unit's mesh or not
+    public int stage { get; private set; }					// stage of the unit
+    public Vector3 targetRotationV3 { get; private set; }	// vector to rotate around target pocket
+    public Vector3 selfRotationV3 { get; private set; }		// vector to rotate unit itself to face the pocket
+	public int numFolds { get; private set; }				// number of folds of the unit
 
 	// Use this for initialization
 	void Awake () {
@@ -44,15 +44,6 @@ public class FourSquare : MonoBehaviour {
 		ChangeColor ();
 		CollectChildBounds ();
 
-		// only uncomment for sandbox
-//		OrigamiFolder.FoldSquare (EdgeType.HORZ, this);
-//		OrigamiFolder.FoldSquare (EdgeType.VERT, this);
-//		OrigamiFolder.FoldSquare (EdgeType.DIAG_RIGHT, this);
-//		OrigamiFolder.FoldSquare (EdgeType.DIAG_LEFT, this);
-
-
-//		UnityHelper.RandomlyRotate (transform);
-//		print( transform.Find ("Tri1-1").GetComponent<MeshFilter> ().mesh.normals [0]);
 	}
 
 	public void ResetStage() {
@@ -119,7 +110,6 @@ public class FourSquare : MonoBehaviour {
 					// erase the pocket
 					toDiscard.Add (p);
 
-//					print ("Discarding pocket " + p.ToString());
                     // create 2 new pockets e-e1,e-e2
                     Pocket p1 = new Pocket(e, e1);
                     Pocket p2 = new Pocket(e, e2);
@@ -145,11 +135,6 @@ public class FourSquare : MonoBehaviour {
 
 
 		}
-//		string output = "";
-//		foreach (Pocket p in pockets) {
-//			output += p.ToString () + "\n";
-//		}
-//		print(output);
 		if (!edges.ContainsKey (et)) {
 			edges.Add (et, new List<TransformEdge> ());
 		}
@@ -222,7 +207,6 @@ public class FourSquare : MonoBehaviour {
 		for (int i = 0; i < NUM_VERTICES; i++) {
 			Transform vertex = transform.Find ("V" + i);
 			float distFromCenter = (vertex.localPosition - center.localPosition).sqrMagnitude;
-//			print (vertex.name + " from center " + distFromCenter);
 			vertDistances.Add (new Tuple<float,Transform> (distFromCenter, vertex));
 		}
 		vertDistances.Sort(delegate(Tuple<float, Transform> x, Tuple<float, Transform> y) {
@@ -264,7 +248,6 @@ public class FourSquare : MonoBehaviour {
 			}
 
 		}
-//		print (ivNeighbor1.name + "\n" + ivNeighbor2.name);
 
 		return iv;
 	}
@@ -365,13 +348,12 @@ public class FourSquare : MonoBehaviour {
 		foreach (var pocket in pockets) {
 			if (!pocket.filled) {
 				Debug.DrawLine (pocket.edge2.end.position, pocket.edge1.end.position, pocket.color);
-//				Debug.DrawLine (pocket.edge2.start.position, pocket.edge2.end.position, pocket.color);
-	//			Debug.DrawLine (pocket.edge2.start.position, pocket.edge2.start.position + pocket.GetVectorIn(), Color.blue);
 			}
 		}
-//		print ((transform.Find ("V0").localPosition - center.localPosition).y);
 
 
 	}
+
+
 
 }

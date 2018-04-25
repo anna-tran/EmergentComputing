@@ -28,7 +28,6 @@ public class Pocket {
         // 'start' of either edge is the center
         pCenter = edge1.start;
 		filled = false;
-//		RandEdgeColor ();
 		color = Color.red;
 	}
 
@@ -71,46 +70,23 @@ public class Pocket {
 			}
 		}
 		return numPos >= 3 && numNeg >= 3;
-
-		// intersection if anything crosses the line between the pocket end points
-
-//		Vector3 orig = edge1.end.position;
-//		Vector3 dir = edge2.end.position - edge1.end.position;
-//		float dist = Vector3.Distance (edge1.end.position, edge2.end.position);
-//		Debug.DrawRay (orig, dir,Color.yellow);
-//		RaycastHit[] hits = Physics.RaycastAll (orig, dir, dist);
-//		foreach (RaycastHit hit in hits) {
-//			if (!hit.collider.transform.parent.Equals (pCenter.transform.parent)) {
-//				return true;
-//			}
-//		}
-//		return false;
 	}
 
 	/*
 	 * Check if pocket is positioned in a way that another unit cannot fill it
 	 */
 	public bool InaccessibleDueTo(Transform other) {
-//		Bounds bOther = other.GetComponent<MeshFilter> ().mesh.bounds;
-//		Bounds b1 = edge1.end.GetComponent<MeshFilter> ().mesh.bounds;
-//		Bounds b2 = edge2.end.GetComponent<MeshFilter> ().mesh.bounds;
-		Collider[] end1Overlaps = Physics.OverlapSphere (edge1.end.position, FourSquare.PAPER_THICKNESS / 4);		
-		Collider[] end2Overlaps = Physics.OverlapSphere (edge2.end.position, FourSquare.PAPER_THICKNESS / 4);		
+		Collider[] end1Overlaps = Physics.OverlapSphere (edge1.end.position, OrigamiUnit.PAPER_THICKNESS / 4);		
+		Collider[] end2Overlaps = Physics.OverlapSphere (edge2.end.position, OrigamiUnit.PAPER_THICKNESS / 4);		
 		foreach (Collider col in end1Overlaps) {
-//			Debug.Log (pCenter.parent.name + " overlap1 " + col.transform.parent.name);
 			if (col.transform.parent.Equals (other) && col.transform.name.Contains("Tri"))
 				return true;
 		}
 		foreach (Collider col in end2Overlaps) {
-//			Debug.Log (pCenter.parent.name + " overlap2 " + col.transform.parent.name);
 			if (col.transform.parent.Equals (other) && col.transform.name.Contains("Tri"))
 				return true;
 		}
 		return false;
-//		if (UnityHelper.Encapsulates (bOther, b1) || UnityHelper.Encapsulates (bOther, b2)) {
-//			return true;
-//		}
-//		return false;
 	}
 
 	public override bool Equals(object obj)

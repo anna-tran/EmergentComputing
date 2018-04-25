@@ -8,29 +8,12 @@ public class UnityHelper : MonoBehaviour {
 	public static float EDGE_POCKET_DISTANCE = 0.05f;
 
 	public static bool Encapsulates (Bounds b1, Bounds b2) {
-//		Vector3 maxB1 = b1.max;
-//		Vector3 minB1 = b1.min;
-//		Vector3 maxB2 = b2.max;
-//		Vector3 minB2 = b2.min;
-//		print (maxB1 + "\n" + maxB2 + "\n" + minB1 + "\n" + minB2);
-//		bool maxEncapsulates = 
-//			maxB2.x < maxB1.x &&
-//			maxB2.y < maxB1.y &&
-//			maxB2.z < maxB1.z;
-//		bool minEncapsulates = 
-//			minB2.x > minB1.x &&
-//			minB2.y > minB1.y &&
-//			minB2.z > minB1.z;
-//
-//		return maxEncapsulates && minEncapsulates;
 		Vector3 b1Extents = b1.center + b1.extents;
 		Vector3 b2Extents = b2.center + b2.extents;
 		print (b1Extents + "\n" + b2Extents);
 		return b1Extents.x > b2Extents.x
 		&& b1Extents.y > b2Extents.y
 		&& b1Extents.z > b2Extents.z;
-
-		
 	}
 
 	// source : https://stackoverflow.com/questions/273313/randomize-a-listt
@@ -46,7 +29,7 @@ public class UnityHelper : MonoBehaviour {
 		}  
 	}
 
-	public static bool CanFitPocket(FourSquare unit, Pocket p)
+	public static bool CanFitPocket(OrigamiUnit unit, Pocket p)
 	{
 		Transform iv = unit.GetIV ();
 		Transform ivn1 = unit.GetIVNeighbour1 ();
@@ -58,7 +41,7 @@ public class UnityHelper : MonoBehaviour {
 		return angleU < angleP || ApproxSameFloat (angleP, angleU);
 	}
 
-	public static bool CorrectTargetPocket(FourSquare unit, Pocket p) {
+	public static bool CorrectTargetPocket(OrigamiUnit unit, Pocket p) {
 		// end1			end of pocket edge 1
 		// end2			end of pocket edge 2
 		// fartherEnd	the edge of the pocket that is farther away from the center
@@ -73,7 +56,6 @@ public class UnityHelper : MonoBehaviour {
 			end1 = p.edge1.end.localPosition - p.pCenter.localPosition;
 			end2 = p.edge2.end.localPosition - p.pCenter.localPosition;
 			fartherEnd = (Math.Abs (end1.y) > Math.Abs (end2.y)) ? end1 : end2;
-//			print (unit.name + " pocket distance " + fartherEnd.y);
 			return Math.Abs(fartherEnd.y) < EDGE_POCKET_DISTANCE;
 
 		case 3:
@@ -90,7 +72,7 @@ public class UnityHelper : MonoBehaviour {
 
 	}
 
-	public static bool CorrectOverlap(FourSquare unit) {
+	public static bool CorrectOverlap(OrigamiUnit unit) {
 		switch (unit.numFolds) {
 		case 0:
 		case 1:
@@ -100,7 +82,6 @@ public class UnityHelper : MonoBehaviour {
 		case 3:
 		case 4:
 			Plane pl = new Plane(unit.GetIV().position, unit.targetP.edge1.end.position, unit.targetP.edge2.end.position);
-				//new Plane (unit.targetP.pCenter.position, unit.targetP.edge1.end.position, unit.targetP.edge2.end.position);
 			Transform targetParent = unit.targetP.pCenter.parent;
 			int numPos = 0;
 			int numNeg = 0;
@@ -112,7 +93,6 @@ public class UnityHelper : MonoBehaviour {
 					numNeg++;
 				}
 			}
-//			Debug.Log (unit.name + "  numTargetPos: " + numTargetPos);
 			Color rand_color = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
 			for (int i = 0; i < unit.transform.childCount; i++) {
 				if (pl.GetSide (unit.transform.GetChild (i).position)) {
@@ -122,17 +102,6 @@ public class UnityHelper : MonoBehaviour {
 					numNeg++;
 				}
 			}
-//			Debug.Log (unit.name + "  numUnitPos: " + numUnitPos);
-
-//			float targetPosRatio = numTargetPos / (float)targetParent.childCount;
-//			float unitPosRatio = numUnitPos / (float)unit.transform.childCount;
-//			Debug.Log(unit.name + "  ratioTargetPos: " + targetPosRatio);
-//			Debug.Log(unit.name + "  ratioUnitPos: " + unitPosRatio);
-//			return (
-//			    (GreaterEqualFloat (targetPosRatio, 0.4f) && (unitPosRatio < 0.5f)) ||
-//			    (GreaterEqualFloat (unitPosRatio, 0.4f) && (targetPosRatio < 0.5f))
-//			);
-			Debug.Log("num pos " + numPos + "  num neg " + numNeg);
 			return (Math.Abs(numNeg-numPos) < unit.transform.childCount/2);
 		default:
 			return true;
@@ -150,7 +119,6 @@ public class UnityHelper : MonoBehaviour {
         float m2 = GetSlope(s2.x, s2.z, e2.x, e2.z);
 
         if (ApproxSameFloat(m1, m2)) {
-            //			print ("m1 " + m1 + "  m2 " + m2);
             return false;
         }
         float intx, intz;
@@ -182,14 +150,13 @@ public class UnityHelper : MonoBehaviour {
 
     }
 
-	public static Plane GetPlaneOfVertex(FourSquare unit, Transform vertex) {
-		Collider[] overlaps = Physics.OverlapSphere (vertex.position, FourSquare.PAPER_THICKNESS / 4);
+	public static Plane GetPlaneOfVertex(OrigamiUnit unit, Transform vertex) {
+		Collider[] overlaps = Physics.OverlapSphere (vertex.position, OrigamiUnit.PAPER_THICKNESS / 4);
 		Transform overlappingTri = null;
 		foreach (Collider col in overlaps) {
 			if (col.name.Contains ("Tri"))
 				overlappingTri = col.transform;
 		}
-//		print ("overlapping tri" + overlappingTri.name);
 		Vector3 v1 = vertex.position;
 		Vector3 v2 = overlappingTri.Find ("Core").position;
 		Vector3 v3 = overlappingTri.position;
