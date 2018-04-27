@@ -3,6 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * Performs folds on an OrigamiUnit in 4 different ways, in the order of: 
+ * 		Horizontal Fold
+ * 		Vertical Fold
+ * 		Right Diagonal Fold
+ * 		Left Diagonal Fold
+ */
 public class OrigamiFolder : MonoBehaviour{
 	// list of temporary parent objects to be cleaned up after performing a fold
 	List<GameObject> tempParents;

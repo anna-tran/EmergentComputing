@@ -3,6 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * Simulates origami units flying around and inserting themselves into the pockets of other units.
+ * Each unit is folded by an OrigamiFolder given user inputted probabilities of each fold upon initialization.
+ * The number of initial units is defaulted to 1 and the number of additional units to generate defaults to 100.
+ * All units can ony be instantiated within the bounds of a zone but can move outside of that zone.
+ */
 public class Simulator : MonoBehaviour {
 	private static float ROTATION_SPEED = 250;			// speed of unit rotation
 	private static float SLOW_ROTATION_SPEED = 30;		// slowed speed of unit rotation
@@ -17,12 +23,12 @@ public class Simulator : MonoBehaviour {
 	private OrigamiFolder folder;
 
 
-    public int initUnits;								// number of initial units to generate in game
 	public float probHorzFold;							// probability of doing a horizontal fold
 	public float probVertFold;							// probability of doing a vertical fold
 	public float probDiagRightFold;						// probability of doing a right diagonal fold
 	public float probDiagLeftFold;						// probability of doing a left diagonal fold
-	private int unitsToGenerate = 100;					// number of units to generate in simulation
+    private int initUnits;								// number of initial units to generate in game
+	private int unitsToGenerate;						// number of units to generate in simulation
     private Transform zone;								// boundary in which units are generated
     private Queue<Pocket> pockets;						// pockets not yet filled by any unit
     private List<Tuple<int,OrigamiUnit>> activeUnits;	// list of units currently trying to fill a pocket
@@ -41,6 +47,7 @@ public class Simulator : MonoBehaviour {
     {
         count = 0;
 		initUnits = 1;
+		unitsToGenerate = 100;
         pockets = new Queue<Pocket>();
 		activeUnits = new List<Tuple<int,OrigamiUnit>>();
 		zone = GameObject.Find ("Zone").transform;

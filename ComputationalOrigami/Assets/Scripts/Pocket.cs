@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * Models a pocket within an OrigamiUnit. A pocket is composed of two edges (TransformEdge in this case)
+ * with the start of each edge being the center of the pocket, which is also the center of the unit in which
+ * it was created.
+ */
 public class Pocket {
 
 	public TransformEdge edge1 { get; private set; }
@@ -12,6 +17,9 @@ public class Pocket {
 
 	public bool filled { get; set; }
 
+	/*
+	 * Calculate the angle of the pocket using the vectors created from each of the edges
+	 */
 	public static float CalculateAngle(TransformEdge e1, TransformEdge e2) {
 		float angle = Vector3.Angle(
 			e1.end.position - e1.start.position, 
@@ -31,31 +39,29 @@ public class Pocket {
 		color = Color.red;
 	}
 
-	void RandEdgeColor() {
-		color = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
-	}
-
-	public Vector3 GetCenterPosition() {
-		return pCenter.position;
-	}
-
+	/*
+	 * Get the vector that rests between both ends of the pocket.
+	 */
 	public Vector3 GetVectorIn() {
 		Vector3 v1 = edge1.end.position - edge1.start.position;
 		Vector3 v2 = edge2.end.position - edge2.start.position;
 		return v1 + v2;
 	}
 
-	public Vector3 GetVectorPerp() {
-		Vector3 vIn = GetVectorIn ();
-		return (vIn);
-	}
-
+	/*
+	 * Get the plane created by the center of the pocket and the two ends of the edges.
+	 */
 	public Plane GetPocketPlane() {
 		return new Plane (pCenter.position, edge1.end.position, edge2.end.position);
 	}
 
-	// intersection of a pocket only if there are at least 4 vertices on each side of
-	// the pocket line
+	/*
+	 * A pocket is overlapped by another object (namely an OrigamiUnit) only if there are 
+	 * at least 3 vertice on each side of the pocket.
+	 * 
+	 * This check is performed on all pockets of a unit for which one of its pockets is the
+	 * target pocket of another unit.
+	 */
 	public bool OverlappedBy(Transform other) {
 
 		Plane plane = GetPocketPlane ();
@@ -73,7 +79,9 @@ public class Pocket {
 	}
 
 	/*
-	 * Check if pocket is positioned in a way that another unit cannot fill it
+	 * Check if pocket (and the parent OrigamiUnit) is positioned in a way that another unit cannot fill it
+	 *
+	 * This check is performed on all pockets of a unit which has just inserted itself into its target pocket.
 	 */
 	public bool InaccessibleDueTo(Transform other) {
 		Collider[] end1Overlaps = Physics.OverlapSphere (edge1.end.position, OrigamiUnit.PAPER_THICKNESS / 4);		

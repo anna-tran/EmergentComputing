@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * Edge made of two Transform: one for the start point of the edge; one for the end point of the edge
+ */
 public class TransformEdge {
 
 	public Transform start { get; private set; }
@@ -15,8 +18,6 @@ public class TransformEdge {
 		end = v_end;
 		edge_type = e_t;
 	}
-
-
 
 
 	public override bool Equals(object obj)

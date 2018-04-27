@@ -3,6 +3,12 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 
+/*
+ * Class to model a modular origami unit.
+ * Its function is to find some target pocket to insert itself into.
+ * The choice of pocket and the corner (vertex) from which the unit will insert itself
+ * is dependent on the number of folds it has.
+ */
 public class OrigamiUnit : MonoBehaviour {
     public static float PAPER_THICKNESS = 0.03f;
     public static int NUM_VERTICES = 8;
@@ -24,7 +30,7 @@ public class OrigamiUnit : MonoBehaviour {
     public Vector3 selfRotationV3 { get; private set; }		// vector to rotate unit itself to face the pocket
 	public int numFolds { get; private set; }				// number of folds of the unit
 
-	// Use this for initialization
+	
 	void Awake () {
 		center = transform.Find ("Center");
 		defaultColor = transform.Find ("Tri1-1").GetComponent<Renderer> ().material.color;
@@ -41,38 +47,60 @@ public class OrigamiUnit : MonoBehaviour {
 		numFolds = 0;
 		targetP = null;
 
+		// set unique color to more easily distinguish from other units
 		ChangeColor ();
+		// the bounds of this unit encompasses all the bounds of its children
 		CollectChildBounds ();
 
 	}
 
+	/*
+	* Reset unit stage to 0.
+	*/
 	public void ResetStage() {
 		stage = 0;
 	}
 
+	/*
+	 * Reset the target pocket to null.
+	 */
 	public void ResetTargetPocket() {
 		targetP = null;
 	}
-
+	/*
+	 * Reset the insertion vertex to null.
+	 */
 	public void ResetIV() {
 		iv = null;
 	}
 
+	/*
+	 * Reset the color to the default color.
+	 */
 	public void ResetColor() {
 		foreach (Renderer rend in transform.GetComponentsInChildren<Renderer>()) {
 			rend.material.color = defaultColor;
 		}
 	}
 
+	/*
+	 * Move to the next stage.
+	 */
     public void MoveToNextStage()
     {
         stage++;
     }
 
+	/*
+	 * Must increment the fold count each time a new fold has been applied to the unit.
+	 */
 	public void AddFold() {
 		numFolds++;
 	}
 
+	/*
+	 * Collect the child bounds into the unit's own mesh bounds
+	*/
 	void CollectChildBounds() {
 		gameObject.AddComponent<MeshFilter> ();
 		Bounds bounds = transform.GetComponent<MeshFilter> ().mesh.bounds;
@@ -83,6 +111,9 @@ public class OrigamiUnit : MonoBehaviour {
 		transform.GetComponent<MeshFilter> ().mesh.bounds = bounds;
 	}
 
+	/*
+	 * Change the unit's color to a random color.
+	 */
 	void ChangeColor() {
 		Color rand_color = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
 		foreach (Renderer rend in transform.GetComponentsInChildren<Renderer>()) {
@@ -135,6 +166,7 @@ public class OrigamiUnit : MonoBehaviour {
 
 
 		}
+		
 		if (!edges.ContainsKey (et)) {
 			edges.Add (et, new List<TransformEdge> ());
 		}
@@ -142,6 +174,10 @@ public class OrigamiUnit : MonoBehaviour {
 
 	}
 
+	/*
+	 * Get the insertion vertex. If the vertex has not been initialized,
+	 * initialize it depending on the number of folds it has.
+	 */
 	public Transform GetIV() {
 		if (iv == null) {
 			switch (numFolds) {
@@ -165,6 +201,10 @@ public class OrigamiUnit : MonoBehaviour {
 		return iv;
 	}
 
+	/*
+	 * Get the first insertion vertex neighbour.
+	 * If it is null, initialize the insertion vertex before initializing the neigbours.
+	 */
 	public Transform GetIVNeighbour1() {
 		if (ivNeighbor1 == null) {
 			GetIV ();
@@ -173,6 +213,10 @@ public class OrigamiUnit : MonoBehaviour {
 		return ivNeighbor1;
 	}
 
+	/*
+	 * Get the second insertion vertex neighbour.
+	 * If it is null, initialize the insertion vertex before initializing the neigbours.
+	 */
 	public Transform GetIVNeighbour2() {
 		if (ivNeighbor2 == null) {
 			GetIV ();
@@ -221,37 +265,6 @@ public class OrigamiUnit : MonoBehaviour {
 	}
 
     
-
-	// vertices are labelled 'Vx' where x in range 1-8
-	public Transform ChooseInsertionVertice(float probCenterInsertion) {
-		int lowerBound = 0;
-		int higherBound = 0;
-		if (UnityHelper.ApproxSameFloat (probCenterInsertion, 1)) {
-			lowerBound = -1;
-		} else {
-			int centerChoice = (int) ( (NUM_VERTICES * probCenterInsertion) / (1 - probCenterInsertion));
-			lowerBound = -centerChoice;
-			higherBound = NUM_VERTICES;
-		}
-
-		while (iv == null) {
-			int vNum = (int) (UnityEngine.Random.Range(lowerBound,higherBound));
-			// -1 means center
-			if (vNum < 0 && pockets.Count > 0) {
-				iv = center;
-				Pocket p = pockets [0];
-				ivNeighbor1 = p.edge1.end;
-				ivNeighbor2 = p.edge2.end;
-			} else if (vNum >= 0) {
-				iv = transform.Find("V" + vNum);
-				GetIVNeighbours ();
-			}
-
-		}
-
-		return iv;
-	}
-		
 	/*
 	 * Get neighbouring vertices for the insertion vertex, in order to determine
 	 * if the unit can fit into the pocket using this vertex and for finding the alignment
@@ -296,6 +309,9 @@ public class OrigamiUnit : MonoBehaviour {
 		}
 	}
 
+	/*
+	 * Get the directional vector of where the insertion vertex is currently facing.
+	 */
 	public Vector3 GetAlignmentV3() {
 		Vector3 v1 = ivNeighbor1.position - iv.position;
 		Vector3 v2 = ivNeighbor2.position - iv.position;
@@ -307,8 +323,9 @@ public class OrigamiUnit : MonoBehaviour {
 	}
 
 
-
-
+	/*
+	 * Calculate the vector to rotate around so that the unit will face the target pocket's center.
+	 */
     public void CalcSelfRotationV3()
     {
         Vector3 pointToTarget = targetP.pCenter.position - iv.position;
@@ -316,6 +333,9 @@ public class OrigamiUnit : MonoBehaviour {
         selfRotationV3 = Vector3.Cross(pointToTarget, pointToCenter);
     }
 
+	/*
+	 * Calculate the vector to rotate around the target pocket.
+	 */
     public void CalcTargetRotationV3()
     {
 		// perpendicular vector to rotate around
@@ -325,7 +345,9 @@ public class OrigamiUnit : MonoBehaviour {
 
     }
 
-
+	/*
+		Disable the unit so that Update() no longer runs.
+	 */
 	public void Disable() {
 		enabled = false;
 
@@ -333,7 +355,6 @@ public class OrigamiUnit : MonoBehaviour {
 
 
 
-    // Update is called once per frame
     void Update () {
 		if (rendMesh) {
 			foreach (MeshRenderer mr in transform.GetComponentsInChildren<MeshRenderer>()) {
@@ -344,7 +365,7 @@ public class OrigamiUnit : MonoBehaviour {
 				mr.enabled = false;
 			}
 		}
-
+		// Draw a line between the ends of the pockets if they are not yet filled
 		foreach (var pocket in pockets) {
 			if (!pocket.filled) {
 				Debug.DrawLine (pocket.edge2.end.position, pocket.edge1.end.position, pocket.color);

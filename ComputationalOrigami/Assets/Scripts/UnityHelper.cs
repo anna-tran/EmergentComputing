@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * Class containing general helper methods.
+ */
 public class UnityHelper : MonoBehaviour {
 	public static System.Random rand = new System.Random ();
 	public static float EDGE_POCKET_DISTANCE = 0.05f;
