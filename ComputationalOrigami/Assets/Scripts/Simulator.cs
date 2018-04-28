@@ -352,7 +352,7 @@ public class Simulator : MonoBehaviour {
 		Vector3 end1 = unit.targetP.edge1.end.localPosition - unit.targetP.pCenter.localPosition;
 		Vector3 end2 = unit.targetP.edge2.end.localPosition - unit.targetP.pCenter.localPosition;
 		float yDiff = (Math.Abs (end1.y) > Math.Abs (end2.y)) ? end1.y : end2.y;
-		yDiff = (yDiff < UnityHelper.EDGE_POCKET_DISTANCE) ? yDiff : 1.5f * yDiff;
+		yDiff = (yDiff < Pocket.EDGE_POCKET_DISTANCE) ? yDiff : 1.5f * yDiff;
 		Plane plane = unit.targetP.GetPocketPlane ();
 		Transform iv = unit.GetIV ();
 

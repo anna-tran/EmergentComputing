@@ -7,7 +7,8 @@ but could be modified if desired.
 ## Running the Program 
 
 1. Install Unity 3D 2017.3.1 or a later version.
-2. Import the assets in this .zip file into a new project.
-3. Select the 'Simulator' GameObject on the Hierarchy panel on the left-hand side.
-4. Input the probabilities of each fold, from 0.0 to 1.0.
-5. Press the play button to view the simulation.
+2. Create a new Unity 3D project and import the ModularOrigamiAssets.unitypackage into the project.
+3. Open the OrigamiFitting scene in the Assets folder.
+4. Select the 'Simulator' GameObject on the Hierarchy panel on the left-hand side.
+5. Input the probabilities of each fold, from 0.0 to 1.0.
+6. Press the play button to view the simulation.

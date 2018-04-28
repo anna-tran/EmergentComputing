@@ -93,7 +93,7 @@ public class OrigamiFolder : MonoBehaviour{
 
 		AddPaperThickness (ref  heightToFold, ref  heightFoldedOn, OrigamiUnit.PAPER_THICKNESS);
 		foreach (Transform t in new List<Transform>{unit.center, lowBound, highBound}) {
-			UnityHelper.SetV3Value (t, "y", ( heightToFold +  heightFoldedOn) / 2.0f);
+			UnityHelper.SetPositionValue (t, "y", ( heightToFold +  heightFoldedOn) / 2.0f);
 		}
 
 		// insert an edge from the center to the upper/lower bound only if the bounding vertice was not the center

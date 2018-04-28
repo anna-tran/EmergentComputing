@@ -8,6 +8,7 @@ using UnityEngine;
  * it was created.
  */
 public class Pocket {
+	public static float EDGE_POCKET_DISTANCE = 0.05f;	
 
 	public TransformEdge edge1 { get; private set; }
 	public TransformEdge edge2 { get; private set; }
